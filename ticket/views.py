@@ -2,10 +2,11 @@ from datetime import datetime
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect ,get_object_or_404
 from django.contrib.auth import  logout
-from django.contrib.auth.models import User,Group ,Permission
 from django.contrib import messages
-from django.db import transaction
 import requests
+from django.core.paginator import Paginator
+
+
 
 #Inicio de sesion con la API externa
 def inicio(request):
@@ -31,10 +32,12 @@ def inicio(request):
                 
                 
                 token = json_data.get('token')
+                user_email = json_data.get('email')
                 print (token)
                 if token:
                     
                     request.session['api_token'] = token
+                    request.session['email'] = user_email
                     
                     messages.success(request, '¡Inicio de sesión exitoso!')
                     
@@ -249,35 +252,65 @@ def menu(request: HttpRequest):
     
 
 def seleccion(request):
-    if 'api_token' not in  request.session:
-        messages.warning(request,"Debe iniciar sesión para ver esta información.")
-        return redirect (inicio)
-    
-    url_api = "http://comedor.mercal.gob.ve/api/p1/empleados"
-    empleados = []
+    if 'api_token' not in request.session:
+        messages.warning(request, "Debe iniciar sesión para ver esta información.")
+        return redirect(inicio)
+
     token = request.session.get('api_token')
     headers = {
         'Authorization': f'Bearer {token}'
     }
+
+    # 1. Obtener gerencia seleccionada desde el formulario
+    gerencia_seleccionada = request.GET.get('gerencia', '')
+
+    # 2. Consultar empleados filtrados por gerencia
+    url_empleados = "http://comedor.mercal.gob.ve/api/p1/empleados"
+    params = {'gerencia': gerencia_seleccionada} if gerencia_seleccionada else {}
+
+    empleados = []
     try:
-        response = requests.get(url_api, headers=headers, timeout=10)
+        response = requests.get(url_empleados, headers=headers, params=params, timeout=10)
         response.raise_for_status()
         json_data = response.json()
-
-        # 1. Acceder al primer 'data' y luego al segundo 'data'
         data_principal = json_data.get('data', {})
         empleados = data_principal.get('data', [])
-
     except requests.exceptions.RequestException as req_err:
-        messages.error(request, f"Ocurrió un error inesperado: {req_err}")
+        messages.error(request, f"Ocurrió un error al obtener empleados: {req_err}")
 
-    return render(request, 'paginas/seleccion.html', {'empleados': empleados})
+    # 3. Paginación
+    paginator = Paginator(empleados, 5)
+    page_number = request.GET.get('page')
+    number_page = paginator.get_page(page_number)
+
+    # 4. Consultar lista de gerencias desde API externa
+    url_gerencias = "http://comedor.mercal.gob.ve/api/p1/gerencias"
+    gerencias = []
+    try:
+        response_gerencias = requests.get(url_gerencias, headers=headers, timeout=10)
+        response_gerencias.raise_for_status()
+        json_gerencias = response_gerencias.json()
+        gerencias = json_gerencias.get('data', [])
+        print(gerencias)
+        
+    except requests.exceptions.RequestException as req_err:
+        messages.warning(request, f"No se pudo cargar la lista de gerencias: {req_err}")
+
+    return render(request, 'paginas/seleccion.html', {
+        'number_page': number_page,
+        'gerencias': gerencias,
+        'gerencia_seleccionada': gerencia_seleccionada
+    })
 
 def resumen(request):
     return render(request, 'paginas/resumen.html')
 
 def ticket(request):
     return render(request, 'paginas/ticket.html')
+
+
+
+
 
 def empleados(request):
     if 'api_token' not in request.session:
@@ -298,12 +331,17 @@ def empleados(request):
 
         # 1. Acceder al primer 'data' y luego al segundo 'data'
         data_principal = json_data.get('data', {})
+        
         empleados = data_principal.get('data', [])
+        
+        paginator = Paginator(empleados,10)
+        page_number= request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
 
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error inesperado: {req_err}")
 
-    return render(request, 'paginas/empleados.html', {'empleados': empleados})
+    return render(request, 'paginas/empleados.html', {'page_obj': page_obj})
 
 
 #logout de la aplicacion

@@ -2,79 +2,45 @@
 {% load static %}
 
 {% block content %}
-  <main class="max-w-6xl mx-auto p-6">
-    <h1 class="text-2xl md:text-3xl font-bold text-center mb-8 select-none dark:text-white">Empleados</h1>
-      <div class="flex flex-col md:flex-row">
-            <div class="w-64 flex-1">
-                <select name="" id="" class="border border-blue-600 rounded-md px-3 py-2 mb-4">
-                    <option value="">Seleccione una Gerencia</option>
-                    <option value="">Tecnologia</option>
-                    <option value="">Comercio</option>
-                    <option value="">Gestion Humana</option>
-                    <option value="">Administracion</option>
-                </select>
-            </div>
-            <div class="w-70 flex-2">
-                <input type="text" class="border border-blue-600 rounded-md px-3 py-2 mb-4" placeholder="Buscar Referencias">
-            </div>
-        </div>  
-    
-          <div class="bg-white rounded-lg shadow-lg overflow-hidden dark:bg-gray-800">
-             
-                <div class="hidden md:grid md:grid-cols-6 bg-gray-100 px-6 py-4 text-sm font-medium text-gray-700 uppercase tracking-wider dark:bg-gray-800">
-                    <div class="dark:text-white">Nombre</div>
-                    <div class="dark:text-white">Cedula</div>
-                    <div class="dark:text-white">Estado</div>
-                    <div class="dark:text-white">Gerencia</div>
-                    
-                    <div class="dark:text-white">Opcion</div>
-                </div>
-             <div class="border-0 flex flex-col gap-2 p-2 rounded-md"> 
-               {% for empleado in empleados %}
-                 <div class="outline outline-blue-100  dark:outline dark:outline-gray-100 rounded-md">
-                   <div class="md:grid md:grid-cols-6 md:gap-4 px-6 py-4 card-hover">
-                    
-                        <div class="flex justify-between md:block mb-2 md:mb-0">
-                            <span class="md:hidden text-sm text-gray-600">Nombre:</span>
-                            <span class="font-semibold text-green-600">{{ empleado.nombre_completo }}</span>
-                        </div>
-
-                        <div class="flex justify-between md:block mb-2 md:mb-0">
-                            <span class="md:hidden text-sm text-gray-600">Cedula:</span>
-                            <span class="font-medium">{{ empleado.cedula }}</span>
-                        </div>
-
-                        <div class="flex justify-between md:block mb-2 md:mb-0">
-                            <span class="md:hidden text-sm text-gray-600">Estado:</span>
-                            <span class="font-medium">{{ empleado.estado }}</span>
-                        </div>
-
-                        <div class="flex justify-between md:block mb-2 md:mb-0">
-                            <span class="md:hidden text-sm text-gray-600">Gerencia:</span>
-                            <span class="font-medium">{{ empleado.gerencia.nombre_gerencia }}</span>
-                        </div>
-
-
-                        <div class="flex justify-between md:block mb-2 md:mb-0">
-                            <span class="md:hidden text-sm text-gray-600">Opcion</span>
-                            <span class="font-medium"><button type="submit" class="bg-red-600 dark:bg-red-800 text-white border-red px-2 py-1 rounded-lg">Eliminar</button></span>
-                        </div>
-                    
-                    </div>
-                
-              
+   <h2 class="dark:text-white text-3xl text-center pt-4">Empleados</h2>
+ <div class="container mx-auto px-4">
           
-                </div>
-                {% empty %}
-                    <div class="flex justify-between md:block mb-2 md:mb-0">
-                            <h2 class="dark:text-red-400 text-center ">No hay empleados</h2>
-                        </div>
+    <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md ">
+        <table class="responsive-table w-full">
+            <thead class="bg-gray-100 dark:bg-dark-200">
+                <tr>
+                    <th class="py-3 px-4 text-center dark:text-white">Nombre completo</th>
+                    <th class="py-3 px-4 text-center dark:text-white">Cedula</th>
+                    <th class="py-3 px-4 text-center dark:text-white">Gerencia</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in page_obj %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="py-3 px-4 dark:text-white" data-label="Nombre">{{ m.nombre_completo}}</td>
+                    <td class="py-3 px-4 dark:text-white" data-label="Email">{{ m.cedula }}</td>
+                    <td class="py-3 px-4 dark:text-white" data-label="Último Acceso">{{ m.gerencia.nombre_gerencia }}</td>
+                  
+                </tr>
+ 
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="flex items-center justify-center space-x-4 p-4">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300">Anterior</a>
+            {% endif %}
 
-             {% endfor %}
-            </div>
+            <span class="text-gray-700 font-medium">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="bg-blue-500 hover:bg-blue-700 dark:text-white font-bold py-2 px-4 rounded transition duration-300">Siguiente</a>
+            {% endif %}
         </div>
-    
-   
-  </main>
+                
+    </div>
+
 
 {% endblock %}

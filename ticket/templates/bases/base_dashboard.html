@@ -91,7 +91,13 @@
                         <img src="https://placehold.co/40" alt="Foto de perfil del usuario masculino con traje y fondo azul claro" class="rounded-full">
                         <div class="ml-3">
                             <div class="menu-text text-sm font-medium text-gray-800 dark:text-white">Juan Pérez</div>
-                            <div class="menu-text text-xs text-gray-800 dark:text-white">Administrador</div>
+                                 {% if request.session.user_email %}
+                                     <div class="menu-text text-xs text-gray-800 dark:text-white">{{ request.session.user_email }}</div>
+                                {% else %}
+                                    Correo no disponible
+                                {% endif %}
+                               
+                            
                         </div>
                     </div>
                 </div>

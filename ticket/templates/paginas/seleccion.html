@@ -3,20 +3,32 @@
 {% block content %}
 
 <div class="max-w-6xl mx-auto p-2">
+
+     
    
-  <div class="flex flex-row md:flex-row items-center">
-        <div class="flex-1">
-            <select name="" id="" class="border rounded-md py-1 px-3">
-                <option value="">Gerencias</option>
-            </select>
-        </div>
-        <div class="flex-1">
-            <h2 class="dark:text-white text-center">Gestión de pedidos</h2>
-        </div>
-        <div class="flex-1">
-            <input class="border rounded-md py-1 px-3" type="text" placeholder="Buscar persona">
-        </div>
+    <div class="flex flex-wrap items-center gap-2 py-6">
+            <form method="get">
+                <div class="basis-1/4 min-w-[150px]">
+                    <select name="gerencia" onchange="this.form.submit()" class="border rounded-md py-2 px-3 w-full">
+                        <option value="">-- Todas las Gerencias --</option>
+                        {% for g in gerencias %}
+                        <option value="{{ g.id_gerencia }}" {% if g.nombre_gerencia == gerencia_seleccionada %}selected{% endif %}>
+                            {{ g.nombre_gerencia }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>    
+            <div class="flex-1 min-w-[200px]">
+                <input class="border rounded-md py-1 px-3 w-md" type="text" id="buscador" placeholder="Buscar persona">
+            </div>
+            <div class="basis-1/4 min-w-[150px]">
+                <button class="bg-green-600 dark:bg-green-800 dark:text-white px-3 py-1 rounded-md w-full">
+                Registrar Invitado
+                </button>
+            </div>
     </div>
+
   
     <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md">
         <table class="responsive-table w-full">
@@ -30,8 +42,8 @@
                 </tr>
             </thead>
             <tbody>
-                {% for empleado in empleados %}
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                {% for empleado in number_page %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700" ">
                     <td class="py-3 px-1 dark:text-white text-center" data-label="Nombre">{{ empleado.nombre_completo }}</td>
                     <td class="py-3  dark:text-white" data-label="Almuerzo Bs">
                         <input type="checkbox" name="" id="item1" value="144">
@@ -39,7 +51,7 @@
                     <td class="py-3 px-1 dark:text-white" data-label="Para llevar Bs">
                        <input type="checkbox" name="" id="item2" value="10">
                     </td>
-                    <td class="py-3 px-1 dark:text-white" data-label="Cubiertos Bs">
+                    <td class="py-3 px-1 dark:text-white " data-label="Cubiertos Bs">
                          <input type="checkbox" name="" id="item3" value="5">
                     </td>
                   
@@ -52,6 +64,19 @@
                 {% endfor %}
             </tbody>
         </table>
+         <div class="flex items-center justify-center space-x-4 p-4">
+            {% if number_page.has_previous %}
+                <a href="?page={{ number_page.previous_page_number }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300">Anterior</a>
+            {% endif %}
+
+            <span class="text-gray-700 font-medium">
+                Página {{ number_page.number }} de {{ number_page.paginator.num_pages }}
+            </span>
+
+            {% if number_page.has_next %}
+                <a href="?page={{ number_page.next_page_number }}" class="bg-blue-500 hover:bg-blue-700 dark:text-white font-bold py-2 px-4 rounded transition duration-300">Siguiente</a>
+            {% endif %}
+        </div>
     </div>
 
     <div class="flex justify-center mt-6">
