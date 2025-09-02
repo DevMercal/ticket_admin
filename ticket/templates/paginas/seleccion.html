@@ -20,7 +20,7 @@
                 </div>
             </form>    
             <div class="flex-1 min-w-[200px]">
-                <input class="border rounded-md py-1 px-3 w-md" type="text" id="buscador" placeholder="Buscar persona">
+                <input class="border rounded-md py-1 px-3 w-md" type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar persona">
             </div>
             <div class="basis-1/4 min-w-[150px]">
                 <button class="bg-green-600 dark:bg-green-800 dark:text-white px-3 py-1 rounded-md w-full">
@@ -28,7 +28,6 @@
                 </button>
             </div>
     </div>
-
   
     <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md">
         <table class="responsive-table w-full">
@@ -41,7 +40,7 @@
                     <th class="py-3 px-4 text-center dark:text-white">total a pagar</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="dataTable">
                 {% for empleado in number_page %}
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700" ">
                     <td class="py-3 px-1 dark:text-white text-center" data-label="Nombre">{{ empleado.nombre_completo }}</td>

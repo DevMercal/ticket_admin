@@ -291,7 +291,7 @@ def seleccion(request):
         response_gerencias.raise_for_status()
         json_gerencias = response_gerencias.json()
         gerencias = json_gerencias.get('data', [])
-        print(gerencias)
+        
         
     except requests.exceptions.RequestException as req_err:
         messages.warning(request, f"No se pudo cargar la lista de gerencias: {req_err}")
