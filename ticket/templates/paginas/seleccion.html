@@ -22,6 +22,15 @@
             <div class="flex-1 min-w-[200px]">
                 <input class="border rounded-md py-1 px-3 w-md" type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar persona">
             </div>
+            <div class="flex-1">
+                
+                <select id="itemsPerPageSelect" class="p-2  rounded-md dark:bg-white dark:text-black">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
             <div class="basis-1/4 min-w-[150px]">
                 <button class="bg-green-600 dark:bg-green-800 dark:text-white px-3 py-1 rounded-md w-full">
                 Registrar Invitado
@@ -30,7 +39,7 @@
     </div>
   
     <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md">
-        <table class="responsive-table w-full">
+        <table class="responsive-table w-full"  id="dataTable">
             <thead class="bg-gray-100 dark:bg-dark-200">
                 <tr>
                     <th class="py-3 px-4 text-center dark:text-white">Nombre y Apellido</th>
@@ -40,44 +49,15 @@
                     <th class="py-3 px-4 text-center dark:text-white">total a pagar</th>
                 </tr>
             </thead>
-            <tbody id="dataTable">
-                {% for empleado in number_page %}
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700" ">
-                    <td class="py-3 px-1 dark:text-white text-center" data-label="Nombre">{{ empleado.nombre_completo }}</td>
-                    <td class="py-3  dark:text-white" data-label="Almuerzo Bs">
-                        <input type="checkbox" name="" id="item1" value="144">
-                    </td>
-                    <td class="py-3 px-1 dark:text-white" data-label="Para llevar Bs">
-                       <input type="checkbox" name="" id="item2" value="10">
-                    </td>
-                    <td class="py-3 px-1 dark:text-white " data-label="Cubiertos Bs">
-                         <input type="checkbox" name="" id="item3" value="5">
-                    </td>
-                  
-                    <td class="py-3 px-1 dark:text-green-500 text-center" data-label="total a pagar">
-                        <span id="total">0</span>
-                    </td>
-                    
-                </tr>
- 
-                {% endfor %}
+            <tbody id="dataBody">
+                
             </tbody>
         </table>
-         <div class="flex items-center justify-center space-x-4 p-4">
-            {% if number_page.has_previous %}
-                <a href="?page={{ number_page.previous_page_number }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300">Anterior</a>
-            {% endif %}
+       <div class="flex justify-between mt-4 m-2" id="pagination-controls">
 
-            <span class="text-gray-700 font-medium">
-                Página {{ number_page.number }} de {{ number_page.paginator.num_pages }}
-            </span>
-
-            {% if number_page.has_next %}
-                <a href="?page={{ number_page.next_page_number }}" class="bg-blue-500 hover:bg-blue-700 dark:text-white font-bold py-2 px-4 rounded transition duration-300">Siguiente</a>
-            {% endif %}
-        </div>
+       </div>
     </div>
-
+    {{ empleados | json_script:"empleados-data" }}
     <div class="flex justify-center mt-6">
         <button class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">
             Resumen y Pago

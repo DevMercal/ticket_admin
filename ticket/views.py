@@ -29,15 +29,17 @@ def inicio(request):
            
             if response.status_code == 200:
                 json_data = response.json()
-                
+                empleados = json_data.get('data', [])
                 
                 token = json_data.get('token')
-                user_email = json_data.get('email')
-                print (token)
+                name = empleados.get('name')
+                email = empleados.get('email')
+                
                 if token:
                     
                     request.session['api_token'] = token
-                    request.session['email'] = user_email
+                    request.session['name'] = name
+                    request.session['email'] = email
                     
                     messages.success(request, '¡Inicio de sesión exitoso!')
                     
@@ -57,6 +59,7 @@ def inicio(request):
   
 
 def index(request):
+    
     return render(request, 'paginas/index.html')
 
 
@@ -278,10 +281,6 @@ def seleccion(request):
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error al obtener empleados: {req_err}")
 
-    # 3. Paginación
-    paginator = Paginator(empleados, 5)
-    page_number = request.GET.get('page')
-    number_page = paginator.get_page(page_number)
 
     # 4. Consultar lista de gerencias desde API externa
     url_gerencias = "http://comedor.mercal.gob.ve/api/p1/gerencias"
@@ -297,10 +296,9 @@ def seleccion(request):
         messages.warning(request, f"No se pudo cargar la lista de gerencias: {req_err}")
 
     return render(request, 'paginas/seleccion.html', {
-        'number_page': number_page,
         'gerencias': gerencias,
-        'gerencia_seleccionada': gerencia_seleccionada
-    })
+        'gerencia_seleccionada': gerencia_seleccionada,
+        'empleados': empleados    })
 
 def resumen(request):
     return render(request, 'paginas/resumen.html')
