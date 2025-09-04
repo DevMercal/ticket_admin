@@ -1,0 +1,50 @@
+<div class="modal fade" id="invitado" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content p-6">
+            <div class="modal-header border-b-0 pb-0">
+                <h5 class="modal-title text-xl font-bold text-center w-full" id="staticBackdropLabel">Agregar Invitado</h5>
+                <button type="button" class="btn-close absolute top-3 right-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form>
+                    <div class="mb-4">
+                        <input type="text" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Nombre">
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Apellido">
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Gerencia">
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Oficina">
+                    </div>
+                    <div class="flex justify-between items-center mb-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600">
+                            <span class="ml-2">Almuerzo</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600">
+                            <span class="ml-2">Para llevar</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-600">
+                            <span class="ml-2">Cubiertos</span>
+                        </label>
+                    </div>
+                    <div class="mb-4">
+                        <label for="personaAutorizada" class="block font-semibold mb-2">Persona Autorizada</label>
+                        <select id="personaAutorizada" class="w-full p-2 border border-gray-300 rounded-md">
+                            <option>Seleccione...</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer flex gap-4 border-t-0 pt-0 justify-center">
+                <button type="button" class="btn btn-secondary bg-gray-400 text-white font-semibold rounded-md py-2 px-6 w-auto flex-auto hover:bg-gray-500 transition-colors" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary bg-blue-500 text-white font-semibold rounded-md py-2 px-6 w-auto flex-auto hover:bg-blue-600 transition-colors">Agregar</button>
+            </div>
+        </div>
+    </div>
+</div>
