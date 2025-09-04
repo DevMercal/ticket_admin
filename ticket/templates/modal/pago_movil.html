@@ -1,0 +1,57 @@
+<div class="modal fade" id="movil" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content dark:bg-gray-800 p-6">
+            <div class="modal-header border-b-0 pb-0">
+                <h5 class="modal-title dark:text-white text-xl font-bold text-center w-full" id="staticBackdropLabel">Total a pagar: <span class="text-green-500">Bs. 0.00</span></h5>
+                <button type="button" class="btn-close absolute top-3 right-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+                
+                <div class="grid grid-cols-2 gap-y-4 text-blue-800 dark:text-blue-300 font-semibold mb-6">
+                    <span class="text-left">Número de Teléfono:</span>
+                    <div class="flex items-center justify-end">
+                        <span>0414-2418171</span>
+                        <button class="ml-2" onclick="navigator.clipboard.writeText('0414-2418171')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <span class="text-left">Banco:</span>
+                    <div class="flex items-center justify-end">
+                        <span>0108 - Provincial</span>
+                        <button class="ml-2" onclick="navigator.clipboard.writeText('0108')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <span class="text-left">Cédula:</span>
+                    <div class="flex items-center justify-end">
+                        <span>V-19.254.775</span>
+                        <button class="ml-2" onclick="navigator.clipboard.writeText('V-19254775')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                                <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-center mb-4">
+                    <label for="referencia" class="text-blue-800 dark:text-blue-300 font-semibold mb-2 block">Número de referencia:</label>
+                    <input type="text" id="referencia" class="w-full p-2 border border-gray-300 rounded-md text-center" placeholder="Ingrese número de referencia">
+                </div>
+                
+            </div>
+            <div class="modal-footer flex gap-4 border-t-0 pt-0 justify-center">
+                <button type="button" class="btn btn-secondary bg-gray-400 text-white font-semibold rounded-md py-2 px-6 w-auto flex-auto hover:bg-gray-500 transition-colors" data-bs-dismiss="modal">Cerrar</button>
+                <button type="submit" class="btn btn-primary bg-green-500 text-white font-semibold rounded-md py-2 px-6 w-auto flex-auto hover:bg-green-600 transition-colors">Generar Tickets</button>
+            </div>
+        </div>
+    </div>
+</div>

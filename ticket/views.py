@@ -263,14 +263,9 @@ def seleccion(request):
     headers = {
         'Authorization': f'Bearer {token}'
     }
-
-    # 1. Obtener gerencia seleccionada desde el formulario
     gerencia_seleccionada = request.GET.get('gerencia', '')
-
-    # 2. Consultar empleados filtrados por gerencia
     url_empleados = "http://comedor.mercal.gob.ve/api/p1/empleados"
     params = {'gerencia': gerencia_seleccionada} if gerencia_seleccionada else {}
-
     empleados = []
     try:
         response = requests.get(url_empleados, headers=headers, params=params, timeout=10)
@@ -280,21 +275,15 @@ def seleccion(request):
         empleados = data_principal.get('data', [])
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error al obtener empleados: {req_err}")
-
-
-    # 4. Consultar lista de gerencias desde API externa
     url_gerencias = "http://comedor.mercal.gob.ve/api/p1/gerencias"
     gerencias = []
     try:
         response_gerencias = requests.get(url_gerencias, headers=headers, timeout=10)
         response_gerencias.raise_for_status()
         json_gerencias = response_gerencias.json()
-        gerencias = json_gerencias.get('data', [])
-        
-        
+        gerencias = json_gerencias.get('data', [])   
     except requests.exceptions.RequestException as req_err:
         messages.warning(request, f"No se pudo cargar la lista de gerencias: {req_err}")
-
     return render(request, 'paginas/seleccion.html', {
         'gerencias': gerencias,
         'gerencia_seleccionada': gerencia_seleccionada,
@@ -332,14 +321,11 @@ def empleados(request):
         
         empleados = data_principal.get('data', [])
         
-        paginator = Paginator(empleados,10)
-        page_number= request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
-
+        
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error inesperado: {req_err}")
 
-    return render(request, 'paginas/empleados.html', {'page_obj': page_obj})
+    return render(request, 'paginas/empleados.html' , {'empleados': empleados} )
 
 
 #logout de la aplicacion

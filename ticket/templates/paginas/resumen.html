@@ -32,57 +32,31 @@
 
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
 
-        <!-- Pago Móvil -->
-        <div class="bg-blue-200 rounded-lg p-4 flex flex-col items-center hover:shadow-lg transition-shadow cursor-pointer select-none dark:bg-blue-600">
-          <h4 class="font-semibold mb-3">Pago Móvil</h4>
-          <img 
-            src="{% static 'img/pago.png' %}" 
-            alt="Mano sosteniendo un teléfono móvil mostrando una aplicación de pago móvil con botones y texto en pantalla, diseño limpio y moderno" 
-            class="w-32 h-32 object-contain rounded-md shadow-sm "
-            onerror="this.onerror=null; this.src='https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/bac3f199-89d9-4b2b-bf8d-8987da3f478e.png';"
-          />
+        <div class="bg-blue-200 dark:bg-blue-600 rounded-lg p-4 flex flex-col items-center cursor-pointer select-none transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500" data-bs-toggle="modal" data-bs-target="#movil">
+         <span>Pago Movil</span>
+          <img src="{% static 'img/pago.png' %}" alt="Pago Movil" class="w-16 h-16 mt-2">
         </div>
-
-        <!-- Transferencia -->
-        <div class="bg-blue-200 rounded-lg p-4 flex flex-col items-center hover:shadow-lg transition-shadow cursor-pointer select-none dark:bg-blue-600">
-          <h4 class="font-semibold mb-3">Transferencia</h4>
-          <img 
-            src="{% static 'img/banesco.jpg' %}" 
-            alt="Logotipos de bancos venezolanos como BBVA, Banesco, Mercantil y Banco de Venezuela agrupados sobre fondo azul claro en un estilo corporativo ordenado" 
-            class="w-32 h-32 object-contain rounded-md shadow-sm"
-            onerror="this.onerror=null; this.src='https://placehold.co/150x150?text=No+image';"
-          />
+         <div class="bg-blue-200  dark:bg-blue-600  rounded-lg p-4 flex flex-col items-center cursor-pointer select-none transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500" data-bs-toggle="modal" data-bs-target="#transf">
+         <span>Pago Movil</span>
+          <img src="{% static 'img/banesco.jpg' %}" alt="Pago Movil" class="w-16 h-16 mt-2">
         </div>
-
-        <!-- Débito -->
-        <div class="bg-blue-200 rounded-lg p-4 flex flex-col items-center hover:shadow-lg transition-shadow cursor-pointer select-none dark:bg-blue-600">
-          <h4 class="font-semibold mb-3">Débito</h4>
-          <img 
-            src="{% static 'img/tarjeta.png' %}" 
-            alt="Tarjeta de débito azul moderna con números en relieve, chip y detalles destacados, fondo suave de color azul celeste" 
-            class="w-32 h-32 object-contain rounded-md shadow-sm"
-            onerror="this.onerror=null; this.src='https://placehold.co/150x150?text=No+image';"
-          />
+         <div class="bg-blue-200 dark:bg-blue-600  rounded-lg p-4 flex flex-col items-center cursor-pointer select-none transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500" data-bs-toggle="modal" data-bs-target="#debito">
+         <span>Pago Movil</span>
+          <img src="{% static 'img/tarjeta.png' %}" alt="Pago Movil" class="w-16 h-16 mt-2">
         </div>
-
-        <!-- Efectivo -->
-        <div class="bg-blue-200 rounded-lg p-4 flex flex-col items-center hover:shadow-lg transition-shadow cursor-pointer select-none dark:bg-blue-600">
-          <h4 class="font-semibold mb-3">Efectivo</h4>
-          <img 
-            src="{% static 'img/efectivo.png' %}" 
-            alt="Billetes de bolívar venezolano de distintos valores organizados en abanico, con colores vivos y texturas visibles, fondo azul claro" 
-            class="w-32 h-32 object-contain rounded-md shadow-sm"
-            onerror="this.onerror=null; this.src='https://placehold.co/150x150?text=No+image';"
-          />
+         <div class="bg-blue-200 dark:bg-blue-600 rounded-lg p-4 flex flex-col items-center cursor-pointer select-none transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500" data-bs-toggle="modal" data-bs-target="#efectivo">
+         <span>Pago Movil</span>
+          <img src="{% static 'img/efectivo.png' %}" alt="Pago Movil" class="w-16 h-16 mt-2">
         </div>
-
-      </div>
       
     </section>
+    
   </main>
 
-
-
+ {% include 'modal/pago_movil.html' %}
+ {% include 'modal/transf.html' %}
+ {% include 'modal/debito.html' %}
+ {% include 'modal/efectivo.html' %}
 
 
 {% endblock %}

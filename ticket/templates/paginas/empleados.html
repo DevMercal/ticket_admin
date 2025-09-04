@@ -2,11 +2,26 @@
 {% load static %}
 
 {% block content %}
-   <h2 class="dark:text-white text-3xl text-center pt-4">Empleados</h2>
+   
  <div class="container mx-auto px-4">
-          
+     <div class="flex flex-wrap items-center gap-2 py-6">
+           
+            <div class="flex min-w-[200px]">
+                <input class="border rounded-md py-1 px-3 w-md" type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar persona">
+            </div>
+            <div class="flex">
+                
+                <select id="itemsPerPageSelect" class="p-2  rounded-md dark:bg-white dark:text-black">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+           
+    </div>      
     <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md ">
-        <table class="responsive-table w-full">
+        <table class="responsive-table w-full"  id="dataTable">
             <thead class="bg-gray-100 dark:bg-dark-200">
                 <tr>
                     <th class="py-3 px-4 text-center dark:text-white">Nombre completo</th>
@@ -14,33 +29,17 @@
                     <th class="py-3 px-4 text-center dark:text-white">Gerencia</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for m in page_obj %}
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td class="py-3 px-4 dark:text-white" data-label="Nombre">{{ m.nombre_completo}}</td>
-                    <td class="py-3 px-4 dark:text-white" data-label="Email">{{ m.cedula }}</td>
-                    <td class="py-3 px-4 dark:text-white" data-label="Último Acceso">{{ m.gerencia.nombre_gerencia }}</td>
-                  
-                </tr>
- 
-                {% endfor %}
+            <tbody id="dataBo">
+                
             </tbody>
         </table>
-        <div class="flex items-center justify-center space-x-4 p-4">
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300">Anterior</a>
-            {% endif %}
+       
+                <div class="flex justify-between mt-4 m-2" id="pagination-controls">
 
-            <span class="text-gray-700 font-medium">
-                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-            </span>
-
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" class="bg-blue-500 hover:bg-blue-700 dark:text-white font-bold py-2 px-4 rounded transition duration-300">Siguiente</a>
-            {% endif %}
-        </div>
-                
+                </div> 
     </div>
+    {{ empleados | json_script:"empleados-data" }}
 
+    <script src="{% static 'js/empleados.js' %}"></script>
 
 {% endblock %}
