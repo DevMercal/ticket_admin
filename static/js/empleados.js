@@ -25,9 +25,9 @@ function renderTable() {
         employeesToShow.forEach(empleado => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="py-3 px-1 dark:text-white text-center" data-label="Nombre">${ empleado.nombre_completo }</td>
+                <td class="py-3 px-1 dark:text-white text-center" data-label="Nombre">${ empleado.last_name }</td>
                 <td class="py-3 px-1 dark:text-white text-center" data-label="Cédula">${ empleado.cedula }</td>
-                <td class="py-3 px-1 dark:text-white text-center" data-label="Gerencia">${ empleado.gerencia.nombre_gerencia }</td>
+                <td class="py-3 px-1 dark:text-white text-center" data-label="Gerencia">${ empleado.gerecia.management_name }</td>
                 <td class="py-3 px-1 dark:text-white text-center" data-label="Acciones">
             `;
             tbody.appendChild(tr);

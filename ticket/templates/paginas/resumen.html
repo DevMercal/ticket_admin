@@ -15,14 +15,20 @@
         <table class="min-w-full bg-blue-600 text-white text-sm md:text-base rounded-md dark:bg-blue-200">
           <thead>
             <tr>
-              <th class="py-3 px-4 font-semibold text-left dark:text-black">Empleado</th>
-              <th class="py-3 px-4 font-semibold text-left dark:text-black">Almuerzo</th>
-              <th class="py-3 px-4 font-semibold text-left dark:text-black">Para Llevar</th>
-              <th class="py-3 px-4 font-semibold text-left dark:text-black">Cubiertos</th>
-              <th class="py-3 px-4 font-semibold text-left dark:text-black">Autorizado</th>
-              <th class="py-3 px-4 font-semibold text-left rounded-tr-md dark:text-black">Evento Especial</th>
+              <th class="py-3 px-4 font-semibold text-center dark:text-black">Empleado</th>
+              <th class="py-3 px-4 font-semibold text-center dark:text-black">Almuerzo</th>
+              <th class="py-3 px-4 font-semibold text-center dark:text-black">Para Llevar</th>
+              <th class="py-3 px-4 font-semibold text-center dark:text-black">Cubiertos</th>
             </tr>
           </thead>
+          <tbody>
+       <tbody class="bg-white divide-y divide-gray-200 dark:bg-dark-100 dark:divide-dark-200">
+                <th class="text-black   dark:text-white">manuel</th>
+                <th class="text-black   dark:text-white">Si</th>
+                <th class="text-black   dark:text-white">No</th>
+                <th class="text-black   dark:text-white">Si</th>
+                <th class="text-black   dark:text-white">0.00</th>
+               </tbody>
         </table>
       </div>
     </section>
@@ -37,15 +43,15 @@
           <img src="{% static 'img/pago.png' %}" alt="Pago Movil" class="w-16 h-16 mt-2">
         </div>
          <div class="bg-blue-200  dark:bg-blue-600  rounded-lg p-4 flex flex-col items-center cursor-pointer select-none transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500" data-bs-toggle="modal" data-bs-target="#transf">
-         <span>Pago Movil</span>
+         <span>Transferencias</span>
           <img src="{% static 'img/banesco.jpg' %}" alt="Pago Movil" class="w-16 h-16 mt-2">
         </div>
          <div class="bg-blue-200 dark:bg-blue-600  rounded-lg p-4 flex flex-col items-center cursor-pointer select-none transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500" data-bs-toggle="modal" data-bs-target="#debito">
-         <span>Pago Movil</span>
+         <span>Debito</span>
           <img src="{% static 'img/tarjeta.png' %}" alt="Pago Movil" class="w-16 h-16 mt-2">
         </div>
          <div class="bg-blue-200 dark:bg-blue-600 rounded-lg p-4 flex flex-col items-center cursor-pointer select-none transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500" data-bs-toggle="modal" data-bs-target="#efectivo">
-         <span>Pago Movil</span>
+         <span>efectivo</span>
           <img src="{% static 'img/efectivo.png' %}" alt="Pago Movil" class="w-16 h-16 mt-2">
         </div>
       

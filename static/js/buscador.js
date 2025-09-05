@@ -25,7 +25,7 @@ function renderTable() {
         employeesToShow.forEach(empleado => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="py-3 px-1 dark:text-white text-center" data-label="Nombre">${ empleado.nombre_completo }</td>
+                <td class="py-3 px-1 dark:text-white text-center" data-label="Nombre">${ empleado.last_name }</td>
                 <td class="py-3  dark:text-white" data-label="Almuerzo Bs">
                     <input type="checkbox" name="" value="144">
                 </td>

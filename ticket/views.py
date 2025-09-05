@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 
 
 
-#Inicio de sesion con la API externa
+
 def inicio(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -59,7 +59,6 @@ def inicio(request):
   
 
 def index(request):
-    
     return render(request, 'paginas/index.html')
 
 
@@ -87,15 +86,10 @@ def usu(request: HttpRequest):
         
         # 4. Procesamos la respuesta JSON si todo fue bien
         json_data = response.json()
+        print (json_data)
         usuarios = json_data.get('data', [])
-        
-    except requests.exceptions.HTTPError as http_err:
-        if http_err.response.status_code == 401:
-            messages.error(request, "Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.")
-            return redirect('login')
-        else:
-            messages.error(request, f"Error HTTP: {http_err} - No se pudo obtener la información de los usuarios.")
-            
+        print(usuarios)
+   
     except requests.exceptions.ConnectionError as conn_err:
         messages.error(request, f"Error de conexión: {conn_err} - No se pudo conectar con la API.")
             
@@ -204,7 +198,7 @@ def registro(request):
 
 
 
-def menu(request: HttpRequest):
+def menu(request):
     if 'api_token' not in request.session:
         messages.warning(request, "Debe iniciar sesión para ver esta información.")
         return redirect('inicio') 
@@ -222,31 +216,11 @@ def menu(request: HttpRequest):
         response.raise_for_status()
         
         json_data = response.json()
+       
+
         
-        # === Lógica de corrección ===
-        # Si la respuesta es una lista, la asignamos directamente
-        if isinstance(json_data, list):
-            menus = json_data
-        # Si es un diccionario y tiene la clave 'data', la extraemos
-        elif isinstance(json_data, dict) and 'data' in json_data:
-            menus = json_data.get('data', [])
-        else:
-            # Si el formato no es el esperado, mostramos un error
-            messages.error(request, "El formato de la respuesta de la API para menús no es el esperado.")
-        
-    except requests.exceptions.HTTPError as http_err:
-        if http_err.response.status_code == 401:
-            messages.error(request, "Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.")
-            return redirect('login')
-        else:
-            messages.error(request, f"Error HTTP: {http_err} - No se pudo obtener la información de los menús.")
-            
-    except requests.exceptions.ConnectionError as conn_err:
-        messages.error(request, f"Error de conexión: {conn_err} - No se pudo conectar con la API.")
-            
-    except requests.exceptions.Timeout as timeout_err:
-        messages.error(request, f"Error de tiempo de espera: {timeout_err} - La solicitud tardó demasiado en responder.")
-            
+        menus = json_data.get('menus', [])
+       
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error inesperado: {req_err}")
 
@@ -266,13 +240,14 @@ def seleccion(request):
     gerencia_seleccionada = request.GET.get('gerencia', '')
     url_empleados = "http://comedor.mercal.gob.ve/api/p1/empleados"
     params = {'gerencia': gerencia_seleccionada} if gerencia_seleccionada else {}
-    empleados = []
+    employees = []
     try:
         response = requests.get(url_empleados, headers=headers, params=params, timeout=10)
         response.raise_for_status()
         json_data = response.json()
-        data_principal = json_data.get('data', {})
-        empleados = data_principal.get('data', [])
+       
+        employees = json_data.get('employees', [])
+       
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error al obtener empleados: {req_err}")
     url_gerencias = "http://comedor.mercal.gob.ve/api/p1/gerencias"
@@ -281,13 +256,17 @@ def seleccion(request):
         response_gerencias = requests.get(url_gerencias, headers=headers, timeout=10)
         response_gerencias.raise_for_status()
         json_gerencias = response_gerencias.json()
-        gerencias = json_gerencias.get('data', [])   
+        gerencias = json_gerencias.get('gerencias', [])   
     except requests.exceptions.RequestException as req_err:
         messages.warning(request, f"No se pudo cargar la lista de gerencias: {req_err}")
     return render(request, 'paginas/seleccion.html', {
         'gerencias': gerencias,
         'gerencia_seleccionada': gerencia_seleccionada,
-        'empleados': empleados    })
+        'employees': employees    })
+
+
+
+
 
 def resumen(request):
     return render(request, 'paginas/resumen.html')
@@ -317,15 +296,15 @@ def empleados(request):
         json_data = response.json()
 
         # 1. Acceder al primer 'data' y luego al segundo 'data'
-        data_principal = json_data.get('data', {})
+        data_principal = json_data.get('employees', [])
         
-        empleados = data_principal.get('data', [])
+        print(data_principal)
         
         
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error inesperado: {req_err}")
 
-    return render(request, 'paginas/empleados.html' , {'empleados': empleados} )
+    return render(request, 'paginas/empleados.html' , {'data_principal': data_principal} )
 
 
 #logout de la aplicacion

@@ -10,64 +10,32 @@
     {% include 'modal/menu.html' %}
     <div class="bg-white dark:bg-gray-800 pt-6 rounded-lg shadow-md">
         
-            <h1 class="text-xl text-blue-600 font-bold mb-2 dark:text-blue-800 text-center">
-                Menu de Hoy: <strong class="text-dark-600 dark:text-white">{{ fecha|date:"d-m-Y" }}</strong>
-            </h1>
+        <h1 class="text-xl text-blue-600 font-bold mb-2 dark:text-blue-800 text-center">
+            Menu de Hoy: <strong class="text-dark-600 dark:text-white">{{ menus.0.date_menu|date:"d-m-Y" }}</strong>
+        </h1>
         
 
         <div class="flex items-center flex-col md:flex-row py-10">
 
-           <div class="w-full md:w-1/2 px-4 py-10 md:py-0 h-96">
-                <img src="{% static 'img/comedor.jpg' %}" alt=""
+            <div class="w-full md:w-1/2 px-4 py-10 md:py-0 h-96">
+                <img src="{% static 'img/comedor.jpg' %}" alt="Imagen del comedor"
                     class="w-full h-full object-cover rounded-lg border-4 border-sky-500 dark:border-white">
             </div>
           
-          
-          
             <div class="w-full md:w-1/2 px-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg shadow-md">
-                        <h3 class="text-blue-600 dark:text-blue-400 font-bold text-lg mb-2">Sopa</h3>
-                        <p class="text-gray-800 dark:text-gray-200">{{sopa}}</p>
-                    </div>
-
-                    <div class="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg shadow-md">
-                        <h3 class="text-blue-600 dark:text-blue-400 font-bold text-lg mb-2">Proteinas</h3>
-                        <ul class="list-disc list-inside text-gray-800 dark:text-gray-200">
-                            <li>{{contour_one}}</li>
-                            <li>{{contour_two}}</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg shadow-md">
-                        <h3 class="text-blue-600 dark:text-blue-400 font-bold text-lg mb-2">Contornos</h3>
-                        <ul class="list-disc list-inside text-gray-800 dark:text-gray-200">
-                            <li>{{salad_one}}</li>
-                            <li>{{salad_two}}</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg shadow-md">
-                        <h3 class="text-blue-600 dark:text-blue-400 font-bold text-lg mb-2">Ensaladas</h3>
-                        <ul class="list-disc list-inside text-gray-800 dark:text-gray-200">
-                            <li>Ensalada de Berro</li>
-                            <li>Ensalada de Papa</li>
-                        </ul>
-                    </div>
-
-                    <div class="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg shadow-md">
-                        <h3 class="text-blue-600 dark:text-blue-400 font-bold text-lg mb-2">Jugo</h3>
-                        <p class="text-gray-800 dark:text-gray-200">Flor de Jamaica</p>
-                    </div>
-
-                    <div class="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg shadow-md">
-                        <h3 class="text-blue-600 dark:text-blue-400 font-bold text-lg mb-2">Postre</h3>
-                        <p class="text-gray-800 dark:text-gray-200">Torta de Chocolate</p>
-                    </div>
+                    {% if menus %}
+                        {% for item in menus %}
+                        <div class="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg shadow-md">
+                            <h3 class="text-blue-600 dark:text-blue-400 font-bold text-lg mb-2">{{ item.food_category }}</h3>
+                            <p class="text-gray-800 dark:text-gray-200">{{ item.name_ingredient }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-gray-800 dark:text-gray-200 col-span-2 text-center">No hay menú disponible para hoy.</p>
+                    {% endif %}
                 </div>
             </div>
-            
-          
         </div>
     </div>
 </div>
