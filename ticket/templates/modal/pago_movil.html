@@ -41,10 +41,21 @@
                         </button>
                     </div>
                 </div>
-
-                <div class="text-center mb-4">
+   <form action="ticket" method="post">    
+         {% csrf_token %}
+             
+                        {% for i in contexto %}
+                   {% if i.lunch == "Si" %}
+                   <input type="text" name="employees" value="{{ i.employees }}">
+                   <input type="text" name="lunch" value="{{ i.lunch }}">
+                   <input type="text" name="to_go" value="{{ i.to_go }}">
+                   <input type="text" name="covered" value="{{ i.covered }}">
+                    
+                    {% endif %}
+            {% endfor %}
+    <div class="text-center mb-4">
                     <label for="referencia" class="text-blue-800 dark:text-blue-300 font-semibold mb-2 block">Número de referencia:</label>
-                    <input type="text" id="referencia" class="w-full p-2 border border-gray-300 rounded-md text-center" placeholder="Ingrese número de referencia">
+                    <input type="text" id="referencia" class="w-full p-2 border border-gray-300 rounded-md text-center" placeholder="Ingrese número de referencia" required>
                 </div>
                 
             </div>
@@ -52,6 +63,7 @@
                 <button type="button" class="btn btn-secondary bg-gray-400 text-white font-semibold rounded-md py-2 px-6 w-auto flex-auto hover:bg-gray-500 transition-colors" data-bs-dismiss="modal">Cerrar</button>
                 <button type="submit" class="btn btn-primary bg-green-500 text-white font-semibold rounded-md py-2 px-6 w-auto flex-auto hover:bg-green-600 transition-colors">Generar Tickets</button>
             </div>
+</form>
         </div>
     </div>
 </div>

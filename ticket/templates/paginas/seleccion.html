@@ -40,7 +40,8 @@
                  {% include 'modal/invitado.html' %}
             </div>
     </div>
-  
+   <form action="resumen" method="post">
+                {% csrf_token %}
     <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md">
         <table class="responsive-table w-full"  id="dataTable">
             <thead class="bg-gray-100 dark:bg-dark-200">
@@ -53,19 +54,36 @@
                 </tr>
             </thead>
             <tbody id="dataBody">
-              
+               {% for em in employees %}
+                <tr>
+                    <td class="py-3 px-4 text-center dark:text-white">{{ em.first_name }}</td>
+                    <input type="hidden" name="employees_{{ forloop.counter }}" value="{{ em.first_name }}">
+                    <td class="py-3 px-4 text-center dark:text-white">
+                        <input type="checkbox" name="lunch_{{ forloop.counter }}" value="Si">
+                    </td>
+                    <td class="py-3 px-4 text-center dark:text-white">
+                        <input type="checkbox" name="to_go_{{ forloop.counter }}" value="Si">
+                    </td>
+                    <td class="py-3 px-4 text-center dark:text-white">
+                        <input type="checkbox" name="covered_{{ forloop.counter }}" value="Si">
+                    </td>
+                    <td class="py-3 px-4 text-center dark:text-white">0.00</td>
+                </tr>
+                {% endfor %}
+                <input type="hidden" name="total_employees" value="{{ employees|length }}">
+
             </tbody>
         </table>
        <div class="flex justify-between mt-4 m-2" id="pagination-controls">
 
        </div>
     </div>
-    {{ employees | json_script:"empleados-data" }}
     <div class="flex justify-center mt-6">
-        <button class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">
+        <button type="submit" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">
             Resumen y Pago
         </button>
     </div>
+    </form>
 </div>
-<script src="{% static 'js/buscador.js' %}"></script>
+
 {% endblock %}

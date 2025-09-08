@@ -1,12 +1,13 @@
 from datetime import datetime
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import render, redirect ,get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth import  logout
 from django.contrib import messages
 import requests
 from django.core.paginator import Paginator
-
-
+import qrcode
+from io import BytesIO
+import base64
 
 
 def inicio(request):
@@ -267,14 +268,86 @@ def seleccion(request):
 
 
 
-
+    
 def resumen(request):
-    return render(request, 'paginas/resumen.html')
+    if request.method == 'POST':
+        total = int(request.POST.get('total_employees', 0))
+        resumen_empleados = []
+        print (resumen_empleados)
+
+        for i in range(1, total + 1):
+            employees = request.POST.get(f'employees_{i}')
+            if not employees:
+                continue  # omitir si empleado no llega
+            
+            lunch = request.POST.get(f'lunch_{i}', 'No')
+            to_go = request.POST.get(f'to_go_{i}', 'No')
+            covered = request.POST.get(f'covered_{i}', 'No')
+
+            # Llenamos la lista con dict para cada empleado y su selección
+            resumen_empleados.append({
+                'employees': employees,
+                'lunch': lunch,
+                'to_go': to_go,
+                'covered': covered,
+            })
+            
+            request.session['resumen_empleados'] = resumen_empleados
+
+        contexto = {
+            'contexto': resumen_empleados  # pasa la lista con datos relacionados
+        }
+
+        return render(request, 'paginas/resumen.html', contexto)
+    return redirect('seleccion')
+
+
+def registration_order():
+    pass
+
+
 
 def ticket(request):
-    return render(request, 'paginas/ticket.html')
+    # Ensure the request method is POST to process the form data.
+    if request.method == 'POST':
+        # Get all submitted values for each field as a list.
+        employee_names = request.POST.getlist('employees')
+        lunch_options = request.POST.getlist('lunch')
+        to_go_options = request.POST.getlist('to_go')
+        covered_options = request.POST.getlist('covered')
+        
+        encoded_qrs = []
 
+        # Zip the lists together to process each employee's data as a single item.
+        for i in range(len(employee_names)):
+            try:
+                # Build the information string for the QR code.
+                info = (
+                    f"Empleado: {employee_names[i]}\n"
+                    f"Almuerzo: {lunch_options[i]}\n"
+                    f"Para Llevar: {to_go_options[i]}\n"
+                    f"Cubiertos: {covered_options[i]}"
+                )
+                
+                # Generate the QR code as an in-memory image.
+                qr_img = qrcode.make(info)
+                buffer = BytesIO()
+                qr_img.save(buffer, format='PNG')
+                
+                # Encode the image data to a base64 string for embedding in HTML.
+                encoded_img_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                encoded_qrs.append(encoded_img_data)
 
+            except IndexError:
+                # This handles cases where data might be incomplete for an employee.
+                print(f"Skipping incomplete data for employee at index {i}")
+                continue
+                
+        # Render the template with the list of encoded QR codes.
+        return render(request, 'paginas/ticket.html', {'encoded_qrs': encoded_qrs})
+    
+    # If the request is not POST, redirect or show an error.
+    return render(request, 'paginas/error.html', {'message': 'Invalid request method.'})
 
 
 

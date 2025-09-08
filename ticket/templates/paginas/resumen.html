@@ -12,7 +12,7 @@
       </header>
 
       <div class="overflow-x-auto rounded-md ">
-        <table class="min-w-full bg-blue-600 text-white text-sm md:text-base rounded-md dark:bg-blue-200">
+        <table class="min-w-full bg-blue-600 text-white text-sm md:text-base rounded-md dark:bg-blue-200" >
           <thead>
             <tr>
               <th class="py-3 px-4 font-semibold text-center dark:text-black">Empleado</th>
@@ -21,14 +21,20 @@
               <th class="py-3 px-4 font-semibold text-center dark:text-black">Cubiertos</th>
             </tr>
           </thead>
-          <tbody>
-       <tbody class="bg-white divide-y divide-gray-200 dark:bg-dark-100 dark:divide-dark-200">
-                <th class="text-black   dark:text-white">manuel</th>
-                <th class="text-black   dark:text-white">Si</th>
-                <th class="text-black   dark:text-white">No</th>
-                <th class="text-black   dark:text-white">Si</th>
-                <th class="text-black   dark:text-white">0.00</th>
-               </tbody>
+         
+            <tbody class="bg-white divide-y divide-gray-200 dark:bg-dark-100 dark:divide-dark-200">
+                
+              {% for i in contexto %}
+                   {% if i.lunch == "Si" %}
+                    <tr> 
+                        <th class="text-black dark:text-white">{{ i.employees }}</th>
+                        <th class="text-black dark:text-white">{{ i.lunch }}</th>
+                        <th class="text-black dark:text-white">{{ i.to_go }}</th>
+                        <th class="text-black dark:text-white">{{ i.covered }}</th>
+                    </tr>
+                    {% endif %}
+            {% endfor %}
+            </tbody>
         </table>
       </div>
     </section>

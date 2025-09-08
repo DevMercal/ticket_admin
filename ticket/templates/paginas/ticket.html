@@ -1,7 +1,12 @@
 {% extends 'bases/base_dashboard.html' %}
 
 {% block  content %}
-
-
+<div class="flex flex-row-4 flex-wrap justify-center gap-2">
+{% for qr_data in encoded_qrs %}
+    <img src="data:image/png;base64,{{ qr_data }}" alt="QR Code" style="height: 150px;" />
+{% empty %}
+    <p>No hay resumen de empleados para generar tickets.</p>
+{% endfor %}
+</div>
 
 {% endblock %}

@@ -10,6 +10,7 @@ urlpatterns = [
     path('menu', menu , name='menu'),
     path('seleccion', seleccion , name='seleccion'),
     path('resumen', resumen, name='resumen'),
+    path('registration_order', registration_order , name="registration_order"),
     path('ticket', ticket , name='ticket'),
     path('empleados' , empleados , name= 'empleados'),
     path('logout_view' , logout_view , name='logout_view' )
