@@ -11,27 +11,27 @@
     <div class="flex flex-wrap items-center gap-2 py-6">
             <form method="get">
                 <div class="basis-1/4 min-w-[150px]">
-                    <select name="gerencia" onchange="this.form.submit()" class="border rounded-md py-2 px-3 w-full">
+                    <select name="mamagement" onchange="this.form.submit()" class="border rounded-md py-1.5 px-3 w-full">
                         <option value="">-- Todas las Gerencias --</option>
-                        {% for g in gerencias %}
-                        <option value="{{ g.id_gerencia }}" {% if g.nombre_gerencia == gerencia_seleccionada %}selected{% endif %}>
-                            {{ g.nombre_gerencia }}
+                        {% for g in management %}
+                        <option value="{{ g.id_management }}" {% if g.management_name == selected_management %}selected{% endif %}>
+                            {{ g.management_name }}
                         </option>
                         {% endfor %}
                     </select>
                 </div>
             </form>    
-            <div class="flex-1 min-w-[200px]">
-                <input class="border rounded-md py-1 px-3 w-md" type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar persona">
-            </div>
+
             <div class="flex-1">
                 
-                <select id="itemsPerPageSelect" class="p-2  rounded-md dark:bg-white dark:text-black">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
+                <div class="controls">
+                <input type="text" id="searchInput" class="rounded-md py-1 " placeholder="Buscar usuario...">
+                <select id="rowsPerPage" class="rounded-md py-2">
+                    <option value="5">5 por página</option>
+                    <option value="10">10 por página</option>
+                    <option value="20">20 por página</option>
                 </select>
+            </div>
             </div>
             <div class="basis-1/4 min-w-[150px]">
                 <button class="bg-green-600 dark:bg-green-800 dark:text-white px-3 py-1 rounded-md w-full" data-bs-toggle="modal" data-bs-target="#invitado">
@@ -40,10 +40,10 @@
                  {% include 'modal/invitado.html' %}
             </div>
     </div>
-   <form action="resumen" method="post">
+   <form action="resumen" method="post" id="resumen-form">
                 {% csrf_token %}
     <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md">
-        <table class="responsive-table w-full"  id="dataTable">
+        <table class="responsive-table w-full"  id="myTable" >
             <thead class="bg-gray-100 dark:bg-dark-200">
                 <tr>
                     <th class="py-3 px-4 text-center dark:text-white">Nombre y Apellido</th>
@@ -53,30 +53,33 @@
                     <th class="py-3 px-4 text-center dark:text-white">total a pagar</th>
                 </tr>
             </thead>
-            <tbody id="dataBody">
+            <tbody>
                {% for em in employees %}
-                <tr>
-                    <td class="py-3 px-4 text-center dark:text-white">{{ em.first_name }}</td>
-                    <input type="hidden" name="employees_{{ forloop.counter }}" value="{{ em.first_name }}">
-                    <td class="py-3 px-4 text-center dark:text-white">
-                        <input type="checkbox" name="lunch_{{ forloop.counter }}" value="Si">
-                    </td>
-                    <td class="py-3 px-4 text-center dark:text-white">
-                        <input type="checkbox" name="to_go_{{ forloop.counter }}" value="Si">
-                    </td>
-                    <td class="py-3 px-4 text-center dark:text-white">
-                        <input type="checkbox" name="covered_{{ forloop.counter }}" value="Si">
-                    </td>
-                    <td class="py-3 px-4 text-center dark:text-white">0.00</td>
-                </tr>
+                    <tr data-employee-id="{{ em.id }}" data-employee-name="{{ em.first_name }}" data-employee-index="{{ forloop.counter0 }}">
+                        <td class="py-3 px-4 text-center dark:text-white">{{ em.first_name }}</td>
+                        <td class="py-3 px-4 text-center dark:text-white">
+                            <input type="checkbox" data-selection-type="lunch" value="Si">
+                        </td>
+                        <td class="py-3 px-4 text-center dark:text-white">
+                            <input type="checkbox" data-selection-type="to_go" value="Si">
+                        </td>
+                        <td class="py-3 px-4 text-center dark:text-white">
+                            <input type="checkbox" data-selection-type="covered" value="Si">
+                        </td>
+                        <td class="py-3 px-4 text-center dark:text-white">0.00</td>
+                    </tr>
                 {% endfor %}
-                <input type="hidden" name="total_employees" value="{{ employees|length }}">
 
             </tbody>
+            
         </table>
-       <div class="flex justify-between mt-4 m-2" id="pagination-controls">
 
-       </div>
+            <div class="pagination-controls flex justify-center items-center gap-4 my-4">
+                <button id="prevBtn" type="button">Anterior</button>
+                <h6 id="pageNumbers" class="dark:text-white"></h6>
+                <button id="nextBtn" type="button">Siguiente</button>
+            </div>
+            
     </div>
     <div class="flex justify-center mt-6">
         <button type="submit" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">
@@ -85,5 +88,5 @@
     </div>
     </form>
 </div>
-
+<script src="{% static 'js/buscador.js' %}"></script>
 {% endblock %}

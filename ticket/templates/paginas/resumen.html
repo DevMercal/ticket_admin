@@ -25,14 +25,14 @@
             <tbody class="bg-white divide-y divide-gray-200 dark:bg-dark-100 dark:divide-dark-200">
                 
               {% for i in contexto %}
-                   {% if i.lunch == "Si" %}
+                  
                     <tr> 
                         <th class="text-black dark:text-white">{{ i.employees }}</th>
                         <th class="text-black dark:text-white">{{ i.lunch }}</th>
                         <th class="text-black dark:text-white">{{ i.to_go }}</th>
                         <th class="text-black dark:text-white">{{ i.covered }}</th>
                     </tr>
-                    {% endif %}
+                   
             {% endfor %}
             </tbody>
         </table>

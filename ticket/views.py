@@ -238,9 +238,11 @@ def seleccion(request):
     headers = {
         'Authorization': f'Bearer {token}'
     }
-    gerencia_seleccionada = request.GET.get('gerencia', '')
+    selected_management = request.GET.get('management', '')
+    
     url_empleados = "http://comedor.mercal.gob.ve/api/p1/empleados"
-    params = {'gerencia': gerencia_seleccionada} if gerencia_seleccionada else {}
+    params = {'management': selected_management} if selected_management else {}
+    
     employees = []
     try:
         response = requests.get(url_empleados, headers=headers, params=params, timeout=10)
@@ -251,40 +253,41 @@ def seleccion(request):
        
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error al obtener empleados: {req_err}")
-    url_gerencias = "http://comedor.mercal.gob.ve/api/p1/gerencias"
-    gerencias = []
+    url_management = "http://comedor.mercal.gob.ve/api/p1/gerencias"
+    management = []
     try:
-        response_gerencias = requests.get(url_gerencias, headers=headers, timeout=10)
-        response_gerencias.raise_for_status()
-        json_gerencias = response_gerencias.json()
-        gerencias = json_gerencias.get('gerencias', [])   
+        response_management = requests.get(url_management, headers=headers, timeout=10)
+        response_management.raise_for_status()
+        json_management = response_management.json()
+        
+        management = json_management.get('management', [])   
+        
     except requests.exceptions.RequestException as req_err:
         messages.warning(request, f"No se pudo cargar la lista de gerencias: {req_err}")
     return render(request, 'paginas/seleccion.html', {
-        'gerencias': gerencias,
-        'gerencia_seleccionada': gerencia_seleccionada,
+        'management': management,
+        'selected_management': selected_management,
         'employees': employees    })
-
-
 
 
     
 def resumen(request):
     if request.method == 'POST':
+        # Esta línea lee el 'total_employees' que el JavaScript añadió
         total = int(request.POST.get('total_employees', 0))
+       
         resumen_empleados = []
-        print (resumen_empleados)
-
-        for i in range(1, total + 1):
+        
+        
+        for i in range(total): 
             employees = request.POST.get(f'employees_{i}')
             if not employees:
-                continue  # omitir si empleado no llega
+                continue 
             
             lunch = request.POST.get(f'lunch_{i}', 'No')
             to_go = request.POST.get(f'to_go_{i}', 'No')
             covered = request.POST.get(f'covered_{i}', 'No')
 
-            # Llenamos la lista con dict para cada empleado y su selección
             resumen_empleados.append({
                 'employees': employees,
                 'lunch': lunch,
@@ -295,7 +298,7 @@ def resumen(request):
             request.session['resumen_empleados'] = resumen_empleados
 
         contexto = {
-            'contexto': resumen_empleados  # pasa la lista con datos relacionados
+            'contexto': resumen_empleados
         }
 
         return render(request, 'paginas/resumen.html', contexto)
@@ -308,9 +311,9 @@ def registration_order():
 
 
 def ticket(request):
-    # Ensure the request method is POST to process the form data.
+    
     if request.method == 'POST':
-        # Get all submitted values for each field as a list.
+        
         employee_names = request.POST.getlist('employees')
         lunch_options = request.POST.getlist('lunch')
         to_go_options = request.POST.getlist('to_go')
@@ -318,10 +321,10 @@ def ticket(request):
         
         encoded_qrs = []
 
-        # Zip the lists together to process each employee's data as a single item.
+      
         for i in range(len(employee_names)):
             try:
-                # Build the information string for the QR code.
+                
                 info = (
                     f"Empleado: {employee_names[i]}\n"
                     f"Almuerzo: {lunch_options[i]}\n"
@@ -329,24 +332,24 @@ def ticket(request):
                     f"Cubiertos: {covered_options[i]}"
                 )
                 
-                # Generate the QR code as an in-memory image.
+               
                 qr_img = qrcode.make(info)
                 buffer = BytesIO()
                 qr_img.save(buffer, format='PNG')
                 
-                # Encode the image data to a base64 string for embedding in HTML.
+               
                 encoded_img_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
                 encoded_qrs.append(encoded_img_data)
 
             except IndexError:
-                # This handles cases where data might be incomplete for an employee.
+                
                 print(f"Skipping incomplete data for employee at index {i}")
                 continue
                 
-        # Render the template with the list of encoded QR codes.
+        
         return render(request, 'paginas/ticket.html', {'encoded_qrs': encoded_qrs})
     
-    # If the request is not POST, redirect or show an error.
+   
     return render(request, 'paginas/error.html', {'message': 'Invalid request method.'})
 
 
