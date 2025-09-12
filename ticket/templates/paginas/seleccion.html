@@ -4,27 +4,16 @@
 
 <div class="max-w-6xl mx-auto p-2">
 
-     <div>
+    <div>
         <h1 class="text-2xl font-bold mb-4 text-center dark:text-white">Gestion de Pedido</h1>
-     </div>
-   
-    <div class="flex flex-wrap items-center gap-2 py-6">
-            <form method="get">
-                <div class="basis-1/4 min-w-[150px]">
-                    <select name="mamagement" onchange="this.form.submit()" class="border rounded-md py-1.5 px-3 w-full">
-                        <option value="">-- Todas las Gerencias --</option>
-                        {% for g in management %}
-                        <option value="{{ g.id_management }}" {% if g.management_name == selected_management %}selected{% endif %}>
-                            {{ g.management_name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </form>    
+    </div>
 
-            <div class="flex-1">
-                
-                <div class="controls">
+    <div class="flex flex-wrap items-center gap-2 py-6">
+
+
+        <div class="flex-1">
+
+            <div class="controls">
                 <input type="text" id="searchInput" class="rounded-md py-1 " placeholder="Buscar usuario...">
                 <select id="rowsPerPage" class="rounded-md py-2">
                     <option value="5">5 por página</option>
@@ -32,30 +21,36 @@
                     <option value="20">20 por página</option>
                 </select>
             </div>
-            </div>
-            <div class="basis-1/4 min-w-[150px]">
-                <button class="bg-green-600 dark:bg-green-800 dark:text-white px-3 py-1 rounded-md w-full" data-bs-toggle="modal" data-bs-target="#invitado">
+        </div>
+        <div class="basis-1/4 min-w-[150px]">
+            <button class="bg-green-600 dark:bg-green-800 dark:text-white px-3 py-1 rounded-md w-full"
+                data-bs-toggle="modal" data-bs-target="#invitado">
                 Registrar Invitado
-                </button>
-                 {% include 'modal/invitado.html' %}
-            </div>
+            </button>
+            {% include 'modal/invitado.html' %}
+        </div>
     </div>
-   <form action="resumen" method="post" id="resumen-form">
-                {% csrf_token %}
-    <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md">
-        <table class="responsive-table w-full"  id="myTable" >
-            <thead class="bg-gray-100 dark:bg-dark-200">
-                <tr>
-                    <th class="py-3 px-4 text-center dark:text-white">Nombre y Apellido</th>
-                    <th class="py-3 px-4 text-center dark:text-white">Almuerzo Bs</th>
-                    <th class="py-3 px-4 text-center dark:text-white">Para llevar Bs</th>
-                    <th class="py-3 px-4 text-center dark:text-white">cubiertos Bs</th>
-                    <th class="py-3 px-4 text-center dark:text-white">total a pagar</th>
-                </tr>
-            </thead>
-            <tbody>
-               {% for em in employees %}
-                    <tr data-employee-id="{{ em.id }}" data-employee-name="{{ em.first_name }}" data-employee-index="{{ forloop.counter0 }}">
+    <form action="resumen" method="post" id="resumen-form">
+        {% csrf_token %}
+        <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md">
+            <table class="responsive-table w-full" id="myTable">
+                <thead class="bg-gray-100 dark:bg-dark-200">
+                    <tr>
+                        <th class="py-3 px-4 text-center dark:text-white" hidden>Gerencias</th>
+                        <th class="py-3 px-4 text-center dark:text-white">Cedula</th>
+                        <th class="py-3 px-4 text-center dark:text-white">Nombre y Apellido</th>
+                        <th class="py-3 px-4 text-center dark:text-white">Almuerzo Bs</th>
+                        <th class="py-3 px-4 text-center dark:text-white">Para llevar Bs</th>
+                        <th class="py-3 px-4 text-center dark:text-white">cubiertos Bs</th>
+                        <th class="py-3 px-4 text-center dark:text-white" hidden>total a pagar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for em in employees %}
+                    <tr data-employee-id="{{ em.id }}" data-employee-name="{{ em.first_name }}"
+                        data-employee-index="{{ forloop.counter0 }}">
+                        <td class="py-3 px-4 text-center dark:text-white" hidden>{{ em.gerencias.management_name }}</td>
+                        <td class="py-3 px-4 text-center dark:text-white">{{ em.cedula }}</td>
                         <td class="py-3 px-4 text-center dark:text-white">{{ em.first_name }}</td>
                         <td class="py-3 px-4 text-center dark:text-white">
                             <input type="checkbox" data-selection-type="lunch" value="Si">
@@ -66,26 +61,26 @@
                         <td class="py-3 px-4 text-center dark:text-white">
                             <input type="checkbox" data-selection-type="covered" value="Si">
                         </td>
-                        <td class="py-3 px-4 text-center dark:text-white">0.00</td>
+                        <td class="py-3 px-4 text-center dark:text-white" hidden>0.00</td>
                     </tr>
-                {% endfor %}
+                    {% endfor %}
 
-            </tbody>
-            
-        </table>
+                </tbody>
+
+            </table>
 
             <div class="pagination-controls flex justify-center items-center gap-4 my-4">
                 <button id="prevBtn" type="button">Anterior</button>
                 <h6 id="pageNumbers" class="dark:text-white"></h6>
                 <button id="nextBtn" type="button">Siguiente</button>
             </div>
-            
-    </div>
-    <div class="flex justify-center mt-6">
-        <button type="submit" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">
-            Resumen y Pago
-        </button>
-    </div>
+
+        </div>
+        <div class="flex justify-center mt-6">
+            <button type="submit" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">
+                Resumen y Pago
+            </button>
+        </div>
     </form>
 </div>
 <script src="{% static 'js/buscador.js' %}"></script>

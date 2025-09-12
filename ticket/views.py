@@ -8,26 +8,24 @@ from django.core.paginator import Paginator
 import qrcode
 from io import BytesIO
 import base64
+from django.conf import settings
 
+api_url = settings.API
 
 def inicio(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-
-        url_api_login = "http://comedor.mercal.gob.ve/api/p1/users/login"
-        
-        
+ 
         data = {
             'email': email,
             'password': password
         }
 
         try:
-          
-            response = requests.post(url_api_login, json=data, timeout=10)
             
-           
+            response = requests.post(f"{api_url}/users/login", json=data, timeout=10)
+            print(response)
             if response.status_code == 200:
                 json_data = response.json()
                 empleados = json_data.get('data', [])
@@ -67,25 +65,22 @@ def usu(request: HttpRequest):
    
     if 'api_token' not in request.session:
         messages.warning(request, "Debe iniciar sesión para ver esta información.")
-        return redirect('inicio')  # Redirige a la página de login si no hay token
-
-    url_api = "http://comedor.mercal.gob.ve/api/p1/users"
-    usuarios = []  # Inicializamos la variable aquí para que siempre esté definida
-    token = request.session.get('api_token')
+        return redirect('inicio')  
     
-    # Preparamos las cabeceras con el token para la autenticación
+    token = request.session.get('api_token')
     headers = {
         'Authorization': f'Bearer {token}'
     }
-
+      
+      
     try:
-        # 2. Hacemos la solicitud a la API usando el token en los headers
-        response = requests.get(url_api, headers=headers, timeout=10)
+       
+        response = requests.get(f"{api_url}/users", headers=headers, timeout=10)
         
-        # 3. Verificamos el estado de la respuesta
+        
         response.raise_for_status()
         
-        # 4. Procesamos la respuesta JSON si todo fue bien
+       
         json_data = response.json()
         print (json_data)
         usuarios = json_data.get('data', [])
@@ -103,16 +98,11 @@ def usu(request: HttpRequest):
     # 5. Renderizamos la plantilla con los datos obtenidos (o una lista vacía en caso de error)
     return render(request, 'paginas/usuarios.html', {'usuarios': usuarios})
 
+
+
+
 def user_registro(request: HttpRequest) -> HttpResponse:
-    """
-    Handles user registration by sending a POST request to an external API.
-
-    Args:
-        request: The Django HttpRequest object.
-
-    Returns:
-        An HttpResponse redirecting to another page or rendering the registration form.
-    """
+ 
     url = "http://comedor.mercal.gob.ve/api/p1/users"
     token = request.session.get('api_token')
     headers = {
@@ -120,16 +110,16 @@ def user_registro(request: HttpRequest) -> HttpResponse:
         'Content-Type': 'application/json'
     }
 
-    if request.method == 'POST':
+    if request.method == 'POST': 
         # Use .get() with a default value to prevent KeyError if a field is missing
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
         password = request.POST.get('password', '')
         password_confirmation = request.POST.get('password_confirmation', '')
-        id_gerencia = request.POST.get('id_gerencia', '')
+        id_management = request.POST.get('id_management', '')
 
         # Basic validation to ensure required fields aren't empty
-        if not all([name, email, password, password_confirmation, id_gerencia]):
+        if not all([name, email, password, password_confirmation, id_management]):
             messages.error(request, 'Todos los campos son obligatorios.')
             return redirect('usu') # Replace with your form view name
 
@@ -138,7 +128,7 @@ def user_registro(request: HttpRequest) -> HttpResponse:
             'email': email,
             'password': password,
             'password_confirmation': password_confirmation,
-            'id_gerencia': id_gerencia
+            'id_management': id_management
         }
 
         try:
@@ -241,7 +231,7 @@ def seleccion(request):
     selected_management = request.GET.get('management', '')
     
     url_empleados = "http://comedor.mercal.gob.ve/api/p1/empleados"
-    params = {'management': selected_management} if selected_management else {}
+    params = {'gerencias': selected_management} if selected_management else {}
     
     employees = []
     try:
