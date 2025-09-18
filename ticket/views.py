@@ -418,7 +418,7 @@ def ticket(request):
         
         return render(request, 'paginas/ticket.html', {'encoded_qrs': encoded_qrs})
     
-    messages.error(request, "Advertencia: no puede ir a ticket si no ha seleccionado nada")
+    messages.warning(request, "Advertencia: no puede ir a ticket si no ha seleccionado nada")
         
         # 2. Redirige a la vista (URL) que mostrará ese mensaje
     return redirect('seleccion')
