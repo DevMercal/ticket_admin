@@ -1,15 +1,14 @@
 <div class="modal fade" id="menu" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    aria-labelledby="staticBackdropLabel" aria-hidden="true" >
+    <div class="modal-dialog" >
         <div class="modal-content dark:bg-gray-800">
             <div class="modal-header">
                 <h5 class="modal-title dark:text-white text-center" id="staticBackdropLabel">Registrar Menu</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body dark:bg-gray-800">
-                <form action="" method="post" id="menuForm">
-                    {% csrf_token %}
-                    <div id="container-grupos-menu" class="flex flex-col"></div>
+            <div class="modal-body dark:bg-gray-800" >
+                <form action="registro_menu" method="POST" id="menuForm">
+                    <div id="container-grupos-menu" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4"></div>
                 </form>
             </div>
             <div class="modal-footer flex gap-4">

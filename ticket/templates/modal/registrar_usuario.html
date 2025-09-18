@@ -14,8 +14,14 @@
             <input type="email" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white" name="email" placeholder="Correo Electrónico">
             <input type="text" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white" name="password" placeholder="Contraseña">
             <input type="text" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white" name="password_confirmation" placeholder="Confitmar Contraseña">
-            <input type="text" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white" name="id_management" placeholder="Gerencia">
-        </div>
+            
+            <select name="id_management" id="" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white">
+              <option  >---Seleccione Gerencia</option>
+              {% for management in managements %}
+                 <option value="{{ management.id_management }}">{{ management.management_name }}</option>
+              {% endfor %}
+            </select> 
+          </div>
       
       </div>
       <div class="modal-footer flex gap-4">

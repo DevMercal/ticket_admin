@@ -4,16 +4,31 @@
 
 
 <div class="container mx-auto px-4 ">
-    <div class="flex justify-end m-4 pt-2">
-        <button class="py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-bs-toggle="modal" data-bs-target="#menu">Cargar menu</button>
+    <div class="flex justify-between items-center mb-6 mt-6">
+
+        <div class="flex">
+            <button
+                class="py-2 px-4 bg-red-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                data-bs-toggle="modal" data-bs-target="#menu">Eliminar Menu</button>
+        </div>
+
+        <div class="flex">
+            <button
+                class="py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                data-bs-toggle="modal" data-bs-target="#menu">Cargar Menu</button>
+        </div>
+
+
     </div>
     {% include 'modal/menu.html' %}
     <div class="bg-white dark:bg-gray-800 pt-6 rounded-lg shadow-md">
-        
-        <h1 class="text-xl text-blue-600 font-bold mb-2 dark:text-blue-800 text-center">
-            Menu de Hoy: <strong class="text-dark-600 dark:text-white">{{ menus.0.date_menu|date:"d-m-Y" }}</strong>
-        </h1>
-        
+
+        {% if date_format %}
+        Menu de Hoy: <strong class="text-dark-600 dark:text-white">{{ date_format}}</strong>
+        {% else %}
+        <p>no hay fecha</p>
+        {% endif %}
+
 
         <div class="flex items-center flex-col md:flex-row py-10">
 
@@ -21,18 +36,20 @@
                 <img src="{% static 'img/comedor.jpg' %}" alt="Imagen del comedor"
                     class="w-full h-full object-cover rounded-lg border-4 border-sky-500 dark:border-white">
             </div>
-          
+
             <div class="w-full md:w-1/2 px-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {% if menus %}
-                        {% for item in menus %}
-                        <div class="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg shadow-md">
-                            <h3 class="text-blue-600 dark:text-blue-400 font-bold text-lg mb-2">{{ item.food_category }}</h3>
-                            <p class="text-gray-800 dark:text-gray-200">{{ item.name_ingredient }}</p>
-                        </div>
-                        {% endfor %}
+                    {% for item in menus %}
+                    <div class="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg shadow-md">
+                        <h3 class="text-blue-600 dark:text-blue-400 font-bold text-lg mb-2">{{ item.food_category }}
+                        </h3>
+                        <p class="text-gray-800 dark:text-gray-200">{{ item.name_ingredient }}</p>
+                    </div>
+                    {% endfor %}
                     {% else %}
-                        <p class="text-gray-800 dark:text-gray-200 col-span-2 text-center">No hay menú disponible para hoy.</p>
+                    <p class="text-gray-800 dark:text-gray-200 col-span-2 text-center">No hay menú disponible para hoy.
+                    </p>
                     {% endif %}
                 </div>
             </div>

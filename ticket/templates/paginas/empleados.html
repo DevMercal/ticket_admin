@@ -2,44 +2,67 @@
 {% load static %}
 
 {% block content %}
-   
- <div class="container mx-auto px-4">
-     <div class="flex flex-wrap items-center gap-2 py-6">
-           
-            <div class="flex min-w-[200px]">
-                <input class="border rounded-md py-1 px-3 w-md" type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar persona">
-            </div>
-            <div class="flex">
-                
-                <select id="itemsPerPageSelect" class="p-2  rounded-md dark:bg-white dark:text-black">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
+
+
+<div class="max-w-6xl mx-auto p-2">
+
+    <div>
+        <h1 class="text-2xl font-bold mb-4 text-center dark:text-white">Empleados</h1>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 py-6">
+
+
+        <div class="flex-1">
+
+            <div class="controls">
+                <input type="text" id="searchInput" class="rounded-md py-1 " placeholder="Buscar usuario...">
+                <select id="rowsPerPage" class="rounded-md py-2">
+                    <option value="5">5 por página</option>
+                    <option value="10">10 por página</option>
+                    <option value="20">20 por página</option>
                 </select>
             </div>
-           
-    </div>      
-    <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md ">
-        <table class="responsive-table w-full"  id="dataTable">
+        </div>
+
+    </div>
+
+    {% csrf_token %}
+    <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md">
+        <table class="responsive-table w-full" id="myTable">
             <thead class="bg-gray-100 dark:bg-dark-200">
                 <tr>
-                    <th class="py-3 px-4 text-center dark:text-white">Nombre completo</th>
+                    <th class="py-3 px-4 text-center dark:text-white">Gerencias</th>
                     <th class="py-3 px-4 text-center dark:text-white">Cedula</th>
-                    <th class="py-3 px-4 text-center dark:text-white">Gerencia</th>
+                    <th class="py-3 px-4 text-center dark:text-white">Nombres</th>
+
                 </tr>
             </thead>
-            <tbody id="dataBo">
-                
+            <tbody>
+                {% for em in data_principal %}
+                <tr data-employee-id="{{ em.id }}" data-employee-name="{{ em.first_name }}"
+                    data-employee-index="{{ forloop.counter0 }}">
+                    <td class="py-3 px-4 text-center dark:text-white">{{ em.gerencias.management_name }}</td>
+                    <td class="py-3 px-4 text-center dark:text-white">{{ em.cedula }}</td>
+                    <td class="py-3 px-4 text-center dark:text-white">{{ em.first_name }}</td>
+
+                </tr>
+                {% endfor %}
+
             </tbody>
+
         </table>
-       
-                <div class="flex justify-between mt-4 m-2" id="pagination-controls">
 
-                </div> 
+        <div class="pagination-controls flex justify-center items-center gap-4 my-4">
+            <button id="prevBtn" type="button">Anterior</button>
+            <h6 id="pageNumbers" class="dark:text-white"></h6>
+            <button id="nextBtn" type="button">Siguiente</button>
+        </div>
+
     </div>
-    {{ data_principal | json_script:"empleados-data" }}
 
-    <script src="{% static 'js/empleados.js' %}"></script>
+
+</div>
+<script src="{% static 'js/buscador.js' %}"></script>
 
 {% endblock %}

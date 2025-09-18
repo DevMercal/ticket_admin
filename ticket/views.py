@@ -9,6 +9,7 @@ import qrcode
 from io import BytesIO
 import base64
 from django.conf import settings
+from datetime import date
 
 api_url = settings.API
 
@@ -57,8 +58,28 @@ def inicio(request):
 
   
 
-def index(request):
-    return render(request, 'paginas/index.html')
+
+def index(request): 
+    token = request.session.get('api_token')
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    
+    response = requests.get(f"{api_url}/users", headers=headers, timeout=10)
+    response.raise_for_status() 
+    
+    json_data = response.json()
+   
+    numero_usuarios = 0
+   
+    numero_usuarios = len(json_data)
+    print (numero_usuarios)
+    contexto = {
+        'numero_usuarios': numero_usuarios,
+        'datos_usuarios': json_data  
+    }
+    
+    return render(request, 'paginas/index.html', contexto)
 
 
 def usu(request: HttpRequest):
@@ -74,17 +95,26 @@ def usu(request: HttpRequest):
       
       
     try:
+        management = requests.get(f"{api_url}/gerencias" , headers=headers, timeout=10)
+        
+        management.raise_for_status() 
+        
        
+        management_data = management.json()
+       
+        managements = management_data.get('management', [])
+        
         response = requests.get(f"{api_url}/users", headers=headers, timeout=10)
         
         
-        response.raise_for_status()
+        response.raise_for_status() 
         
        
         json_data = response.json()
-        print (json_data)
+       
         usuarios = json_data.get('data', [])
-        print(usuarios)
+        
+        
    
     except requests.exceptions.ConnectionError as conn_err:
         messages.error(request, f"Error de conexión: {conn_err} - No se pudo conectar con la API.")
@@ -95,8 +125,12 @@ def usu(request: HttpRequest):
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error inesperado: {req_err}")
 
-    # 5. Renderizamos la plantilla con los datos obtenidos (o una lista vacía en caso de error)
-    return render(request, 'paginas/usuarios.html', {'usuarios': usuarios})
+    result = {
+        'usuarios' : usuarios,
+        'managements' : managements
+    }    
+    
+    return render(request, 'paginas/usuarios.html', result)
 
 
 
@@ -184,26 +218,71 @@ def eliminar_user(request, id):
 
     return redirect('usu')
         
-def registro(request):
-    pass
+def registro_menu(request):
+    if request.method == 'POST':
+        
+        sopas = request.POST.getlist('sopas')
+        contornos = request.POST.getlist('contornos')
+        proteinas = request.POST.getlist('proteinas')
+        postres = request.POST.getlist('postres') 
+        bebidas = request.POST.getlist('bebidas')
+        
+       
+        data = []
+        
+        
+        def agregar_al_payload(categoria, ingredientes):
+            if ingredientes:
+                
+                ingredient_string = ", ".join(ingredientes)
+                data.append({
+                    "foodCategory": categoria,
+                    "ingredient": ingredient_string
+                })
+        
+      
+        agregar_al_payload("Sopas", sopas)
+        agregar_al_payload("Contornos", contornos)
+        agregar_al_payload("Proteinas", proteinas)
+        agregar_al_payload("Postres", postres)
+        agregar_al_payload("Bebidas", bebidas)
+        
+        try:
+            token = request.session.get('api_token')
+            headers = {
+                'Authorization': f'Bearer {token}',
+                'Content-Type': 'application/json'
+            }
+            response = requests.post(f"{api_url}/menus/bluk", json=data, headers=headers, timeout=10)
+            response.raise_for_status() 
 
+            messages.success(request, 'Menú registrado exitosamente.')
+            return redirect('menu')
 
+        except requests.exceptions.RequestException as e:
+            # Manejar errores de la solicitud (conexión, timeouts, etc.)
+            messages.error(request, f"Error al registrar: {e}")
+        except Exception as e:
+            # Manejar otros errores inesperados
+            messages.error(request, f"Ocurrió un error inesperado: {e}")
+
+    # Renderiza la plantilla si el método no es POST
+    return render(request, 'paginas/menu.html')
 
 def menu(request):
     if 'api_token' not in request.session:
         messages.warning(request, "Debe iniciar sesión para ver esta información.")
         return redirect('inicio') 
 
-    url_api = "http://comedor.mercal.gob.ve/api/p1/menus"
-    menus = []  
     token = request.session.get('api_token')
     
     headers = {
         'Authorization': f'Bearer {token}'
     }
-
+    today = date.today()
+    date_format = today.strftime("%d de %B de %Y")
     try:
-        response = requests.get(url_api, headers=headers, timeout=10)
+        response = requests.get(f"{api_url}/menus", headers=headers, timeout=10)
         response.raise_for_status()
         
         json_data = response.json()
@@ -215,7 +294,7 @@ def menu(request):
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error inesperado: {req_err}")
 
-    return render(request, 'paginas/menu.html', {'menus': menus})
+    return render(request, 'paginas/menu.html', {'menus': menus , 'date_format': date_format })
 
     
 
@@ -364,7 +443,7 @@ def empleados(request):
         # 1. Acceder al primer 'data' y luego al segundo 'data'
         data_principal = json_data.get('employees', [])
         
-        print(data_principal)
+        
         
         
     except requests.exceptions.RequestException as req_err:

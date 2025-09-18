@@ -46,10 +46,10 @@
              
                         {% for i in contexto %}
                    {% if i.lunch == "Si" %}
-                   <input type="text" name="employees" value="{{ i.employees }}">
-                   <input type="text" name="lunch" value="{{ i.lunch }}">
-                   <input type="text" name="to_go" value="{{ i.to_go }}">
-                   <input type="text" name="covered" value="{{ i.covered }}">
+                   <input type="text" name="employees" value="{{ i.employees }}" hidden>
+                   <input type="text" name="lunch" value="{{ i.lunch }}" hidden>
+                   <input type="text" name="to_go" value="{{ i.to_go }}" hidden>
+                   <input type="text" name="covered" value="{{ i.covered }}" hidden>
                     
                     {% endif %}
             {% endfor %}

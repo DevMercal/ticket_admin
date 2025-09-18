@@ -54,11 +54,14 @@ body {
 
 .modal-dialog {
     position: relative;
-    max-width: 500px;
+    max-width: 700px;
     margin: 1.75rem auto;
     transition: transform 0.3s ease-out;
     transform: translate(0, -50px); /* Posición inicial fuera de pantalla */
 }
+
+
+
 
 .modal.show .modal-dialog {
     transform: translate(0, 0); /* Posición final */
