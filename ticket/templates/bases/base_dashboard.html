@@ -40,7 +40,8 @@
                         </li>
                         <li>
                             <a href="{% url 'usu' %}" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors">
-                                <i class="fas fa-users w-6 text-center text-gray-800 dark:text-white"></i>
+                                
+                                <i class="fa fa-user text-gray-800 dark:text-white" aria-hidden="true"></i>
                                 <span class="menu-text ml-3 text-gray-800 dark:text-white">Usuarios</span>
                             </a>
                         </li>
@@ -72,11 +73,23 @@
                         </li>
                         <li>
                             <a href="{% url 'empleados' %}" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors">
-                                <i class="fa-solid fa-qrcode text-gray-800 dark:text-white"></i>
+                                <i class="fas fa-users w-6 text-center text-gray-800 dark:text-white"></i>
                                 <span class="menu-text ml-3 text-gray-800 dark:text-white">Empleados</span>
                             </a>
                         </li>
                         <li>
+                            <a href="" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors">
+                                <i class="fa fa-cutlery text-gray-800 dark:text-white" aria-hidden="true"></i>
+                                <span class="menu-text ml-3 text-gray-800 dark:text-white">Pedidos</span>
+                            </a>
+                        </li>
+                         <li>
+                            <a href="" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors">
+                                <i class="fa fa-qrcode text-gray-800 dark:text-white" aria-hidden="true"></i>
+                                <span class="menu-text ml-3 text-gray-800 dark:text-white">Escaner</span>
+                            </a>
+                        </li>
+                         <li>
                             <a href="{% url 'logout_view' %}" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors">
                                 <i class="fas fa-sign-out-alt w-6 text-center text-gray-800 dark:text-white"></i>
                                 <span class="menu-text ml-3 text-gray-800 dark:text-white">salir</span>
