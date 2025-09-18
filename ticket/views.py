@@ -418,8 +418,11 @@ def ticket(request):
         
         return render(request, 'paginas/ticket.html', {'encoded_qrs': encoded_qrs})
     
-   
-    return render(request, 'paginas/error.html', {'message': 'Invalid request method.'})
+    messages.error(request, "Advertencia: no puede ir a ticket si no ha seleccionado nada")
+        
+        # 2. Redirige a la vista (URL) que mostrará ese mensaje
+    return redirect('seleccion')
+    
 
 
 
@@ -451,6 +454,12 @@ def empleados(request):
 
     return render(request, 'paginas/empleados.html' , {'data_principal': data_principal} )
 
+
+def pedidos(request):
+    return render(request, "paginas/pedidos.html")
+
+def escaner(request):
+    return render(request,"paginas/scan.html")
 
 #logout de la aplicacion
 def logout_view(request):

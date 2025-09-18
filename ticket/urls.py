@@ -13,5 +13,7 @@ urlpatterns = [
     path('registration_order', registration_order , name="registration_order"),
     path('ticket', ticket , name='ticket'),
     path('empleados' , empleados , name= 'empleados'),
+    path('pedidos', pedidos , name="pedidos"),
+    path('escaner', escaner, name="escaner"),
     path('logout_view' , logout_view , name='logout_view' )
 ]
