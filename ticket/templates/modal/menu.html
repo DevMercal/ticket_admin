@@ -8,6 +8,7 @@
             </div>
             <div class="modal-body dark:bg-gray-800" >
                 <form action="registro_menu" method="POST" id="menuForm">
+                    {% csrf_token %}
                     <div id="container-grupos-menu" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4"></div>
                 </form>
             </div>
