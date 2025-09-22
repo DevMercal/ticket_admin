@@ -10,7 +10,7 @@ function generarGrupoMenu(titulo, btnId, containerId, inputName) {
     // Crear el título del grupo
     const tituloElemento = document.createElement('h5');
     tituloElemento.textContent = titulo;
-    tituloElemento.className = 'text-lg font-semibold text-white mt-4 capitalize';
+    tituloElemento.className = 'text-lg font-semibold dark:text-white mt-4 capitalize';
 
     // Crear el div para el input principal y el botón
     const divMain = document.createElement('div');

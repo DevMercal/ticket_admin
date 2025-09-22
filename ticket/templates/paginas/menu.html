@@ -5,13 +5,12 @@
 
 <div class="container mx-auto px-4 ">
     <div class="flex justify-between items-center mb-6 mt-6">
-
-        <div class="flex">
+      <div class="flex">
             <button
-                class="py-2 px-4 bg-red-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                data-bs-toggle="modal" data-bs-target="#menu">Eliminar Menu</button>
-        </div>
 
+                 hidden>Cargar Menu</button>
+        </div>
+        
         <div class="flex">
             <button
                 class="py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -42,10 +41,20 @@
                     {% if menus %}
                     {% for item in menus %}
                     <div class="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg shadow-md">
-                        <h3 class="text-blue-600 dark:text-blue-400 font-bold text-lg mb-2">{{ item.food_category }}
+                      <div class="flex justify-end">
+                            <button
+                                class="flex flex-row px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                data-bs-toggle="modal" data-bs-target="#menus{{ item.id_menu }}">
+                                <i class="fa-regular fa-pen-to-square"></i>
+                            </button>
+                        </div>
+                       
+                        <h3 class="text-blue-600 dark:text-blue-400 font-bold text-lg mb-2 ">{{ item.food_category }}
                         </h3>
                         <p class="text-gray-800 dark:text-gray-200">{{ item.name_ingredient }}</p>
+                         
                     </div>
+                  {% include 'modal/update.html' %}
                     {% endfor %}
                     {% else %}
                     <p class="text-gray-800 dark:text-gray-200 col-span-2 text-center">No hay menú disponible para hoy.
@@ -55,5 +64,25 @@
             </div>
         </div>
     </div>
-</div>
+</div> 
+                            <script>
+                                function confirmarEliminar(event, url) {
+                                    event.preventDefault(); // Evita que el enlace navegue inmediatamente
+
+                                    Swal.fire({
+                                        title: '¿Estás seguro?',
+                                        text: '¡No podrás revertir esto!',
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#d33',
+                                        cancelButtonColor: '#3085d6',
+                                        confirmButtonText: 'Sí, ¡elimínalo!',
+                                        cancelButtonText: 'Cancelar'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = url; // Redirige a la URL de eliminación si el usuario confirma
+                                        }
+                                    });
+                                }
+                            </script>
 {% endblock %}

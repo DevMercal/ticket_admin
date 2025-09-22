@@ -76,7 +76,10 @@ def index(request):
     print (numero_usuarios)
     contexto = {
         'numero_usuarios': numero_usuarios,
-        'datos_usuarios': json_data  
+        'datos_usuarios': json_data,  
+        
+        'current_page': 'dashboard'
+   
     }
     
     return render(request, 'paginas/index.html', contexto)
@@ -127,7 +130,8 @@ def usu(request: HttpRequest):
 
     result = {
         'usuarios' : usuarios,
-        'managements' : managements
+        'managements' : managements,
+        'current_page' : 'usuarios'
     }    
     
     return render(request, 'paginas/usuarios.html', result)
@@ -217,7 +221,12 @@ def eliminar_user(request, id):
             messages.error(request, f'Error de conexión con la API: {e}')
 
     return redirect('usu')
-        
+
+
+def actulizar_menu(request, date_menu):
+    pass
+
+            
 def registro_menu(request):
     if request.method == 'POST':
         
@@ -270,31 +279,40 @@ def registro_menu(request):
     return render(request, 'paginas/menu.html')
 
 def menu(request):
+    
     if 'api_token' not in request.session:
         messages.warning(request, "Debe iniciar sesión para ver esta información.")
-        return redirect('inicio') 
+        return redirect('inicio')
 
-    token = request.session.get('api_token')
     
+    menus = []
+    
+    token = request.session.get('api_token')
     headers = {
         'Authorization': f'Bearer {token}'
     }
-    today = date.today()
-    date_format = today.strftime("%d de %B de %Y")
+   
+    
     try:
         response = requests.get(f"{api_url}/menus", headers=headers, timeout=10)
-        response.raise_for_status()
+        response.raise_for_status() 
         
         json_data = response.json()
-       
+        menus = json_data.get('menus', [])
+        # menu_item = menus[4]
 
         
-        menus = json_data.get('menus', [])
-       
+        # date_of_menu = menu_item['date_menu']
+        
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error inesperado: {req_err}")
-
-    return render(request, 'paginas/menu.html', {'menus': menus , 'date_format': date_format })
+    contexto= {
+        # 'date_of_menu':date_of_menu,
+        'menus': menus,
+        'current_page' : 'menu'
+    }
+   
+    return render(request, 'paginas/menu.html', contexto)
 
     
 
@@ -336,7 +354,8 @@ def seleccion(request):
     return render(request, 'paginas/seleccion.html', {
         'management': management,
         'selected_management': selected_management,
-        'employees': employees    })
+        'employees': employees, 
+        'current_page' : 'seleccion'})
 
 
     
@@ -367,7 +386,8 @@ def resumen(request):
             request.session['resumen_empleados'] = resumen_empleados
 
         contexto = {
-            'contexto': resumen_empleados
+            'contexto': resumen_empleados,
+            'current_page' : 'resumen'
         }
 
         return render(request, 'paginas/resumen.html', contexto)
@@ -416,7 +436,7 @@ def ticket(request):
                 continue
                 
         
-        return render(request, 'paginas/ticket.html', {'encoded_qrs': encoded_qrs})
+        return render(request, 'paginas/ticket.html', {'encoded_qrs': encoded_qrs ,'current_page' : 'ticket'})
     
     messages.warning(request, "Advertencia: no puede ir a ticket si no ha seleccionado nada")
         

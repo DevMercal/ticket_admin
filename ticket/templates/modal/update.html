@@ -1,0 +1,29 @@
+<div class="modal fade" id="menus{{ item.id_menu }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content dark:bg-gray-800">
+            <div class="modal-header">
+                <h5 class="modal-title dark:text-white text-center" id="staticBackdropLabel">Actualizar {{ item.food_category }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body dark:bg-gray-800">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                   
+                    <div class="flex flex-col justify-center gap-4">
+                        <input type="text" name="first_ingredient" value="{{ item.name_ingredient }}"
+                            class="py-2 px-20 border border-blue-800 dark:bg-gray-800 dark:text-white rounded-lg text-center text-lg font-bold"
+                            placeholder="Primer Ingrediente">
+
+                        
+                    </div>
+                   
+                </form>
+            </div>
+            <div class="modal-footer flex gap-4">
+                <button type="button" class="btn btn-secondary w-20 flex-auto" data-bs-dismiss="modal">Cerrar</button>
+                <button type="submit" form="menuForm" class="btn btn-primary w-20 flex-auto">Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
