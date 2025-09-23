@@ -10,11 +10,11 @@
                     <i class="fas fa-users text-indigo-500 dark:text-indigo-300"></i>
                 </div>
                 <div>
-                    {% if numero_usuarios > 0 %}
+                    {% if number > 0 %}
                     <p class="text-gray-500 dark:text-gray-400 text-sm">Usuarios Totales</p>
-                    <h3 class="text-2xl font-bold text-gray-800 dark:text-white">{{ numero_usuarios }}</h3>
+                    <h3 class="text-2xl font-bold text-gray-800 dark:text-white">{{ number }}</h3>
                     {% else %}
-                    <p>No se encontraron usuarios o hubo un error.</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">No se encontraron usuarios o hubo un error.</p>
                     {% endif %}
                 </div>
             </div>

@@ -1,10 +1,9 @@
-from datetime import datetime
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from requests.exceptions import ConnectionError, HTTPError, Timeout
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import  logout
 from django.contrib import messages
 import requests
-from django.core.paginator import Paginator
 import qrcode
 from io import BytesIO
 import base64
@@ -59,27 +58,27 @@ def inicio(request):
   
 
 
-def index(request): 
+def index(request):
     token = request.session.get('api_token')
     headers = {
         'Authorization': f'Bearer {token}'
     }
     
-    response = requests.get(f"{api_url}/users", headers=headers, timeout=10)
-    response.raise_for_status() 
-    
-    json_data = response.json()
-   
-    numero_usuarios = 0
-   
-    numero_usuarios = len(json_data)
-    print (numero_usuarios)
+    try:
+        response = requests.get(f"{api_url}/users", headers=headers, timeout=10)
+        response.raise_for_status() 
+        json_data = response.json()
+        user = json_data.get('data', [])
+        number = len(user)
+        print(number)
+    except (ConnectionError, HTTPError, Timeout) as e:
+        print(f"Error al conectar con la API: {e}")
+        number = 0
+        json_data = []
     contexto = {
-        'numero_usuarios': numero_usuarios,
+        'number': number,
         'datos_usuarios': json_data,  
-        
         'current_page': 'dashboard'
-   
     }
     
     return render(request, 'paginas/index.html', contexto)
@@ -472,14 +471,14 @@ def empleados(request):
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error inesperado: {req_err}")
 
-    return render(request, 'paginas/empleados.html' , {'data_principal': data_principal} )
+    return render(request, 'paginas/empleados.html' , {'data_principal': data_principal ,'current_page' : 'empleados'} )
 
 
 def pedidos(request):
-    return render(request, "paginas/pedidos.html")
+    return render(request, "paginas/pedidos.html" ,{'current_page' : 'pedidos'})
 
 def escaner(request):
-    return render(request,"paginas/scan.html")
+    return render(request,"paginas/scan.html",{'current_page' : 'escaner'})
 
 #logout de la aplicacion
 def logout_view(request):
