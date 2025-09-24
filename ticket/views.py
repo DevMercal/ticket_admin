@@ -10,9 +10,9 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 import base64
 from django.conf import settings
-from datetime import date
 import matplotlib.patches as mpatches
 import os
+
 api_url = settings.API
 
 def inicio(request):
@@ -335,7 +335,7 @@ def menu(request):
 
     
     menus = []
-    
+    date_of_menu = None 
     token = request.session.get('api_token')
     headers = {
         'Authorization': f'Bearer {token}'
@@ -347,16 +347,19 @@ def menu(request):
         response.raise_for_status() 
         
         json_data = response.json()
-        menus = json_data.get('menus', [])
-        # menu_item = menus[4]
+        
+        try:
+            menus = json_data.get('menus', [])
+            menu_item = menus[4]
 
-        
-        # date_of_menu = menu_item['date_menu']
-        
+            
+            date_of_menu = menu_item['date_menu']
+        except Exception as e:
+            messages.error(request, "No hay registro de menu")       
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error inesperado: {req_err}")
     contexto= {
-        # 'date_of_menu':date_of_menu,
+        'date_of_menu':date_of_menu,
         'menus': menus,
         'current_page' : 'menu'
     }

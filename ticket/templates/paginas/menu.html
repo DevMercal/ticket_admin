@@ -4,7 +4,7 @@
 
 
 <div class="container mx-auto px-4 ">
-    <div class="flex justify-between items-center mb-6 mt-6">
+    <div class="flex justify-between items-center mb-6 mt-5">
       <div class="flex">
             <button
 
@@ -22,10 +22,10 @@
     {% include 'modal/menu.html' %}
     <div class="bg-white dark:bg-gray-800 pt-6 rounded-lg shadow-md">
 
-        {% if date_format %}
-        Menu de Hoy: <strong class="text-dark-600 dark:text-white">{{ date_format}}</strong>
+        {% if date_of_menu %}
+        Menu de Hoy: <strong class="text-dark-600 dark:text-white">{{ date_of_menu }}</strong>
         {% else %}
-        <p>no hay fecha</p>
+        <p class="dark:text-white text-2xl">no hay fecha</p>
         {% endif %}
 
 
