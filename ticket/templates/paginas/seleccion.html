@@ -59,6 +59,10 @@
                         <td class="py-3 px-4 text-center dark:text-white">
                             <input type="checkbox" data-selection-type="to_go" value="Si">
                         </td>
+                        <td class="py-3 px-4 text-center dark:text-white">
+                            <input type="checkbox" data-selection-type="covered" value="Si">
+                        </td>
+                        
                         <td class="py-3 px-4 text-center dark:text-white" hidden>0.00</td>
                     </tr>
                     {% endfor %}
@@ -74,11 +78,13 @@
             </div>
 
         </div>
+        
         <div class="flex justify-center mt-6">
             <button type="submit" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">
                 Resumen y Pago
             </button>
         </div>
+       
     </form>
 </div>
 <script src="{% static 'js/buscador.js' %}"></script>

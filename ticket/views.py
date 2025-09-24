@@ -1,3 +1,4 @@
+from PIL import Image
 from requests.exceptions import ConnectionError, HTTPError, Timeout
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
@@ -6,10 +7,12 @@ from django.contrib import messages
 import requests
 import qrcode
 from io import BytesIO
+import matplotlib.pyplot as plt
 import base64
 from django.conf import settings
 from datetime import date
-
+import matplotlib.patches as mpatches
+import os
 api_url = settings.API
 
 def inicio(request):
@@ -55,7 +58,56 @@ def inicio(request):
     return render(request, 'paginas/login.html')
 
 
-  
+def progreso_mensual_view(request):
+    """
+    Genera el gráfico de progreso mensual con Matplotlib
+    y lo devuelve como una imagen PNG.
+    """
+    # Los datos pueden ser dinámicos, por ejemplo, de un modelo de Django
+    completado = 70
+    restante = 100 - completado
+
+    # Colores y etiquetas
+    colores = ['#6a5acd', '#464860']
+    etiquetas = ['Completado', 'Restante']
+
+    # Crear el gráfico de tarta (estilo donut)
+    fig, ax = plt.subplots(figsize=(6, 6))
+    ax.pie([completado, restante],
+           colors=colores,
+           startangle=90,
+           wedgeprops={'edgecolor': '#282c34', 'width': 0.3})
+
+    # Añadir el texto en el centro
+    ax.text(0, 0, f'{completado}%',
+            ha='center', va='center',
+            fontsize=40, color='white', weight='bold')
+    ax.text(0, -0.2, 'Objetivo',
+            ha='center', va='center',
+            fontsize=20, color='white')
+
+    # Crear la leyenda
+    legend_elements = [
+        mpatches.Patch(facecolor=colores[0], label=f'{etiquetas[0]}   {completado}%'),
+        mpatches.Patch(facecolor=colores[1], label=f'{etiquetas[1]}   {restante}%')
+    ]
+    ax.legend(handles=legend_elements, loc='lower center', bbox_to_anchor=(0.5, -0.1),
+              ncol=1, frameon=False, fontsize=12, labelcolor='white')
+
+    # Configurar el fondo y el título
+    fig.patch.set_facecolor('#282c34')
+    ax.set_facecolor('#282c34')
+    ax.set_title('Progreso Mensual', fontsize=20, color='white', weight='bold')
+    ax.axis('equal')
+
+    # Guardar el gráfico en un buffer en memoria en lugar de un archivo
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png', dpi=300, bbox_inches='tight', transparent=True)
+    buffer.seek(0)
+    plt.close(fig) # Cierra la figura para liberar memoria
+
+    # Devolver la imagen como una respuesta HTTP
+    return HttpResponse(buffer.getvalue(), content_type='image/png') 
 
 
 def index(request):
@@ -70,7 +122,7 @@ def index(request):
         json_data = response.json()
         user = json_data.get('data', [])
         number = len(user)
-        print(number)
+        
     except (ConnectionError, HTTPError, Timeout) as e:
         print(f"Error al conectar con la API: {e}")
         number = 0
@@ -134,8 +186,6 @@ def usu(request: HttpRequest):
     }    
     
     return render(request, 'paginas/usuarios.html', result)
-
-
 
 
 def user_registro(request: HttpRequest) -> HttpResponse:
@@ -324,6 +374,7 @@ def seleccion(request):
     headers = {
         'Authorization': f'Bearer {token}'
     }
+    
     selected_management = request.GET.get('management', '')
     
     url_empleados = "http://comedor.mercal.gob.ve/api/p1/empleados"
@@ -360,36 +411,48 @@ def seleccion(request):
     
 def resumen(request):
     if request.method == 'POST':
-        # Esta línea lee el 'total_employees' que el JavaScript añadió
         total = int(request.POST.get('total_employees', 0))
-       
-        resumen_empleados = []
         
+        if total > 0:
+            resumen_empleados = []
+            
+            for i in range(total): 
+                employees_id = request.POST.get(f'employees_{i}')
+                
+                # Si el campo 'employees_id' no existe, saltar al siguiente
+                if not employees_id:
+                    continue 
+                
+                lunch = request.POST.get(f'lunch_{i}', 'No')
+                to_go = request.POST.get(f'to_go_{i}', 'No')
+                covered = request.POST.get(f'covered_{i}', 'No')
+                
+                # Si todos los campos son 'No', no agregar a la lista
+                if lunch == 'No' and to_go == 'No' and covered == 'No':
+                    continue
+
+                resumen_empleados.append({
+                    'employees': employees_id, # Usar employees_id para claridad
+                    'lunch': lunch,
+                    'to_go': to_go,
+                    'covered': covered,
+                })
+            
+            # Guardar el resumen en la sesión solo si hay empleados válidos
+            if resumen_empleados:
+                request.session['resumen_empleados'] = resumen_empleados
+                contexto = {
+                    'contexto': resumen_empleados,
+                    'current_page': 'resumen'
+                }
+                return render(request, 'paginas/resumen.html', contexto)
         
-        for i in range(total): 
-            employees = request.POST.get(f'employees_{i}')
-            if not employees:
-                continue 
-            
-            lunch = request.POST.get(f'lunch_{i}', 'No')
-            to_go = request.POST.get(f'to_go_{i}', 'No')
-            covered = request.POST.get(f'covered_{i}', 'No')
-
-            resumen_empleados.append({
-                'employees': employees,
-                'lunch': lunch,
-                'to_go': to_go,
-                'covered': covered,
-            })
-            
-            request.session['resumen_empleados'] = resumen_empleados
-
-        contexto = {
-            'contexto': resumen_empleados,
-            'current_page' : 'resumen'
-        }
-
-        return render(request, 'paginas/resumen.html', contexto)
+        # Redirigir si 'total_employees' es 0 o si no se seleccionaron opciones
+        messages.warning(request, "No se seleccionó ninguna opción. Por favor, seleccione un empleado para continuar.")
+        return redirect('seleccion')
+        
+    # Redirigir si el método no es POST
+    messages.warning(request, "Acceso denegado: Debe seleccionar un empleado para acceder a esta vista.")
     return redirect('seleccion')
 
 
@@ -397,6 +460,8 @@ def registration_order():
     pass
 
 
+LOGO_PATH = os.path.join(settings.STATIC_ROOT, 'img', 'logo.png')
+#LOGO_PATH = '../static/img/logo.png' 
 
 def ticket(request):
     
@@ -409,10 +474,16 @@ def ticket(request):
         
         encoded_qrs = []
 
-      
+        # Cargar el logo una sola vez antes del bucle
+        try:
+            logo = Image.open(LOGO_PATH)
+        except FileNotFoundError:
+            # Si el logo no se encuentra, la variable será None y no se intentará agregar.
+            logo = None
+            print(f"Advertencia: No se encontró el archivo del logo en la ruta: {LOGO_PATH}")
+            
         for i in range(len(employee_names)):
             try:
-                
                 info = (
                     f"Empleado: {employee_names[i]}\n"
                     f"Almuerzo: {lunch_options[i]}\n"
@@ -420,26 +491,45 @@ def ticket(request):
                     f"Cubiertos: {covered_options[i]}"
                 )
                 
+                # Crear el objeto QR con un alto nivel de corrección de errores
+                qr = qrcode.QRCode(
+                    error_correction=qrcode.constants.ERROR_CORRECT_H
+                )
+                qr.add_data(info)
+                qr.make(fit=True)
+                
+                
+                qr_img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
+                
                
-                qr_img = qrcode.make(info)
+                if logo:
+                    qr_width, qr_height = qr_img.size
+                    
+                    
+                    logo_size = int(qr_width * 0.40)
+                    logo.thumbnail((logo_size, logo_size), Image.Resampling.LANCZOS)
+                    
+                    # Calcular la posición para centrar el logo
+                    logo_pos = ((qr_width - logo.width) // 2, (qr_height - logo.height) // 2)
+                    
+                    # Pegar el logo sobre el QR, usando el propio logo como máscara
+                    qr_img.paste(logo, logo_pos, logo)
+                
+                # Guardar la imagen combinada en un buffer de memoria
                 buffer = BytesIO()
                 qr_img.save(buffer, format='PNG')
                 
-               
+                # Codificar la imagen y añadirla a la lista
                 encoded_img_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
                 encoded_qrs.append(encoded_img_data)
 
             except IndexError:
-                
                 print(f"Skipping incomplete data for employee at index {i}")
                 continue
                 
-        
-        return render(request, 'paginas/ticket.html', {'encoded_qrs': encoded_qrs ,'current_page' : 'ticket'})
+        return render(request, 'paginas/ticket.html', {'encoded_qrs': encoded_qrs, 'current_page': 'ticket'})
     
-    messages.warning(request, "Advertencia: no puede ir a ticket si no ha seleccionado nada")
-        
-        # 2. Redirige a la vista (URL) que mostrará ese mensaje
+    messages.warning(request, "Advertencia: Para crear un ticket, primero debe seleccionar un empleado")
     return redirect('seleccion')
     
 

@@ -34,14 +34,14 @@
                     <ul class="space-y-2 px-4">
                         <li>
                             <a href="{% url 'index' %}" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors
-                                {% if current_page == 'dashboard' %}bg-blue-700 text-white active{% endif %}">
+                                {% if current_page == 'dashboard' %}bg-blue-300 text-white active{% endif %}">
                                 <i class="fas fa-tachometer-alt text-center text-gray-800 dark:text-white"></i>
                                 <span class="menu-text ml-3 text-gray-800 dark:text-white">Dashboard</span>
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'usu' %}" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors
-                                {% if current_page == 'usuarios' %}bg-blue-700 text-white active{% endif %}">
+                                {% if current_page == 'usuarios' %}bg-blue-300 text-white active{% endif %}">
                                 
                                 <i class="fa fa-user text-gray-800 dark:text-white" aria-hidden="true"></i>
                                 <span class="menu-text ml-3 text-gray-800 dark:text-white">Usuarios</span>
@@ -49,21 +49,21 @@
                         </li>
                         <li>
                             <a href="{% url 'menu' %}" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors
-                                {% if current_page == 'menu' %}bg-blue-700 text-white active{% endif %}">
+                                {% if current_page == 'menu' %}bg-blue-300 text-white active{% endif %}">
                                <i class="fa-solid fa-bars text-gray-800 dark:text-white"></i>
                                 <span class="menu-text ml-3 text-gray-800 dark:text-white">Menu</span>
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'seleccion' %}" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors
-                                {% if current_page == 'seleccion' %}bg-blue-700 text-white active{% endif %}">
+                                {% if current_page == 'seleccion' %}bg-blue-300 text-white active{% endif %}">
                                 <i class="fa-solid fa-check-double text-gray-800 dark:text-white"></i>
                                 <span class="menu-text ml-3 text-gray-800 dark:text-white">Seleccion</span>
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'resumen' %}" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors
-                                {% if current_page == 'resumen' %}bg-blue-700 text-white active{% endif %}">
+                                {% if current_page == 'resumen' %}bg-blue-300 text-white active{% endif %}">
                                 <i class="fa-solid fa-money-bill-1-wave text-gray-800 dark:text-white"></i>
                                 <span class="menu-text ml-3 text-gray-800 dark:text-white">Resumen de pagos</span>
                                 
@@ -71,7 +71,7 @@
                         </li>
                         <li>
                             <a href="{% url 'ticket' %}" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors
-                                {% if current_page == 'ticket' %}bg-blue-700 text-white active{% endif %}">
+                                {% if current_page == 'ticket' %}bg-blue-300 text-white active{% endif %}">
                                     <i class="fa-solid fa-ticket text-gray-800 dark:text-white"></i>
                                 <span class="menu-text ml-3 text-gray-800 dark:text-white">Generar Ticket</span>
                                 
@@ -79,21 +79,21 @@
                         </li>
                         <li>
                             <a href="{% url 'empleados' %}" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors
-                                {% if current_page == 'empleados' %}bg-blue-700 text-white active{% endif %}">
+                                {% if current_page == 'empleados' %}bg-blue-300 text-white active{% endif %}">
                                 <i class="fas fa-users w-6 text-center text-gray-800 dark:text-white"></i>
                                 <span class="menu-text ml-3 text-gray-800 dark:text-white">Empleados</span>
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'pedidos' %}" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors
-                                {% if current_page == 'pedidos' %}bg-blue-700 text-white active{% endif %}">
+                                {% if current_page == 'pedidos' %}bg-blue-300 text-white active{% endif %}">
                                 <i class="fa fa-cutlery text-gray-800 dark:text-white" aria-hidden="true"></i>
                                 <span class="menu-text ml-3 text-gray-800 dark:text-white">Pedidos</span>
                             </a>
                         </li>
                          <li>
                             <a href="{% url 'escaner' %}" class="menu-item flex items-center p-3 rounded-lg text-gray-300 hover:bg-blue-200 transition-colors
-                                {% if current_page == 'escaner' %}bg-blue-700 text-white active{% endif %}">
+                                {% if current_page == 'escaner' %}bg-blue-300 text-white active{% endif %}">
                                 <i class="fa fa-qrcode text-gray-800 dark:text-white" aria-hidden="true"></i>
                                 <span class="menu-text ml-3 text-gray-800 dark:text-white">Escaner</span>
                             </a>
@@ -148,7 +148,7 @@
                         </div>
                         
                         <div class="flex items-center">
-                            <img src="https://placehold.co/40" alt="Miniatura de foto de perfil del usuario masculino con traje y fondo blanco" class="rounded-full w-8 h-8">
+                            <img src="{% static 'img/TicketLunchLogo.png' %}" alt="Miniatura de foto de perfil del usuario masculino con traje y fondo blanco" class="rounded-full w-10 h-10">
                         </div>
                     </div>
                 </div>
