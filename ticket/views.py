@@ -567,6 +567,7 @@ def pedidos(request):
 def escaner(request):
     return render(request,"paginas/scan.html",{'current_page' : 'escaner'})
 
+
 #logout de la aplicacion
 def logout_view(request):
     logout(request)
