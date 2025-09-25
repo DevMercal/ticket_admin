@@ -1,105 +1,128 @@
-const empleados = JSON.parse(document.getElementById('empleados-data').textContent);
+document.addEventListener('DOMContentLoaded', () => {
+    // --- 1. Variables y Elementos del DOM ---
+    const table = document.getElementById('myTable');
+    const tbody = table.querySelector('tbody');
+    const searchInput = document.getElementById('searchInput');
+    const rowsPerPageSelect = document.getElementById('rowsPerPage');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pageNumbersSpan = document.getElementById('pageNumbers');
+    const resumenForm = document.getElementById('resumen-form');
 
-// Variables de estado para la paginación
-let currentPage = 1;
-let itemsPerPage = 5;
-let filteredEmployees = [...empleados];
+    const allRows = Array.from(tbody.querySelectorAll('tr'));
+    let filteredRows = [...allRows];
+    let currentPage = 1;
+    let rowsPerPage = parseInt(rowsPerPageSelect.value);
 
-// Referencias a elementos del DOM
-const tbody = document.getElementById("dataBo");
-const searchInput = document.getElementById("searchInput");
-const paginationControls = document.getElementById("pagination-controls");
-const itemsPerPageSelect = document.getElementById("itemsPerPageSelect");
+    // Objeto para almacenar las selecciones de todos los empleados
+    const employeeSelections = {};
+    console.log(employeeSelections)
+    // --- 2. Funciones de Lógica de Negocio ---
+    function renderTable() {
+        tbody.innerHTML = '';
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const paginatedRows = filteredRows.slice(start, end);
 
-// Función principal para renderizar la tabla
-function renderTable() {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const employeesToShow = filteredEmployees.slice(startIndex, endIndex);
+        if (paginatedRows.length === 0) {
+            const noResultsRow = document.createElement('tr');
+            noResultsRow.innerHTML = `<td colspan="${table.querySelectorAll('th').length}" style="text-align: center; padding: 20px;">No se encontraron resultados.</td>`;
+            tbody.appendChild(noResultsRow);
+        } else {
+            paginatedRows.forEach(row => {
+                const employeeIndex = row.dataset.employeeIndex;
+                const selections = employeeSelections[employeeIndex] || {};
 
-    tbody.innerHTML = '';
+                // Restaurar estado de checkboxes si existen
+                const lunchCheckbox = row.querySelector(`[name="lunch_${employeeIndex}"]`);
+                const toGoCheckbox = row.querySelector(`[name="to_go_${employeeIndex}"]`);
+                const coveredCheckbox = row.querySelector(`[name="covered_${employeeIndex}"]`);
 
-    if (employeesToShow.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center">No se encontraron resultados.</td></tr>';
-    } else {
-        employeesToShow.forEach(empleado => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="py-3 px-1 dark:text-white text-center" data-label="Nombre">${ empleado.last_name }</td>
-                <td class="py-3 px-1 dark:text-white text-center" data-label="Cédula">${ empleado.cedula }</td>
-                <td class="py-3 px-1 dark:text-white text-center" data-label="Gerencia">${ empleado.gerecia.management_name }</td>
-                <td class="py-3 px-1 dark:text-white text-center" data-label="Acciones">
-            `;
-            tbody.appendChild(tr);
-        });
+                if (lunchCheckbox) lunchCheckbox.checked = selections.lunch === 'Si';
+                if (toGoCheckbox) toGoCheckbox.checked = selections.to_go === 'Si';
+                if (coveredCheckbox) coveredCheckbox.checked = selections.covered === 'Si';
+
+                tbody.appendChild(row);
+            });
+        }
+        updatePaginationControls();
     }
-    
-    updatePaginationControls();
-}
 
-// Función para actualizar los controles de paginación
-function updatePaginationControls() {
-    const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
-    paginationControls.innerHTML = '';
+    function updatePaginationControls() {
+        const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+        pageNumbersSpan.textContent = `Página ${currentPage} de ${totalPages}`;
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+    }
 
-    if (totalPages > 1) {
-        // Botón "Anterior"
-        const prevButton = document.createElement('button');
-        prevButton.innerText = 'Anterior';
-        prevButton.className = 'px-4 py-2 mr-2 bg-gray-200 rounded-md';
-        prevButton.disabled = currentPage === 1;
-        prevButton.addEventListener('click', () => {
+    function handleSearch() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        if (searchTerm === '') {
+            filteredRows = [...allRows];
+        } else {
+            filteredRows = allRows.filter(row => {
+                return Array.from(row.children).some(cell =>
+                    cell.textContent.toLowerCase().includes(searchTerm)
+                );
+            });
+        }
+        currentPage = 1;
+        renderTable();
+    }
+
+    function handleRowsPerPageChange() {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        currentPage = 1;
+        renderTable();
+    }
+
+    function handlePrevClick() {
+        if (currentPage > 1) {
             currentPage--;
             renderTable();
-        });
-        paginationControls.appendChild(prevButton);
+        }
+    }
 
-        // Indicador de página actual
-        const pageIndicator = document.createElement('span');
-        pageIndicator.className = 'px-4 py-2';
-        pageIndicator.innerText = `Página ${currentPage} de ${totalPages}`;
-        paginationControls.appendChild(pageIndicator);
-        
-        // Botón "Siguiente"
-        const nextButton = document.createElement('button');
-        nextButton.innerText = 'Siguiente';
-        nextButton.className = 'px-4 py-2 ml-2 bg-gray-200 rounded-md'; // Corregido: 'justify-end' fue eliminado de aquí
-        nextButton.disabled = currentPage === totalPages;
-        nextButton.addEventListener('click', () => {
+    function handleNextClick() {
+        const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+        if (currentPage < totalPages) {
             currentPage++;
             renderTable();
-        });
-        paginationControls.appendChild(nextButton);
-    }
-}
-
-// Función para manejar el filtrado
-function handleFilter() {
-    const filter = searchInput.value.toUpperCase();
-    
-    filteredEmployees = empleados.filter(empleado => {
-        for (const key in empleado) {
-            const valor = String(empleado[key]);
-            if (valor.toUpperCase().includes(filter)) {
-                return true;
-            }
         }
-        return false;
+    }
+    
+    // --- 3. Event Listeners ---
+    searchInput.addEventListener('input', handleSearch);
+    rowsPerPageSelect.addEventListener('change', handleRowsPerPageChange);
+    prevBtn.addEventListener('click', handlePrevClick);
+    nextBtn.addEventListener('click', handleNextClick);
+
+    // Listener para capturar cambios en los checkboxes
+    tbody.addEventListener('change', (event) => {
+        if (event.target.type === 'checkbox') {
+            const row = event.target.closest('tr');
+            if (!row) return; // Protección por si no encuentra fila
+            const employeeIndex = row.dataset.employeeIndex;
+            const selectionType = event.target.dataset.selectionType;
+            if (!employeeIndex || !selectionType) return; // Protección
+
+            const isChecked = event.target.checked;
+
+            if (!employeeSelections[employeeIndex]) {
+                employeeSelections[employeeIndex] = {
+                    index: employeeIndex,
+                    name: row.dataset.employeeName,
+                    lunch: 'No',
+                    to_go: 'No',
+                    covered: 'No'
+                };
+            }
+            employeeSelections[employeeIndex][selectionType] = isChecked ? 'Si' : 'No';
+        }
     });
 
-    currentPage = 1;
-    renderTable();
-}
+   
 
-// Nuevo: Escuchar los cambios en el menú desplegable de cantidad de registros
-itemsPerPageSelect.addEventListener("change", (event) => {
-    itemsPerPage = Number(event.target.value);
-    currentPage = 1;
+    // --- 4. Renderizado Inicial ---
     renderTable();
-});
-
-// Asignar los eventos una sola vez al cargar el documento
-document.addEventListener('DOMContentLoaded', () => {
-    renderTable();
-    searchInput.addEventListener("input", handleFilter);
 });

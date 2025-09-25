@@ -28,7 +28,7 @@
     </div>
 
     {% csrf_token %}
-    <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md">
+    <div class="overflow-x-auto max-h-96 overflow-y-auto bg-white dark:bg-dark-100 rounded-lg shadow-md">
         <table class="responsive-table w-full" id="myTable">
             <thead class="bg-gray-100 dark:bg-dark-200">
                 <tr>
@@ -63,6 +63,6 @@
 
 
 </div>
-<script src="{% static 'js/buscador.js' %}"></script>
+<script src="{% static 'js/empleados.js' %}"></script>
 
 {% endblock %}
