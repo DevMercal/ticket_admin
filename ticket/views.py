@@ -27,8 +27,8 @@ def inicio(request):
 
         try:
             
-            response = requests.post(f"{api_url}/users/login", json=data, timeout=10)
-            print(response)
+            response = requests.post(f"{api_url}/users/login", json=data)
+            
             if response.status_code == 200:
                 json_data = response.json()
                 empleados = json_data.get('data', [])
@@ -190,7 +190,6 @@ def usu(request: HttpRequest):
 
 def user_registro(request: HttpRequest) -> HttpResponse:
  
-    url = "http://comedor.mercal.gob.ve/api/p1/users"
     token = request.session.get('api_token')
     headers = {
         'Authorization': f'Bearer {token}',
@@ -198,17 +197,17 @@ def user_registro(request: HttpRequest) -> HttpResponse:
     }
 
     if request.method == 'POST': 
-        # Use .get() with a default value to prevent KeyError if a field is missing
+       
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
         password = request.POST.get('password', '')
         password_confirmation = request.POST.get('password_confirmation', '')
         id_management = request.POST.get('id_management', '')
 
-        # Basic validation to ensure required fields aren't empty
+       
         if not all([name, email, password, password_confirmation, id_management]):
             messages.error(request, 'Todos los campos son obligatorios.')
-            return redirect('usu') # Replace with your form view name
+            return redirect('usu') 
 
         data = {
             'name': name,
@@ -219,8 +218,8 @@ def user_registro(request: HttpRequest) -> HttpResponse:
         }
 
         try:
-            # It's good practice to set a timeout for external requests
-            response = requests.post(url, json=data, headers=headers, timeout=10)
+            
+            response = requests.post(f"{api_url}/users", json=data, headers=headers, timeout=10)
             response.raise_for_status()  # This will raise an HTTPError for 4xx/5xx status codes
 
             messages.success(request, 'Usuario registrado exitosamente.')
@@ -244,7 +243,7 @@ def user_registro(request: HttpRequest) -> HttpResponse:
 
 def eliminar_user(request, id):
     if request.method == 'GET':
-        url = f"http://comedor.mercal.gob.ve/api/p1/users/{id}"
+      
         token = request.session.get('api_token')
         headers = {
             'Authorization': f'Bearer {token}',
@@ -252,7 +251,7 @@ def eliminar_user(request, id):
         }
 
         try:
-            response = requests.delete(url, headers=headers, timeout=10)
+            response = requests.delete(f"{api_url}/users/{id}", headers=headers, timeout=10)
             response.raise_for_status()  # Raise an error for bad responses
 
             messages.success(request, 'Usuario eliminado exitosamente.')
@@ -380,12 +379,11 @@ def seleccion(request):
     
     selected_management = request.GET.get('management', '')
     
-    url_empleados = "http://comedor.mercal.gob.ve/api/p1/empleados"
     params = {'gerencias': selected_management} if selected_management else {}
     
     employees = []
     try:
-        response = requests.get(url_empleados, headers=headers, params=params, timeout=10)
+        response = requests.get(f"{api_url}/empleados", headers=headers, params=params, timeout=10)
         response.raise_for_status()
         json_data = response.json()
        
@@ -393,10 +391,10 @@ def seleccion(request):
        
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error al obtener empleados: {req_err}")
-    url_management = "http://comedor.mercal.gob.ve/api/p1/gerencias"
+    
     management = []
     try:
-        response_management = requests.get(url_management, headers=headers, timeout=10)
+        response_management = requests.get(f"{api_url}/gerencias", headers=headers, timeout=10)
         response_management.raise_for_status()
         json_management = response_management.json()
         
@@ -543,24 +541,20 @@ def empleados(request):
         messages.warning(request, "Debe iniciar sesión para ver esta información.")
         return redirect('inicio') 
 
-    url_api = "http://comedor.mercal.gob.ve/api/p1/empleados"
-    empleados = []
+    
     token = request.session.get('api_token')
     headers = {
         'Authorization': f'Bearer {token}'
     }
     
     try:
-        response = requests.get(url_api, headers=headers, timeout=10)
+        response = requests.get(f"{api_url}/empleados", headers=headers, timeout=10)
         response.raise_for_status()
         json_data = response.json()
 
         # 1. Acceder al primer 'data' y luego al segundo 'data'
         data_principal = json_data.get('employees', [])
-        
-        
-        
-        
+       
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error inesperado: {req_err}")
 
