@@ -26,8 +26,7 @@
                 <tr>
                     <th class="py-3 px-4 text-center dark:text-white">Nombre</th>
                     <th class="py-3 px-4 text-center dark:text-white">Email</th>
-                    <th class="py-3 px-4 text-center dark:text-white">Rol</th>
-                    
+                    <th class="py-3 px-4 text-center dark:text-white">Gerencia</th>
                      <th class="py-3 px-4 text-center dark:text-white">Detalles</th>
                     <th class="py-3 px-4 text-center dark:text-white">Accion</th>
                 </tr>
@@ -37,20 +36,14 @@
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td class="py-3 px-4 dark:text-white" data-label="Nombre">{{usuario.name}}</td>
                     <td class="py-3 px-4 dark:text-white" data-label="Email">{{ usuario.email }}</td>
-                    <td class="py-3 px-4 dark:text-white">
-                        {% for grou in usuario.groups.all %}
-                        <span>{{ grou.name }}</span>
-                        {% empty %}
-                        <span>Sin grupo asignado</span>
-                        {% endfor %}
-                    </td>
+                    <td class="py-3 px-4 dark:text-white" data-label="Gerencias">{{ usuario.management.management_name }}</td>
                    
-                    <td> <button data-modal-target="miModal{{ usuario.id }}"
+                    <td class="py-3 px-4 dark:text-white" data-label="Accion"> <button data-modal-target="miModal{{ usuario.id }}"
                             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             Ver mas
                         </button>
                     </td>
-                    <td>
+                    <td class="py-3 px-4 dark:text-white" data-label="Accion">
                         {% url 'eliminar_user' usuario.id as ruta %}
                          <a href="#" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                                 onclick="confirmarEliminar(event, '{{ruta}}')" >Eliminar</a> 

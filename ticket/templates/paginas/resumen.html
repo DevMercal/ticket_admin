@@ -11,32 +11,58 @@
         <span class="text-green-600 font-semibold text-sm md:text-base">Total a pagar: <span class="font-bold">Bs. 0.00</span></span>
       </header>
 
-      <div class="overflow-x-auto rounded-md ">
-        <table class="min-w-full bg-blue-600 text-white text-sm md:text-base rounded-md dark:bg-blue-200" >
-          <thead>
+<div class="hidden md:block overflow-x-auto max-h-96 overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <table class="w-full text-sm rounded-lg overflow-hidden">
+        <thead class="bg-blue-600 text-white dark:bg-blue-800 dark:text-gray-100">
             <tr>
-              <th class="py-3 px-4 font-semibold text-center dark:text-black">Empleado</th>
-              <th class="py-3 px-4 font-semibold text-center dark:text-black">Almuerzo</th>
-              <th class="py-3 px-4 font-semibold text-center dark:text-black">Para Llevar</th>
-              <th class="py-3 px-4 font-semibold text-center dark:text-black">Cubiertos</th>
+                <th class="py-3 px-4 font-semibold text-left">Empleado</th>
+                <th class="py-3 px-4 font-semibold text-center">Almuerzo</th>
+                <th class="py-3 px-4 font-semibold text-center">Para Llevar</th>
+                <th class="py-3 px-4 font-semibold text-center">Cubiertos</th>
             </tr>
-          </thead>
-         
-            <tbody class="bg-white divide-y divide-gray-200 dark:bg-dark-100 dark:divide-dark-200">
-                
-              {% for i in contexto %}
-                  
-                    <tr> 
-                        <th class="text-black dark:text-white">{{ i.employees }}</th>
-                        <th class="text-black dark:text-white">{{ i.lunch }}</th>
-                        <th class="text-black dark:text-white">{{ i.to_go }}</th>
-                        <th class="text-black dark:text-white">{{ i.covered }}</th>
-                    </tr>
-                   
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-700 dark:divide-gray-600">
+            {% for i in contexto %}
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-600 transition duration-150">
+                <td class="py-3 px-4 font-medium text-gray-900 dark:text-white">{{ i.employees }}</td>
+                <td class="py-3 px-4 text-center text-gray-700 dark:text-gray-200">{{ i.lunch }}</td>
+                <td class="py-3 px-4 text-center text-gray-700 dark:text-gray-200">{{ i.to_go }}</td>
+                <td class="py-3 px-4 text-center text-gray-700 dark:text-gray-200">{{ i.covered }}</td>
+            </tr>
             {% endfor %}
-            </tbody>
-        </table>
-      </div>
+        </tbody>
+    </table>
+</div>
+
+<div class="md:hidden space-y-4 p-4">
+    {% for i in contexto %}
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700">
+        
+        <h3 class="text-lg font-bold text-blue-600 dark:text-blue-400 mb-3 border-b pb-2 border-gray-100 dark:border-gray-700">
+            {{ i.employees }}
+        </h3>
+        
+        <div class="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+            
+            <div class="flex flex-col">
+                <span class="font-semibold text-gray-500 dark:text-gray-400">Almuerzo:</span>
+                <span class="text-gray-900 dark:text-white">{{ i.lunch }}</span>
+            </div>
+            
+            <div class="flex flex-col">
+                <span class="font-semibold text-gray-500 dark:text-gray-400">Para Llevar:</span>
+                <span class="text-gray-900 dark:text-white">{{ i.to_go }}</span>
+            </div>
+            
+            <div class="flex flex-col col-span-2">
+                <span class="font-semibold text-gray-500 dark:text-gray-400">Cubiertos:</span>
+                <span class="text-gray-900 dark:text-white">{{ i.covered }}</span>
+            </div>
+
+        </div>
+    </div>
+    {% endfor %}
+</div>
     </section>
 
     <section>

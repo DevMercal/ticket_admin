@@ -1,7 +1,7 @@
 ###  USUARIOS
 GET http://comedor.mercal.gob.ve/api/p1/users HTTP/1.1
 content-type: application/json
-Authorization: Bearer 4|HzW2YI4FVZwN2c6aX3MqppZlGkYEZEoQxfu108vD5f2c5289
+Authorization: Bearer 32|7MX5Ed22cu26DKvQz3nbCYcRZ1YQBzFxCpe1r0cT8d364ebf
 ### MENU
 GET  http://comedor.mercal.gob.ve/api/p1/menus HTTP/1.1
 content-type: application/json
@@ -9,7 +9,7 @@ Authorization: Bearer 4|HzW2YI4FVZwN2c6aX3MqppZlGkYEZEoQxfu108vD5f2c5289
 ### EXTRAS
 GET http://comedor.mercal.gob.ve/api/p1/extras HTTP/1.1
 content-type: application/json
-Authorization: Bearer 4|HzW2YI4FVZwN2c6aX3MqppZlGkYEZEoQxfu108vD5f2c5289
+Authorization: Bearer 32|7MX5Ed22cu26DKvQz3nbCYcRZ1YQBzFxCpe1r0cT8d364ebf
 ### GERENCIAS TODAS
 GET http://comedor.mercal.gob.ve/api/p1/gerencias HTTP/1.1
 content-type: application/json
@@ -23,12 +23,12 @@ GET http://comedor.mercal.gob.ve/api/p1/pedidos HTTP/1.1
 content-type: application/json
 Authorization: Bearer 4|HzW2YI4FVZwN2c6aX3MqppZlGkYEZEoQxfu108vD5f2c5289
 ###  EMPLEADOS
-GET http://192.168.1.111:8000/api/p1/empleados HTTP/1.1
+GET http://comedor.mercal.gob.ve/api/p1/empleados HTTP/1.1
 content-type: application/json
-Authorization: Bearer 4|HzW2YI4FVZwN2c6aX3MqppZlGkYEZEoQxfu108vD5f2c5289
+Authorization: Bearer 32|7MX5Ed22cu26DKvQz3nbCYcRZ1YQBzFxCpe1r0cT8d364ebf
 *******************************POSTS******************************
 #### LOGIN
-POST http://192.168.1.111:8000/api/p1/users/login HTTP/1.1
+POST http://comedor.mercal.gob.ve/api/p1/users/login HTTP/1.1
 content-type: application/json
 
 {

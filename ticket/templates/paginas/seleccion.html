@@ -38,7 +38,7 @@
                 <thead class="bg-gray-100 dark:bg-dark-200">
                     <tr>
                         <th class="py-3 px-4 text-center dark:text-white" hidden>Gerencias</th>
-                        <th class="py-3 px-4 text-center dark:text-white">Cedula</th>
+                        <th class="py-3 px-4 text-center dark:text-white" >Cedula</th>
                         <th class="py-3 px-4 text-center dark:text-white">Nombre y Apellido</th>
                         <th class="py-3 px-4 text-center dark:text-white">Almuerzo Bs</th>
                         <th class="py-3 px-4 text-center dark:text-white">Para llevar Bs</th>
@@ -50,20 +50,20 @@
                     {% for em in employees %}
                     <tr data-employee-id="{{ em.id }}" data-employee-name="{{ em.first_name }}"
                         data-employee-index="{{ forloop.counter0 }}">
-                        <td class="py-3 px-4 text-center dark:text-white" hidden>{{ em.gerencias.management_name }}</td>
-                        <td class="py-3 px-4 text-center dark:text-white">{{ em.cedula }}</td>
-                        <td class="py-3 px-4 text-center dark:text-white">{{ em.first_name }}</td>
-                        <td class="py-3 px-4 text-center dark:text-white">
+                        <td class="py-3 px-4 text-center dark:text-white" hidden data-label="Gerencias">{{ em.gerencias.management_name }}</td>
+                        <td class="py-3 px-4 text-center dark:text-white" data-label="Cedula">{{ em.cedula }}</td>
+                        <td class="py-3 px-4 text-center dark:text-white" data-label="Nombre">{{ em.first_name }}</td>
+                        <td class="py-3 px-4 text-center dark:text-white" data-label="Comida">
                             <input type="checkbox" data-selection-type="lunch" value="Si">
                         </td>
-                        <td class="py-3 px-4 text-center dark:text-white">
+                        <td class="py-3 px-4 text-center dark:text-white" data-label="Para llevar">
                             <input type="checkbox" data-selection-type="to_go" value="Si">
                         </td>
-                        <td class="py-3 px-4 text-center dark:text-white">
+                        <td class="py-3 px-4 text-center dark:text-white" data-label="Cubiertos">
                             <input type="checkbox" data-selection-type="covered" value="Si">
                         </td>
                         
-                        <td class="py-3 px-4 text-center dark:text-white" hidden>0.00</td>
+                       
                     </tr>
                     {% endfor %}
 

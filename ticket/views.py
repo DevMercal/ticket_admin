@@ -413,7 +413,7 @@ def seleccion(request):
 def resumen(request):
     if request.method == 'POST':
         total = int(request.POST.get('total_employees', 0))
-        
+    
         if total > 0:
             resumen_empleados = []
             
@@ -492,7 +492,7 @@ def ticket(request):
                     f"Cubiertos: {covered_options[i]}"
                 )
                 
-                # Crear el objeto QR con un alto nivel de corrección de errores
+               
                 qr = qrcode.QRCode(
                     error_correction=qrcode.constants.ERROR_CORRECT_H
                 )
@@ -523,12 +523,16 @@ def ticket(request):
                 # Codificar la imagen y añadirla a la lista
                 encoded_img_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
                 encoded_qrs.append(encoded_img_data)
-
+                zipped_data = zip(employee_names, encoded_qrs) 
             except IndexError:
                 print(f"Skipping incomplete data for employee at index {i}")
                 continue
+        
+        return render(request, 'paginas/ticket.html',{
+                'zipped_data': zipped_data,
+                'current_page': 'ticket' , 
                 
-        return render(request, 'paginas/ticket.html', {'encoded_qrs': encoded_qrs, 'current_page': 'ticket'})
+                } )
     
     messages.warning(request, "Advertencia: Para crear un ticket, primero debe seleccionar un empleado")
     return redirect('seleccion')

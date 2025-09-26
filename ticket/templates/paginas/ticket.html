@@ -1,12 +1,31 @@
 {% extends 'bases/base_dashboard.html' %}
+{% load humanize %}
 
-{% block  content %}
-<div class="flex flex-row-4 flex-wrap m-10 gap-6 pt-2">
-{% for qr_data in encoded_qrs %}
-    <img src="data:image/png;base64,{{ qr_data }}" alt="QR Code" class="w-60" />
-{% empty %}
-    <p>No hay resumen de empleados para generar tickets.</p>
-{% endfor %}
+{% block content %}
+<div class="p-4 sm:p-6 lg:p-8">
+    <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-6 border-b pb-2 border-gray-200 dark:border-gray-700 text-center">
+        Códigos QR Generados
+    </h2>
+
+    <div class="qr-container-list grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 auto-rows-fr">
+    
+        {% for name, qr_data in zipped_data %} 
+        <div class="qr-item bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 ease-in-out transform hover:-translate-y-1 p-5 flex flex-col items-center justify-between border border-gray-100 dark:border-gray-700">
+            
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 text-center truncate w-full" title="{{ name }}">
+                {{ name }}
+            </h3>
+            
+            <div class="flex-grow flex items-center justify-center mb-4 w-full">
+                <img 
+                    src="data:image/png;base64,{{ qr_data }}" 
+                    alt="Código QR para {{ name }}" 
+                    class="w-full max-w-xs h-auto rounded-lg border border-gray-200 dark:border-gray-600 p-1 bg-white" 
+                />
+            </div>
+
+            </div>
+        {% endfor %}
+    </div>
 </div>
-
 {% endblock %}
