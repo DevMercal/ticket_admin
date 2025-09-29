@@ -349,6 +349,7 @@ def menu(request):
         
         try:
             menus = json_data.get('menus', [])
+            print(menu)
             menu_item = menus[4]
 
             
@@ -382,17 +383,38 @@ def seleccion(request):
     params = {'gerencias': selected_management} if selected_management else {}
     
     employees = []
+    processed_employees = []
+    management = []
     try:
-        response = requests.get(f"{api_url}/empleados", headers=headers, params=params, timeout=10)
-        response.raise_for_status()
-        json_data = response.json()
-       
-        employees = json_data.get('employees', [])
+            response = requests.get(f"{api_url}/empleados", headers=headers, params=params, timeout=10)
+            response.raise_for_status()
+            json_data = response.json()
+            
+            
+            employees = json_data.get('employees', [])
+            
+            
+            # Iterate over each employee in the list
+            for employee_data in employees:
+                full_first_name = employee_data.get("first_name")
+                full_last_name = employee_data.get("last_name")
+                
+                # Safely split and concatenate the names
+                first_name = full_first_name.split()[0] if full_first_name else ""
+                first_last_name = full_last_name.split()[0] if full_last_name else ""
+                
+                # Combine into a full name
+                full_name = f"{first_name} {first_last_name}".strip()
+                
+                # Add the full name to the current employee's dictionary
+                employee_data['full_name'] = full_name
+                
+                # Append the processed employee data to the new list
+                processed_employees.append(employee_data)
        
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error al obtener empleados: {req_err}")
-    
-    management = []
+
     try:
         response_management = requests.get(f"{api_url}/gerencias", headers=headers, timeout=10)
         response_management.raise_for_status()
@@ -405,7 +427,7 @@ def seleccion(request):
     return render(request, 'paginas/seleccion.html', {
         'management': management,
         'selected_management': selected_management,
-        'employees': employees, 
+        'employees': processed_employees, 
         'current_page' : 'seleccion'})
 
 
@@ -419,8 +441,8 @@ def resumen(request):
             
             for i in range(total): 
                 employees_id = request.POST.get(f'employees_{i}')
+               
                 
-                # Si el campo 'employees_id' no existe, saltar al siguiente
                 if not employees_id:
                     continue 
                 
@@ -428,12 +450,12 @@ def resumen(request):
                 to_go = request.POST.get(f'to_go_{i}', 'No')
                 covered = request.POST.get(f'covered_{i}', 'No')
                 
-                # Si todos los campos son 'No', no agregar a la lista
+                
                 if lunch == 'No' and to_go == 'No' and covered == 'No':
                     continue
 
                 resumen_empleados.append({
-                    'employees': employees_id, # Usar employees_id para claridad
+                    'employees': employees_id,
                     'lunch': lunch,
                     'to_go': to_go,
                     'covered': covered,
@@ -446,6 +468,8 @@ def resumen(request):
                     'contexto': resumen_empleados,
                     'current_page': 'resumen'
                 }
+               
+                    
                 return render(request, 'paginas/resumen.html', contexto)
         
         # Redirigir si 'total_employees' es 0 o si no se seleccionaron opciones
@@ -474,12 +498,12 @@ def ticket(request):
         covered_options = request.POST.getlist('covered')
         
         encoded_qrs = []
-
-        # Cargar el logo una sola vez antes del bucle
+        
+        
         try:
             logo = Image.open(LOGO_PATH)
         except FileNotFoundError:
-            # Si el logo no se encuentra, la variable será None y no se intentará agregar.
+           
             logo = None
             print(f"Advertencia: No se encontró el archivo del logo en la ruta: {LOGO_PATH}")
             
@@ -524,6 +548,7 @@ def ticket(request):
                 encoded_img_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
                 encoded_qrs.append(encoded_img_data)
                 zipped_data = zip(employee_names, encoded_qrs) 
+                
             except IndexError:
                 print(f"Skipping incomplete data for employee at index {i}")
                 continue
@@ -567,6 +592,21 @@ def empleados(request):
 
 def pedidos(request):
     return render(request, "paginas/pedidos.html" ,{'current_page' : 'pedidos'})
+
+
+def extras(request):
+    if 'api_token' not in request.session:
+        messages.warning(request, "Debe iniciar sesión para ver esta información.")
+        return redirect('inicio') 
+    
+    if request.method == 'POST':
+        coverd = request.POST.get ('cubiertos')
+        to_go = request.POST.get ('para_llevar')
+        
+        print(coverd)
+        print(to_go)
+    
+    return render(request, "paginas/pedidos.html") 
 
 def escaner(request):
     return render(request,"paginas/scan.html",{'current_page' : 'escaner'})

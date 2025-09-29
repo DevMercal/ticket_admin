@@ -25,13 +25,13 @@
         </div>
         <div class="basis-1/4 min-w-[150px]">
             <button class="bg-green-600 dark:bg-green-800 dark:text-white px-3 py-1 rounded-md w-full"
-                data-bs-toggle="modal" data-bs-target="#invitado">
+                data-bs-toggle="modal" data-bs-target="#extras">
                 Registrar extra
             </button>
-            {% include 'modal/invitado.html' %}
+            {% include 'modal/extras.html' %}
         </div>
     </div>
-    <form action="resumen" method="post" id="resumen-form">
+    
         {% csrf_token %}
         <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md">
             <table class="responsive-table w-full" id="myTable">
@@ -67,19 +67,15 @@
 
             </table>
 
-            <div class="pagination-controls flex justify-center items-center gap-4 my-4">
+            
+
+        </div>
+        <div class="pagination-controls flex justify-center items-center gap-4 my-4">
                 <button id="prevBtn" class="bg-blue-800 rounded-md dark:text-white px-2 py-2" type="button">Anterior</button>
                 <h6 id="pageNumbers" class="dark:text-white"></h6>
                 <button id="nextBtn" class="bg-blue-800 rounded-md dark:text-white px-2 py-2" type="button">Siguiente</button>
-            </div>
-
         </div>
-        <div class="flex justify-center mt-6">
-            <button type="submit" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg">
-                Resumen y Pago
-            </button>
-        </div>
-    </form>
+  
 </div>
 <script src="{% static 'js/buscador.js' %}"></script>
 {% endblock %}

@@ -48,11 +48,11 @@
                 </thead>
                 <tbody>
                     {% for em in employees %}
-                    <tr data-employee-id="{{ em.id }}" data-employee-name="{{ em.first_name }}"
+                    <tr data-employee-id="{{ em.id }}" data-employee-name="{{ em.full_name }}"
                         data-employee-index="{{ forloop.counter0 }}">
                         <td class="py-3 px-4 text-center dark:text-white" hidden data-label="Gerencias">{{ em.gerencias.management_name }}</td>
                         <td class="py-3 px-4 text-center dark:text-white" data-label="Cedula">{{ em.cedula }}</td>
-                        <td class="py-3 px-4 text-center dark:text-white" data-label="Nombre">{{ em.first_name }}</td>
+                        <td class="py-3 px-4 text-center dark:text-white" data-label="Nombre">{{ em.full_name }}</td>
                         <td class="py-3 px-4 text-center dark:text-white" data-label="Comida">
                             <input type="checkbox" data-selection-type="lunch" value="Si">
                         </td>

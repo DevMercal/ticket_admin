@@ -5,7 +5,7 @@ Authorization: Bearer 32|7MX5Ed22cu26DKvQz3nbCYcRZ1YQBzFxCpe1r0cT8d364ebf
 ### MENU
 GET  http://comedor.mercal.gob.ve/api/p1/menus HTTP/1.1
 content-type: application/json
-Authorization: Bearer 4|HzW2YI4FVZwN2c6aX3MqppZlGkYEZEoQxfu108vD5f2c5289
+Authorization: Bearer 38|xsGg52ysl8hlw4d4N4n4n3B98BQchyksXqFFuuMAad791286
 ### EXTRAS
 GET http://comedor.mercal.gob.ve/api/p1/extras HTTP/1.1
 content-type: application/json
@@ -21,7 +21,7 @@ Authorization: Bearer 4|HzW2YI4FVZwN2c6aX3MqppZlGkYEZEoQxfu108vD5f2c5289
 ###  PEDIDOS
 GET http://comedor.mercal.gob.ve/api/p1/pedidos HTTP/1.1
 content-type: application/json
-Authorization: Bearer 4|HzW2YI4FVZwN2c6aX3MqppZlGkYEZEoQxfu108vD5f2c5289
+Authorization: Bearer 38|xsGg52ysl8hlw4d4N4n4n3B98BQchyksXqFFuuMAad791286
 ###  EMPLEADOS
 GET http://comedor.mercal.gob.ve/api/p1/empleados HTTP/1.1
 content-type: application/json
