@@ -1,5 +1,5 @@
 <div class="modal fade" id="movil" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    aria-labelledby="staticBackdropLabel" aria-="true">
     <div class="modal-dialog">
         <div class="modal-content dark:bg-gray-800 p-6">
             <div class="modal-header border-b-0 pb-0">
@@ -53,37 +53,94 @@
                         </button>
                     </div>
                 </div>
-                <form action="ticket" method="post">
+                <form method="POST" action="{% url 'registration_order' %}" enctype="multipart/form-data" class="max-w-md mx-auto">
+                    {% csrf_token %}
+                    
+                
+                    
+                    <label for="special_event">id_employee:</label>
+                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="id_employee" name="cedula" required><br>
+
+                    <label for="special_event">Evento Especial:</label>
+                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="special_event" name="special_event" required><br>
+
+                    <label for="authorized">Autorizado (Sí/No):</label>
+                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="authorized" name="authorized" required><br>
+                    
+                    <label for="authorized_person">Persona Autorizada:</label>
+                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="authorized_person" name="authorized_person"><br>
+
+                    <label for="id_payment_method">Método de Pago ID:</label>
+                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="id_payment_method" name="id_payment_method" required><br>
+
+                    <label for="reference">Referencia/Número de Transacción:</label>
+                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="reference" name="reference"><br>
+
+                    <label for="total_amount">Monto Total:</label>
+                    <input type="number" class="w-full p-2 border border-gray-300 rounded-md text-center" class="w-full p-2 border border-gray-300 rounded-md text-center" step="0.01" id="total_amount" name="total_amount" required><br>
+
+                    
+                    <label for="payment_support">Soporte de Pago (Archivo):</label>
+                    <input type="file" class="w-full p-2 border border-gray-300 rounded-md text-center" id="payment_support" name="payment_support" accept="image/*,application/pdf" required><br>
+
+                    <h2>Datos del Empleado que Paga/Solicita</h2>
+
+                    <label for="cedula_employee">Cédula Empleado:</label>
+                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="cedula_employee" name="cedula_employee" required><br>
+
+                    <label for="name_employee">Nombre Empleado:</label>
+                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="name_employee" name="name_employee" required><br>
+
+                    <label for="phone_employee">Teléfono Empleado:</label>
+                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="phone_employee" name="phone_employee"><br>
+
+                  
+                    <button type="submit">Registrar Orden</button>
+
+                </form>
+                <!-- <form action="registration_order" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
 
                     {% for i in contexto %}
-                    {% if i.lunch == "Si" %}
+                   
+                        <input type="text" name="id_employee" value="{{ i.employees }}" >
+                        <input type="text" name="lunch" value="{{ i.lunch }}" >
+                        <input type="text" name="to_go" value="{{ i.to_go }}" >
+                        <input type="text" name="covered" value="{{ i.covered }}" >
                     
-                        <input type="text" name="employees" value="{{ i.employees }}" hidden>
-                        <input type="text" name="lunch" value="{{ i.lunch }}" hidden>
-                        <input type="text" name="to_go" value="{{ i.to_go }}" hidden>
-                        <input type="text" name="covered" value="{{ i.covered }}" hidden>
-
-                    {% endif %}
                     {% endfor %}
-                    <div class="text-center mb-4">
+
+                    <div class="text-center mb-4 gap-4">
                         <label for="referencia" class="text-blue-800 dark:text-blue-300 font-semibold mb-2 block">Número
                             de referencia:</label>
-                        <input type="number" id="referencia"
-                            class="w-full p-2 border border-gray-300 rounded-md text-center"
+                        <input type="number" 
+                            id="referencia"
+                            name="reference" class="w-full p-2 border border-gray-300 rounded-md text-center"
                             placeholder="Ingrese número de referencia" required>
+                        <input type="text" 
+                            id="referencia"
+                            name="name_employee" class="w-full p-2 border border-gray-300 rounded-md text-center"
+                            placeholder="Nombre y Apellido" required>
+                        <input type="text" 
+                            id="referencia"
+                            name="cedula_employee" class="w-full p-2 border border-gray-300 rounded-md text-center"
+                            placeholder="Cedula" required>
+                        <input type="text" 
+                            id="referencia"
+                            name="phone_employee" class="w-full p-2 border border-gray-300 rounded-md text-center"
+                            placeholder="telefono" required>
+                        <input type="file" 
+                            id="payment_support"
+                            name="payment_support" class="w-full p-2 border border-gray-300 rounded-md text-center mt-4"
+                            required>
+                        </div>
+                    
+                    <div class="modal-footer flex gap-4 border-t-0 pt-0 justify-center">
+                        <button type="submit"
+                            class="btn btn-primary bg-green-500 text-white font-semibold rounded-md py-2 px-6 w-auto flex-auto hover:bg-green-600 transition-colors">Generar
+                            Tickets</button>
                     </div>
-
-            </div>
-            <div class="modal-footer flex gap-4 border-t-0 pt-0 justify-center">
-                <button type="button"
-                    class="btn btn-secondary bg-gray-400 text-white font-semibold rounded-md py-2 px-6 w-auto flex-auto hover:bg-gray-500 transition-colors"
-                    data-bs-dismiss="modal">Cerrar</button>
-                <button type="submit"
-                    class="btn btn-primary bg-green-500 text-white font-semibold rounded-md py-2 px-6 w-auto flex-auto hover:bg-green-600 transition-colors">Generar
-                    Tickets</button>
-            </div>
-            </form>
+                </form> -->
         </div>
     </div>
 </div>

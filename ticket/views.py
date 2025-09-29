@@ -12,6 +12,7 @@ import base64
 from django.conf import settings
 import matplotlib.patches as mpatches
 import os
+import mimetypes
 
 api_url = settings.API
 
@@ -481,12 +482,128 @@ def resumen(request):
     return redirect('seleccion')
 
 
-def registration_order():
-    pass
+
+
+
+import requests
+import json  # Necesitas importar 'json'
+# ... otras importaciones (messages, redirect, render, mimetypes, inicio, api_url)
+
+def registration_order(request):
+    if 'api_token' not in request.session:
+        messages.warning(request, "Debe iniciar sesión para ver esta información.")
+        return redirect(inicio)
+
+    token = request.session.get('api_token')
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+
+    if request.method == 'POST':
+        # 1. Recuperar los datos del formulario
+        special_event = request.POST.get('special_event')
+        authorized = request.POST.get('authorized')
+        authorized_person = request.POST.get('authorized_person')
+        id_payment_method = request.POST.get('id_payment_method')
+        reference = request.POST.get('reference')
+        total_amount = request.POST.get('total_amount')
+        cedula = request.POST.get('cedula')
+        
+        id_order_status = request.POST.get('id_order_status', '1') 
+        id_orders_consumption = request.POST.get('id_orders_consumption', '1') 
+        extras = request.POST.get('extras','1')
+        # Datos para employeePayment
+        cedula_employee = request.POST.get('cedula_employee')
+        name_employee = request.POST.get('name_employee')
+        phone_employee = request.POST.get('phone_employee')
+        
+        
+        
+        payment_support = request.FILES.get('payment_support')
+        
+        
+      
+        payload_data = {
+            "order": {
+                "special_event": special_event,
+                "authorized": authorized,
+                "authorized_person": authorized_person,
+                "id_payment_method": id_payment_method,
+                "reference": reference,
+                "total_amount": total_amount,
+                "cedula": cedula,
+                "id_order_status": id_order_status,
+                "id_orders_consumption": id_orders_consumption,
+                # 'payment_support' se enviará por separado en 'files'
+                "payment_support": "" 
+            },
+           
+            "extras": [
+                extras
+            ],
+            "employeePayment": {
+                "cedula_employee": cedula_employee,
+                "name_employee": name_employee,
+                "phone_employee": phone_employee,
+                
+            }
+        }
+        
+        
+          
+        payload_json_str = json.dumps(payload_data)
+
+               
+        data_to_send = {
+            'data': payload_json_str  
+        }
+        
+        files_to_send = {}
+        if payment_support:
+            
+            content_type = mimetypes.guess_type(payment_support.name)[0] or 'application/octet-stream'
+          
+            files_to_send = {
+                'payment_support': (payment_support.name, payment_support.file, content_type)
+            }
+        
+        print(files_to_send)
+        
+       
+        try:
+          
+            response = requests.post(
+                f"{api_url}/pedidos", 
+                headers=headers, 
+                data=data_to_send, 
+                files=files_to_send, 
+                timeout=10
+            )
+            response.raise_for_status()
+
+            messages.success(request, "La orden se ha registrado correctamente.")
+            return redirect('ticket')
+
+        except requests.exceptions.HTTPError as err:
+            # ... (Manejo de errores existente)
+            error_msg = f"Error: {response.status_code}. Detalles no disponibles."
+            try:
+                error_data = response.json()
+                error_msg = error_data.get('detail') or error_data.get('message', error_msg)
+            except:
+                pass
+            messages.error(request, f"❌ Error al registrar: {error_msg}")
+
+        except requests.exceptions.RequestException as e:
+            # ... (Manejo de errores existente)
+            messages.error(request, "Error de conexión con la API de órdenes.")
+            print(f"Error de conexión: {e}")
+
+    return render(request, "paginas/ticket.html")
 
 
 LOGO_PATH = os.path.join(settings.STATIC_ROOT, 'img', 'logo.png')
-#LOGO_PATH = '../static/img/logo.png' 
+
 
 def ticket(request):
     
