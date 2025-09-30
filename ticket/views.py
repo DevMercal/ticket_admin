@@ -13,6 +13,7 @@ from django.conf import settings
 import matplotlib.patches as mpatches
 import os
 import mimetypes
+import json
 
 api_url = settings.API
 
@@ -485,14 +486,11 @@ def resumen(request):
 
 
 
-import requests
-import json  # Necesitas importar 'json'
-# ... otras importaciones (messages, redirect, render, mimetypes, inicio, api_url)
 
 def registration_order(request):
     if 'api_token' not in request.session:
         messages.warning(request, "Debe iniciar sesión para ver esta información.")
-        return redirect(inicio)
+        return redirect('inicio') # Asumiendo el nombre de la URL 'inicio'
 
     token = request.session.get('api_token')
     headers = {
@@ -500,78 +498,85 @@ def registration_order(request):
     }
 
     if request.method == 'POST':
-        # 1. Recuperar los datos del formulario
-        special_event = request.POST.get('special_event')
-        authorized = request.POST.get('authorized')
-        authorized_person = request.POST.get('authorized_person')
-        id_payment_method = request.POST.get('id_payment_method')
-        reference = request.POST.get('reference')
-        total_amount = request.POST.get('total_amount')
-        cedula = request.POST.get('cedula')
+        # 1. Recuperar y CONVERTIR/PREPARAR los datos
         
-        id_order_status = request.POST.get('id_order_status', '1') 
-        id_orders_consumption = request.POST.get('id_orders_consumption', '1') 
-        extras = request.POST.get('extras','1')
-        # Datos para employeePayment
+        # --- CAMPOS STRING ---
+        special_event = request.POST.get('special_event', 'No')
+        authorized = request.POST.get('authorized', 'No')      
+        authorized_person = request.POST.get('authorized_person', '')
+        total_amount = request.POST.get('total_amount', '0.0') # 'required|string'
+
+        # --- CAMPOS NUMÉRICOS (Convertidos a STRING para el envío 'multipart') ---
+        try:
+            # reference: 'required|numeric'
+            reference = str(float(request.POST.get('reference') or 0.0))
+        except ValueError:
+            messages.error(request, "❌ Error: El campo 'Referencia' debe ser numérico.")
+            return redirect('ticket')
+            
+        try:
+            # cedula: 'required|numeric'
+            cedula = str(int(request.POST.get('cedula') or 0))
+        except ValueError:
+            messages.error(request, "❌ Error: El campo 'Cédula de la Orden' debe ser un número entero.")
+            return redirect('ticket')
+
+        try:
+            # IDs: Convertidos a STRING
+            id_payment_method = str(int(request.POST.get('id_payment_method') or 0))
+            id_order_status = str(int(request.POST.get('id_order_status', '1')))
+            id_orders_consumption = str(int(request.POST.get('id_orders_consumption', '1')))
+        except ValueError:
+            messages.error(request, "❌ Error: Los IDs de pago o estado deben ser números enteros.")
+            return redirect('ticket')
+            
+        # --- Campos de EmployeePayment (STRING) ---
         cedula_employee = request.POST.get('cedula_employee')
         name_employee = request.POST.get('name_employee')
-        phone_employee = request.POST.get('phone_employee')
-        
-        
+        phone_employee = request.POST.get('phone_employee', '')
+        management = request.POST.get('management') 
+        extras = request.POST.get('extras', '1') # Lo incluimos aunque no esté en la validación
         
         payment_support = request.FILES.get('payment_support')
         
         
-      
-        payload_data = {
-            "order": {
-                "special_event": special_event,
-                "authorized": authorized,
-                "authorized_person": authorized_person,
-                "id_payment_method": id_payment_method,
-                "reference": reference,
-                "total_amount": total_amount,
-                "cedula": cedula,
-                "id_order_status": id_order_status,
-                "id_orders_consumption": id_orders_consumption,
-                # 'payment_support' se enviará por separado en 'files'
-                "payment_support": "" 
-            },
-           
-            "extras": [
-                extras
-            ],
-            "employeePayment": {
-                "cedula_employee": cedula_employee,
-                "name_employee": name_employee,
-                "phone_employee": phone_employee,
-                
-            }
-        }
-        
-        
-          
-        payload_json_str = json.dumps(payload_data)
-
-               
+        # 2. CONSTRUIR el payload PLANO (Claves de Laravel)
+        # ESTO REEMPLAZA a payload_data, json.dumps() y data_to_send anterior.
         data_to_send = {
-            'data': payload_json_str  
+             # --- Claves de Order con NOTACIÓN DE ARRAY ---
+            'order[special_event]': special_event,
+            'order[authorized]': authorized,
+            'order[authorized_person]': authorized_person,
+            'order[id_payment_method]': str(id_payment_method), 
+            'order[reference]': str(reference), 
+            'order[total_amount]': total_amount, 
+            'order[cedula]': str(cedula), 
+            'order[id_order_status]': str(id_order_status), 
+            'order[id_orders_consumption]': str(id_orders_consumption),
+            
+            # --- Claves de employeePayment con NOTACIÓN DE ARRAY ---
+            'employeePayment[cedula_employee]': cedula_employee,
+            'employeePayment[name_employee]': name_employee,
+            'employeePayment[phone_employee]': phone_employee,
+            'employeePayment[management]': management,
+            
+            # --- Extras ---
+            'extras[]': extras, 
         }
-        
+
+        # 3. Preparar los archivos (Clave de Laravel para el archivo con notación de array)
         files_to_send = {}
         if payment_support:
-            
             content_type = mimetypes.guess_type(payment_support.name)[0] or 'application/octet-stream'
-          
+            
+            # ¡CLAVE! El archivo también debe usar la notación de array
             files_to_send = {
-                'payment_support': (payment_support.name, payment_support.file, content_type)
+                'order[payment_support]': (payment_support.name, payment_support.file, content_type)
             }
-        
-        print(files_to_send)
         
        
         try:
-          
+            # Enviamos data (datos planos con claves de array) y files (archivo)
             response = requests.post(
                 f"{api_url}/pedidos", 
                 headers=headers, 
@@ -581,21 +586,28 @@ def registration_order(request):
             )
             response.raise_for_status()
 
-            messages.success(request, "La orden se ha registrado correctamente.")
+            messages.success(request, "La orden se ha registrado correctamente. ")
             return redirect('ticket')
 
         except requests.exceptions.HTTPError as err:
-            # ... (Manejo de errores existente)
+            # La depuración es esencial
+            print(f"Error {response.status_code} - Respuesta de la API: {response.text}") 
+            
             error_msg = f"Error: {response.status_code}. Detalles no disponibles."
             try:
                 error_data = response.json()
-                error_msg = error_data.get('detail') or error_data.get('message', error_msg)
+                # Mostrar el detalle del error de validación
+                error_msg = error_data.get('message', error_msg)
+                
+                if 'errors' in error_data:
+                    validation_errors = [f"{k}: {', '.join(v)}" for k, v in error_data['errors'].items()]
+                    error_msg += " | Detalles: " + " | ".join(validation_errors)
+
             except:
                 pass
-            messages.error(request, f"❌ Error al registrar: {error_msg}")
+            messages.error(request, f" Error al registrar: {error_msg}")
 
         except requests.exceptions.RequestException as e:
-            # ... (Manejo de errores existente)
             messages.error(request, "Error de conexión con la API de órdenes.")
             print(f"Error de conexión: {e}")
 
