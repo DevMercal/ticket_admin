@@ -1,0 +1,82 @@
+<div class="modal fade" id="VerPedido{{ pedido.number_order }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg "> <div class="modal-content dark:bg-gray-800 p-6 shadow-2xl rounded-xl">
+            <div class="modal-header border-b-2 border-gray-200 dark:border-gray-700 pb-4">
+                <h5 class="modal-title dark:text-white text-3xl font-extrabold text-center w-full" id="staticBackdropLabel">
+                    Detalles del Pedido #{{ pedido.number_order }}
+                </h5>
+                <button type="button" class="btn-close text-gray-400 hover:text-gray-900 dark:hover:text-white absolute top-4 right-4" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body pt-4 max-h-96 overflow-y-auto">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Evento Especial:</p>
+                        <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pedido.special_event|default:"N/A" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Método de Pago:</p>
+                        <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pedido.payment_method.payment_method }}</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Monto Total:</p>
+                        <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ pedido.total_amount }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Referencia de Pago:</p>
+                        <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pedido.reference|default:"No aplica" }}</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Estado del Pedido:</p>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                            {{ pedido.order_status.status_order }}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tipo de Consumo:</p>
+                        <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pedido.order_consumption.orders_consumption }}</p>
+                    </div>
+
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha y Hora:</p>
+                        <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pedido.date_order }}</p>
+                    </div>
+                     <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Autorizado:</p>
+                        <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pedido.authorized|yesno:"Sí,No" }}</p>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-bold dark:text-white border-t pt-4 mt-4 border-gray-200 dark:border-gray-700">Datos del Empleado</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 mb-6">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Cédula:</p>
+                        <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pedido.employees.cedula }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Nombre:</p>
+                        <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pedido.employees.first_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Apellido:</p>
+                        <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pedido.employees.last_name }}</p>
+                    </div>
+                </div>
+
+                {% if pedido.payment_support %}
+                    <h3 class="text-xl font-bold dark:text-white border-t pt-4 mt-4 border-gray-200 dark:border-gray-700">Comprobante de Pago</h3>
+                    <div class="mt-4 flex justify-center">
+                         <img src="{{ pedido.payment_support }}" alt="Comprobante de Pago" class="rounded-lg shadow-md max-w-full max-h-96 object-contain border border-gray-300 dark:border-gray-700 p-1">
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="modal-footer border-t-2 border-gray-200 dark:border-gray-700 pt-4 flex justify-end">
+                <button type="button" class="btn bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition duration-300" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-3 transition duration-300">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>

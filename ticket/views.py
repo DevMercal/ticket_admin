@@ -511,14 +511,14 @@ def registration_order(request):
             # reference: 'required|numeric'
             reference = str(float(request.POST.get('reference') or 0.0))
         except ValueError:
-            messages.error(request, "❌ Error: El campo 'Referencia' debe ser numérico.")
+            messages.error(request, " Error: El campo 'Referencia' debe ser numérico.")
             return redirect('ticket')
             
         try:
             # cedula: 'required|numeric'
             cedula = str(int(request.POST.get('cedula') or 0))
         except ValueError:
-            messages.error(request, "❌ Error: El campo 'Cédula de la Orden' debe ser un número entero.")
+            messages.error(request, " Error: El campo 'Cédula de la Orden' debe ser un número entero.")
             return redirect('ticket')
 
         try:
@@ -527,7 +527,7 @@ def registration_order(request):
             id_order_status = str(int(request.POST.get('id_order_status', '1')))
             id_orders_consumption = str(int(request.POST.get('id_orders_consumption', '1')))
         except ValueError:
-            messages.error(request, "❌ Error: Los IDs de pago o estado deben ser números enteros.")
+            messages.error(request, " Error: Los IDs de pago o estado deben ser números enteros.")
             return redirect('ticket')
             
         # --- Campos de EmployeePayment (STRING) ---
@@ -543,7 +543,7 @@ def registration_order(request):
         # 2. CONSTRUIR el payload PLANO (Claves de Laravel)
         # ESTO REEMPLAZA a payload_data, json.dumps() y data_to_send anterior.
         data_to_send = {
-             # --- Claves de Order con NOTACIÓN DE ARRAY ---
+           
             'order[special_event]': special_event,
             'order[authorized]': authorized,
             'order[authorized_person]': authorized_person,
@@ -720,7 +720,27 @@ def empleados(request):
 
 
 def pedidos(request):
-    return render(request, "paginas/pedidos.html" ,{'current_page' : 'pedidos'})
+    if 'api_token' not in request.session:
+        messages.warning(request, "Debe iniciar sesión para ver esta información.")
+        return redirect('inicio') 
+
+    
+    token = request.session.get('api_token')
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    
+    try:
+        response = requests.get(f"{api_url}/pedidos", headers=headers, timeout=10)
+        response.raise_for_status()
+        json_data = response.json()
+
+        
+        pedidos = json_data.get('orders', [])
+          
+    except requests.exceptions.RequestException as req_err:
+        messages.error(request, f"Ocurrió un error inesperado: {req_err}" )
+    return render(request, "paginas/pedidos.html" ,{'current_page' : 'pedidos', 'pedidos':pedidos})
 
 
 def extras(request):
