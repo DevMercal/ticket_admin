@@ -151,15 +151,7 @@ def usu(request: HttpRequest):
       
       
     try:
-        management = requests.get(f"{api_url}/gerencias" , headers=headers, timeout=10)
-        
-        management.raise_for_status() 
-        
-       
-        management_data = management.json()
-       
-        managements = management_data.get('management', [])
-        
+     
         response = requests.get(f"{api_url}/users", headers=headers, timeout=10)
         
         
@@ -183,7 +175,6 @@ def usu(request: HttpRequest):
 
     result = {
         'usuarios' : usuarios,
-        'managements' : managements,
         'current_page' : 'usuarios'
     }    
     

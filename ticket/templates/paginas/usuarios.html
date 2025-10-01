@@ -34,9 +34,9 @@
             <tbody>
                 {% for usuario in usuarios %}
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td class="py-3 px-4 dark:text-white" data-label="Nombre">{{usuario.name}}</td>
+                    <td class="py-3 px-4 dark:text-white" data-label="Nombre">{{usuario.employees.first_name }}</td>
                     <td class="py-3 px-4 dark:text-white" data-label="Email">{{ usuario.email }}</td>
-                    <td class="py-3 px-4 dark:text-white" data-label="Gerencias">{{ usuario.management.management_name }}</td>
+                    <td class="py-3 px-4 dark:text-white" data-label="Gerencias">{{ usuario.employees.management.management_name }}</td>
                    
                     <td class="py-3 px-4 dark:text-white" data-label="Accion"> <button data-modal-target="miModal{{ usuario.id }}"
                             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
