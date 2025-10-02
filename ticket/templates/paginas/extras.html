@@ -10,7 +10,7 @@
         <div class="border border-gray-400 p-4 w-full md:w-1/2 shadow-lg rounded-lg">
             <div class="flex justify-between items-center mb-2">
                 <h2 class="text-lg dark:text-white font-semibold">EXTRAS</h2>
-                <button class="text-lg font-bold w-6 h-6 border border-black rounded-full flex items-center justify-center dark:text-white">+</button>
+                <button class="text-lg font-bold w-6 h-6 border border-black rounded-full flex items-center justify-center dark:text-white" data-bs-toggle="modal" data-bs-target="#extras">+</button>
             </div>
             <div class="text-base space-y-2">
                 <div class="flex justify-between">
@@ -27,20 +27,51 @@
          <div class="border border-gray-400 p-4 w-full md:w-1/2 shadow-lg rounded-lg">
             <div class="flex justify-between items-center mb-2">
                 <h2 class="text-lg font-semibold dark:text-white">Limite de Venta</h2>
-                <button class="text-lg font-bold w-6 h-6 border border-black rounded-full flex items-center justify-center dark:text-white">+</button>
+                <button class="text-lg font-bold w-6 h-6 border border-black rounded-full flex items-center justify-center dark:text-white" data-bs-toggle="modal" data-bs-target="#limite">+</button>
             </div>
             <div class="text-base space-y-2">
+                
                 <div class="flex justify-between">
                     <span class="font-medium dark:text-white">limite</span>
-                    <span class="dark:text-white">20</span>
+                    <!-- <span class="dark:text-white">{{ numbers_orders_day }}</span> -->
                 </div>
                 <div class="flex justify-between">
                     <span class="font-medium dark:text-white">Dia</span>
                     <span class="dark:text-white">20</span>
                 </div>
+                
             </div>
         </div>
     </div>
 </div>
+  {% if mensaje_error %}
+        <p style="color: red;">Error: {{ mensaje_error }}</p>
+    {% elif datos_ordenes %}
+        <h2>Órdenes Encontradas:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cantidad de Órdenes</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in datos_ordenes %}
+                <tr>
+                    <td>{{ orden.id_number_orders_days }}</td>
+                    <td>{{ orden.numbers_orders_day }}</td>
+                    <td>{{ orden.date_number_orders }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No se encontraron datos de órdenes o el formato de la respuesta no es el esperado.</p>
+    {% endif %}
+
+    
+{% include 'modal/extras.html' %}
+{% include 'modal/limite.html' %}
 
 {% endblock %}

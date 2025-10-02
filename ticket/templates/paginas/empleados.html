@@ -40,11 +40,10 @@
             </thead>
             <tbody>
                 {% for em in data_principal %}
-                <tr data-employee-id="{{ em.id }}" data-employee-name="{{ em.first_name }}"
-                    data-employee-index="{{ forloop.counter0 }}">
-                    <td class="py-3 px-4 text-center dark:text-white">{{ em.gerencias.management_name }}</td>
+                <tr>
+                    <td class="py-3 px-4 text-center dark:text-white">{{ em.management.management_name }}</td>
                     <td class="py-3 px-4 text-center dark:text-white">{{ em.cedula }}</td>
-                    <td class="py-3 px-4 text-center dark:text-white">{{ em.first_name }}</td>
+                    <td class="py-3 px-4 text-center dark:text-white">{{ em.full_name }}</td>
 
                 </tr>
                 {% endfor %}
@@ -53,13 +52,13 @@
 
         </table>
 
-        <div class="pagination-controls flex justify-center items-center gap-4 my-4">
-            <button id="prevBtn" type="button">Anterior</button>
-            <h6 id="pageNumbers" class="dark:text-white"></h6>
-            <button id="nextBtn" type="button">Siguiente</button>
-        </div>
-
+        
     </div>
+        <div class="pagination-controls flex justify-center items-center gap-4 my-4">
+            <button class="py-2 px-2 bg-blue-600 text-white rounded-lg" id="prevBtn" type="button">Anterior</button>
+            <h6 id="pageNumbers" class="dark:text-white text-lg "></h6>
+            <button class="py-2 px-2 bg-blue-600 text-white rounded-lg" id="nextBtn" type="button">Siguiente</button>
+        </div>
 
 
 </div>

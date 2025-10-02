@@ -6,10 +6,14 @@ Authorization: Bearer 32|7MX5Ed22cu26DKvQz3nbCYcRZ1YQBzFxCpe1r0cT8d364ebf
 GET  http://comedor.mercal.gob.ve/api/p1/menus HTTP/1.1
 content-type: application/json
 Authorization: Bearer 38|xsGg52ysl8hlw4d4N4n4n3B98BQchyksXqFFuuMAad791286
+### ORDERS
+GET  http://comedor.mercal.gob.ve/api/p1/ordersDay HTTP/1.1
+content-type: application/json
+Authorization: Bearer 29|Fa2mBV1bwPTRJvZVHDWl0rVCT9CGtJDPiQJk4GNUe173ce7d
 ### EXTRAS
 GET http://comedor.mercal.gob.ve/api/p1/extras HTTP/1.1
 content-type: application/json
-Authorization: Bearer 32|7MX5Ed22cu26DKvQz3nbCYcRZ1YQBzFxCpe1r0cT8d364ebf
+Authorization: Bearer 29|Fa2mBV1bwPTRJvZVHDWl0rVCT9CGtJDPiQJk4GNUe173ce7d
 ### GERENCIAS TODAS
 GET http://comedor.mercal.gob.ve/api/p1/gerencias HTTP/1.1
 content-type: application/json
@@ -26,7 +30,7 @@ Authorization: Bearer 8|DFjFp7ZFJSYqBvGqyl3l1V09zcv8ONT55Y1OGjDl12accd71
 ###  EMPLEADOS
 GET http://comedor.mercal.gob.ve/api/p1/empleados HTTP/1.1
 content-type: application/json
-Authorization: Bearer 32|7MX5Ed22cu26DKvQz3nbCYcRZ1YQBzFxCpe1r0cT8d364ebf
+Authorization: Bearer 29|Fa2mBV1bwPTRJvZVHDWl0rVCT9CGtJDPiQJk4GNUe173ce7d
 *******************************POSTS******************************
 #### LOGIN
 POST http://comedor.mercal.gob.ve/api/p1/users/login HTTP/1.1

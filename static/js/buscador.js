@@ -127,56 +127,74 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Listener para el envío del formulario
+   // Listener para el envío del formulario
     resumenForm.addEventListener('submit', (event) => {
-        // Si quieres evitar el envío real, descomenta la siguiente línea:
-        // event.preventDefault();
+        // ... (código previo)
 
         // Eliminar inputs ocultos previos
-            const oldInputs = resumenForm.querySelectorAll('input[name^="employees_"], input[name^="lunch_"], input[name^="to_go_"], input[name^="covered_"], input[name^="cedula_"], input[name="total_employees"]');
+        const oldInputs = resumenForm.querySelectorAll('input[name^="employees_"], input[name^="lunch_"], input[name^="to_go_"], input[name^="covered_"], input[name^="cedula_"], input[name^="employee_index_"], input[name="total_employees"]');
 
         oldInputs.forEach(input => input.remove());
 
         let employeeCount = 0;
+        let i = 0; //  NUEVO: Usaremos 'i' como contador secuencial para el nombre del input
+
         for (const index in employeeSelections) {
             const selection = employeeSelections[index];
             
             if (selection.lunch === 'Si' || selection.to_go === 'Si' || selection.covered === 'Si') {
                
+                // --- CAMBIO CLAVE: Usamos 'i' para el nombre del input ---
+                
+                // Input para la cédula
                 const inputCedula = document.createElement('input');
                 inputCedula.type = 'hidden';
-                inputCedula.name = `cedula_${index}`;
-                inputCedula.value = selection.cedula; // Usar el valor almacenado
+                inputCedula.name = `cedula_${i}`; //  Usamos 'i'
+                inputCedula.value = selection.cedula; 
                 resumenForm.appendChild(inputCedula);
 
+                // Input para el nombre
                 const inputName = document.createElement('input');
                 inputName.type = 'hidden';
-                inputName.name = `employees_${index}`;
+                inputName.name = `employees_${i}`; //  Usamos 'i'
                 inputName.value = selection.name;
                 resumenForm.appendChild(inputName);
 
+                // Input para el índice original (Opcional, pero útil si lo necesitas)
+                const inputIndex = document.createElement('input');
+                inputIndex.type = 'hidden';
+                inputIndex.name = `employee_index_${i}`; //  Usamos 'i'
+                inputIndex.value = index; //  El valor es el índice original
+                resumenForm.appendChild(inputIndex);
+
+
+                // Input para Lunch
                 const inputLunch = document.createElement('input');
                 inputLunch.type = 'hidden';
-                inputLunch.name = `lunch_${index}`;
+                inputLunch.name = `lunch_${i}`; //  Usamos 'i'
                 inputLunch.value = selection.lunch;
                 resumenForm.appendChild(inputLunch);
 
+                // Input para To Go
                 const inputToGo = document.createElement('input');
                 inputToGo.type = 'hidden';
-                inputToGo.name = `to_go_${index}`;
+                inputToGo.name = `to_go_${i}`; //  Usamos 'i'
                 inputToGo.value = selection.to_go;
                 resumenForm.appendChild(inputToGo);
 
+                // Input para Covered
                 const inputCovered = document.createElement('input');
                 inputCovered.type = 'hidden';
-                inputCovered.name = `covered_${index}`;
+                inputCovered.name = `covered_${i}`; //  Usamos 'i'
                 inputCovered.value = selection.covered;
                 resumenForm.appendChild(inputCovered);
 
+                i++; //  Incrementamos el contador secuencial
                 employeeCount++;
             }
         }
         
+        // El input total_employees queda igual, contando la cantidad de empleados seleccionados.
         const totalInput = document.createElement('input');
         totalInput.type = 'hidden';
         totalInput.name = 'total_employees';

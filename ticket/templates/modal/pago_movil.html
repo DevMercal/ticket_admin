@@ -8,7 +8,7 @@
                 <button type="button" class="btn-close absolute top-3 right-3" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
-            <div class="modal-body pt-0 overfow-y-auto">
+            <div class="modal-body pt-0 max-h-96 overflow-y-auto">
 
                 <div class="grid grid-cols-2 gap-y-4 text-blue-800 dark:text-blue-300 font-semibold mb-6">
                     <span class="text-left">Número de Teléfono:</span>
@@ -53,7 +53,7 @@
                         </button>
                     </div>
                 </div>
-              <form method="POST" action="{% url 'registration_order' %}" enctype="multipart/form-data" class="max-h-96 overflow-y-auto">
+              <form method="POST" action="{% url 'registration_order' %}" enctype="multipart/form-data" >
                     {% csrf_token %}
                     
                     <h2>Datos de la Orden</h2>
@@ -65,8 +65,8 @@
                     <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="cedula" name="cedula" value="{{ i.cedula }}" hidden><br>
                     <input type="hidden" name="extras" value="1"> 
                     {% endfor %}
-                    <label for="special_event" class="dark:text-white">Evento Especial (Si/No):</label>
-                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="special_event" name="special_event" required><br>
+                    <label for="special_event" class="dark:text-white" hidden>Evento Especial (Si/No):</label>
+                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="special_event" name="special_event" value="no" required hidden><br>
 
                     <label for="authorized" class="dark:text-white" >Autorizado (Si/No):</label>
                     <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="authorized" name="authorized" required><br>

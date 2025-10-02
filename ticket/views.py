@@ -13,7 +13,7 @@ from django.conf import settings
 import matplotlib.patches as mpatches
 import os
 import mimetypes
-import json
+LOGO_PATH = os.path.join(settings.STATIC_ROOT, 'img', 'logo.png')
 
 api_url = settings.API
 
@@ -58,7 +58,6 @@ def inicio(request):
             messages.error(request, f'Error de conexión con la API: {e}')
 
     return render(request, 'paginas/login.html')
-
 
 def progreso_mensual_view(request):
     """
@@ -111,7 +110,6 @@ def progreso_mensual_view(request):
     # Devolver la imagen como una respuesta HTTP
     return HttpResponse(buffer.getvalue(), content_type='image/png') 
 
-
 def index(request):
     token = request.session.get('api_token')
     headers = {
@@ -136,7 +134,6 @@ def index(request):
     }
     
     return render(request, 'paginas/index.html', contexto)
-
 
 def usu(request: HttpRequest):
    
@@ -179,7 +176,6 @@ def usu(request: HttpRequest):
     }    
     
     return render(request, 'paginas/usuarios.html', result)
-
 
 def user_registro(request: HttpRequest) -> HttpResponse:
  
@@ -263,11 +259,9 @@ def eliminar_user(request, id):
 
     return redirect('usu')
 
-
 def actulizar_menu(request, date_menu):
     pass
-
-            
+          
 def registro_menu(request):
     if request.method == 'POST':
         
@@ -359,8 +353,6 @@ def menu(request):
    
     return render(request, 'paginas/menu.html', contexto)
 
-    
-
 def seleccion(request):
     if 'api_token' not in request.session:
         messages.warning(request, "Debe iniciar sesión para ver esta información.")
@@ -388,9 +380,9 @@ def seleccion(request):
             
             
             # Iterate over each employee in the list
-            for employee_data in employees:
-                full_first_name = employee_data.get("first_name")
-                full_last_name = employee_data.get("last_name")
+            for names_lasname in employees:
+                full_first_name = names_lasname.get("first_name")
+                full_last_name = names_lasname.get("last_name")
                 
                 # Safely split and concatenate the names
                 first_name = full_first_name.split()[0] if full_first_name else ""
@@ -400,10 +392,10 @@ def seleccion(request):
                 full_name = f"{first_name} {first_last_name}".strip()
                 
                 # Add the full name to the current employee's dictionary
-                employee_data['full_name'] = full_name
+                names_lasname['full_name'] = full_name
                 
                 # Append the processed employee data to the new list
-                processed_employees.append(employee_data)
+                processed_employees.append(names_lasname)
        
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error al obtener empleados: {req_err}")
@@ -423,60 +415,57 @@ def seleccion(request):
         'employees': processed_employees, 
         'current_page' : 'seleccion'})
 
-
-    
 def resumen(request):
     if request.method == 'POST':
-            total = int(request.POST.get('total_employees', 0))
+        total = int(request.POST.get('total_employees', 0))
+        
+        resumen_empleados = []
         
         
-            resumen_empleados = []
+        for i in range(total): 
+           
+            employee_name = request.POST.get(f'employees_{i}') 
             
-            for i in range(total): 
-                employees_id = request.POST.get(f'employees_{i}')
-                print(employees_id)
-                cedula = request.POST.get(f'cedula_{i}')
-                print(cedula)
-                if not employees_id:
-                    continue 
-                
-                lunch = request.POST.get(f'lunch_{i}', 'No')
-                to_go = request.POST.get(f'to_go_{i}', 'No')
-                covered = request.POST.get(f'covered_{i}', 'No')
-                cedula = request.POST.get(f'cedula_{i}', 'No')
-                
-                if lunch == 'No' and to_go == 'No' and covered == 'No':
-                    continue
+            employee_index = request.POST.get(f'employee_index_{i}')
+            
+            
+            cedula = request.POST.get(f'cedula_{i}')
+            
+            if not employee_name:
+                continue 
+            
+            # Captura las opciones de servicio
+            lunch = request.POST.get(f'lunch_{i}', 'No')
+            to_go = request.POST.get(f'to_go_{i}', 'No')
+            covered = request.POST.get(f'covered_{i}', 'No')
+            
+            if lunch == 'No' and to_go == 'No' and covered == 'No':
+                continue
 
-                resumen_empleados.append({
-                    'employees': employees_id,
-                    'lunch': lunch,
-                    'to_go': to_go,
-                    'covered': covered,
-                    'cedula': cedula
-                })
+            resumen_empleados.append({
+                'employees': employee_name, # Usamos el nombre que acabamos de capturar
+                'lunch': lunch,
+                'to_go': to_go,
+                'covered': covered,
+                'cedula': cedula,
+                # 'index': employee_index # Si enviaste el índice original, puedes guardarlo aquí
+            })
             
-            # Guardar el resumen en la sesión solo si hay empleados válidos
-            if resumen_empleados:
-                request.session['resumen_empleados'] = resumen_empleados
-                contexto = {
-                    'contexto': resumen_empleados,
-                    'current_page': 'resumen'
-                }
-               
-                    
-                return render(request, 'paginas/resumen.html', contexto)
-        
-       
-        
+            # (El resto de tu lógica de Python es correcta)
+            # ...
+            
+        if resumen_empleados:
+            request.session['resumen_empleados'] = resumen_empleados
+            contexto = {
+                'contexto': resumen_empleados,
+                'current_page': 'resumen'
+            }
+                
+            return render(request, 'paginas/resumen.html', contexto)
+    
     # Redirigir si el método no es POST
     messages.warning(request, "Acceso denegado: Debe seleccionar un empleado para acceder a esta vista.")
     return redirect('seleccion')
-
-
-
-
-
 
 def registration_order(request):
     if 'api_token' not in request.session:
@@ -604,10 +593,6 @@ def registration_order(request):
 
     return render(request, "paginas/ticket.html")
 
-
-LOGO_PATH = os.path.join(settings.STATIC_ROOT, 'img', 'logo.png')
-
-
 def ticket(request):
     
     if request.method == 'POST':
@@ -682,9 +667,6 @@ def ticket(request):
     messages.warning(request, "Advertencia: Para crear un ticket, primero debe seleccionar un empleado")
     return redirect('seleccion')
     
-
-
-
 def empleados(request):
     if 'api_token' not in request.session:
         messages.warning(request, "Debe iniciar sesión para ver esta información.")
@@ -695,20 +677,36 @@ def empleados(request):
     headers = {
         'Authorization': f'Bearer {token}'
     }
-    
+    processed_employees = []
     try:
         response = requests.get(f"{api_url}/empleados", headers=headers, timeout=10)
         response.raise_for_status()
         json_data = response.json()
 
-        # 1. Acceder al primer 'data' y luego al segundo 'data'
+        
         data_principal = json_data.get('employees', [])
+        
+        for names_lasname in data_principal:
+                full_first_name = names_lasname.get("first_name")
+                full_last_name = names_lasname.get("last_name")
+                
+                # Safely split and concatenate the names
+                first_name = full_first_name.split()[0] if full_first_name else ""
+                first_last_name = full_last_name.split()[0] if full_last_name else ""
+                
+                # Combine into a full name
+                full_name = f"{first_name} {first_last_name}".strip()
+                
+                # Add the full name to the current employee's dictionary
+                names_lasname['full_name'] = full_name
+                print(names_lasname)
+                # Append the processed employee data to the new list
+                processed_employees.append(names_lasname)
        
     except requests.exceptions.RequestException as req_err:
         messages.error(request, f"Ocurrió un error inesperado: {req_err}")
 
-    return render(request, 'paginas/empleados.html' , {'data_principal': data_principal ,'current_page' : 'empleados'} )
-
+    return render(request, 'paginas/empleados.html' , {'data_principal': processed_employees ,'current_page' : 'empleados'} )
 
 def pedidos(request):
     if 'api_token' not in request.session:
@@ -720,7 +718,7 @@ def pedidos(request):
     headers = {
         'Authorization': f'Bearer {token}'
     }
-    
+    pedidos = []
     try:
         response = requests.get(f"{api_url}/pedidos", headers=headers, timeout=10)
         response.raise_for_status()
@@ -730,29 +728,80 @@ def pedidos(request):
         pedidos = json_data.get('orders', [])
           
     except requests.exceptions.RequestException as req_err:
-        messages.error(request, f"Ocurrió un error inesperado: {req_err}" )
+        messages.error(request, f"error inesperado no se encontraron registros" )
     return render(request, "paginas/pedidos.html" ,{'current_page' : 'pedidos', 'pedidos':pedidos})
-
 
 def extras(request):
     if 'api_token' not in request.session:
         messages.warning(request, "Debe iniciar sesión para ver esta información.")
         return redirect('inicio') 
-    
-    if request.method == 'POST':
-        coverd = request.POST.get ('cubiertos')
-        to_go = request.POST.get ('para_llevar')
+       
+    token = request.session.get('api_token')
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
+
+    if request.method == 'POST': 
+       
+        numberOrdersDay = request.POST.get ('numberOrdersDay')
+
+       
+        if not all([numberOrdersDay]):
+            messages.error(request, 'Todos los campos son obligatorios.')
+            return redirect('usu') 
+
+        data = {
+            'numberOrdersDay': numberOrdersDay
+        }
+
+        try:
+            
+            response = requests.post(f"{api_url}/ordersDay", json=data, headers=headers, timeout=10)
+            response.raise_for_status() 
+            show_limit = response.json()
+            print(show_limit)
+            messages.success(request, 'cantidad de pedidos registrado.')
+            return redirect('extras')
+        except Exception as e:
+            messages.error(request, 'Limite de registro al dia es uno')
+            return redirect('extras')
         
-        print(coverd)
-        print(to_go)
-    
+        
+        
     return render(request, "paginas/extras.html",{'current_page' : 'extras'}) 
+
+def view_extras(request):
+    if 'api_token' not in request.session:
+        messages.warning(request, "Debe iniciar sesión para ver esta información.")
+        return redirect('inicio') 
+       
+    token = request.session.get('api_token')
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
+    try:
+        response = requests.get(f"{api_url}/ordersDay", headers=headers, timeout=10)
+        response.raise_for_status() 
+        show_limit = response.json()
+        
+        limites = show_limit.get('cantidadOrdenes', [])
+        print(limites)
+        contexto = {
+            'current_page': 'extras',
+            'limites': limites
+        }
+       
+        return render(request, "paginas/extras.html", contexto) 
+    except Exception as e:
+        messages.error(request, 'Error al traer la información.')
+        return redirect('extras')
+
 
 def escaner(request):
     return render(request,"paginas/scan.html",{'current_page' : 'escaner'})
 
-
-#logout de la aplicacion
 def logout_view(request):
     logout(request)
     messages.success(request, 'Has cerrado sesión exitosamente.')
