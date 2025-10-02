@@ -31,7 +31,7 @@
             {% include 'modal/invitado.html' %}
         </div>
     </div>
-    <form action="resumen" method="post" id="resumen-form">
+    <form action="resumen" method="POST" id="resumen-form">
         {% csrf_token %}
         <div class="overflow-x-auto max-h-96 overflow-y-auto  bg-white dark:bg-dark-100 rounded-lg shadow-md">
             <table class="responsive-table w-full" id="myTable">
@@ -49,10 +49,11 @@
                 <tbody>
                     {% for em in employees %}
                     <tr data-employee-id="{{ em.id }}" data-employee-name="{{ em.full_name }}"
-                        data-employee-index="{{ forloop.counter0 }}">
+                        data-employee-index="{{ forloop.counter0 }}" data-employee-cedula="{{ em.cedula }}">
                         <td class="py-3 px-4 text-center dark:text-white" hidden data-label="Gerencias">{{ em.gerencias.management_name }}</td>
-                        <td class="py-3 px-4 text-center dark:text-white" data-label="Cedula">{{ em.cedula }}</td>
-                        <td class="py-3 px-4 text-center dark:text-white" data-label="Nombre">{{ em.full_name }}</td>
+                        <td class="py-3 px-4 text-center dark:text-white" data-label="Cedula" >{{ em.cedula }}</td>
+                        
+                        <td class="py-3 px-4 text-center dark:text-white" data-label="Nombre" >{{ em.full_name }}</td>
                         <td class="py-3 px-4 text-center dark:text-white" data-label="Comida">
                             <input type="checkbox" data-selection-type="lunch" value="Si">
                         </td>

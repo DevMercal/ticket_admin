@@ -1,0 +1,46 @@
+{% extends 'bases/base_dashboard.html' %}
+{% load static %}
+{% block content %}
+
+<div class="flex flex-col items-center p-4">
+    <h1 class="text-xl font-bold mb-4">GESTIÓN DEL COMEDOR</h1>
+
+    <div class="w-full max-w-2xl flex flex-col md:flex-row items-start justify-center m-2 gap-4">
+        
+        <div class="border border-gray-400 p-4 w-full md:w-1/2 shadow-lg rounded-lg">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-lg dark:text-white font-semibold">EXTRAS</h2>
+                <button class="text-lg font-bold w-6 h-6 border border-black rounded-full flex items-center justify-center dark:text-white">+</button>
+            </div>
+            <div class="text-base space-y-2">
+                <div class="flex justify-between">
+                    <span class="font-medium dark:text-white">ENVASE</span>
+                    <span class="dark:text-white">20</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium dark:text-white">CUBIERTO</span>
+                    <span class="dark:text-white">20</span>
+                </div>
+            </div>
+        </div>
+
+         <div class="border border-gray-400 p-4 w-full md:w-1/2 shadow-lg rounded-lg">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-lg font-semibold dark:text-white">Limite de Venta</h2>
+                <button class="text-lg font-bold w-6 h-6 border border-black rounded-full flex items-center justify-center dark:text-white">+</button>
+            </div>
+            <div class="text-base space-y-2">
+                <div class="flex justify-between">
+                    <span class="font-medium dark:text-white">limite</span>
+                    <span class="dark:text-white">20</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium dark:text-white">Dia</span>
+                    <span class="dark:text-white">20</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

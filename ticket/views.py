@@ -427,22 +427,23 @@ def seleccion(request):
     
 def resumen(request):
     if request.method == 'POST':
-        total = int(request.POST.get('total_employees', 0))
-    
-        if total > 0:
+            total = int(request.POST.get('total_employees', 0))
+        
+        
             resumen_empleados = []
             
             for i in range(total): 
                 employees_id = request.POST.get(f'employees_{i}')
-               
-                
+                print(employees_id)
+                cedula = request.POST.get(f'cedula_{i}')
+                print(cedula)
                 if not employees_id:
                     continue 
                 
                 lunch = request.POST.get(f'lunch_{i}', 'No')
                 to_go = request.POST.get(f'to_go_{i}', 'No')
                 covered = request.POST.get(f'covered_{i}', 'No')
-                
+                cedula = request.POST.get(f'cedula_{i}', 'No')
                 
                 if lunch == 'No' and to_go == 'No' and covered == 'No':
                     continue
@@ -452,6 +453,7 @@ def resumen(request):
                     'lunch': lunch,
                     'to_go': to_go,
                     'covered': covered,
+                    'cedula': cedula
                 })
             
             # Guardar el resumen en la sesión solo si hay empleados válidos
@@ -465,9 +467,7 @@ def resumen(request):
                     
                 return render(request, 'paginas/resumen.html', contexto)
         
-        # Redirigir si 'total_employees' es 0 o si no se seleccionaron opciones
-        messages.warning(request, "No se seleccionó ninguna opción. Por favor, seleccione un empleado para continuar.")
-        return redirect('seleccion')
+       
         
     # Redirigir si el método no es POST
     messages.warning(request, "Acceso denegado: Debe seleccionar un empleado para acceder a esta vista.")
@@ -746,7 +746,7 @@ def extras(request):
         print(coverd)
         print(to_go)
     
-    return render(request, "paginas/pedidos.html") 
+    return render(request, "paginas/extras.html",{'current_page' : 'extras'}) 
 
 def escaner(request):
     return render(request,"paginas/scan.html",{'current_page' : 'escaner'})

@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     nextBtn.addEventListener('click', handleNextClick);
 
     // Listener para capturar cambios en los checkboxes
-    tbody.addEventListener('change', (event) => {
+   tbody.addEventListener('change', (event) => {
         if (event.target.type === 'checkbox') {
             const row = event.target.closest('tr');
             if (!row) return; // Protección por si no encuentra fila
@@ -112,12 +112,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 employeeSelections[employeeIndex] = {
                     index: employeeIndex,
                     name: row.dataset.employeeName,
+                    
+                    // --- CAPTURAR LA CÉDULA DE LA FILA ---
+                    cedula: row.dataset.employeeCedula,
+                    
+                    
                     lunch: 'No',
                     to_go: 'No',
                     covered: 'No'
                 };
             }
             employeeSelections[employeeIndex][selectionType] = isChecked ? 'Si' : 'No';
+            console.log(employeeSelections);
         }
     });
 
@@ -127,7 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // event.preventDefault();
 
         // Eliminar inputs ocultos previos
-        const oldInputs = resumenForm.querySelectorAll('input[name^="employees_"], input[name^="lunch_"], input[name^="to_go_"], input[name^="covered_"], input[name="total_employees"]');
+            const oldInputs = resumenForm.querySelectorAll('input[name^="employees_"], input[name^="lunch_"], input[name^="to_go_"], input[name^="covered_"], input[name^="cedula_"], input[name="total_employees"]');
+
         oldInputs.forEach(input => input.remove());
 
         let employeeCount = 0;
@@ -135,6 +142,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const selection = employeeSelections[index];
             
             if (selection.lunch === 'Si' || selection.to_go === 'Si' || selection.covered === 'Si') {
+               
+                const inputCedula = document.createElement('input');
+                inputCedula.type = 'hidden';
+                inputCedula.name = `cedula_${index}`;
+                inputCedula.value = selection.cedula; // Usar el valor almacenado
+                resumenForm.appendChild(inputCedula);
+
                 const inputName = document.createElement('input');
                 inputName.type = 'hidden';
                 inputName.name = `employees_${index}`;

@@ -53,58 +53,63 @@
                         </button>
                     </div>
                 </div>
-              <form method="POST" action="{% url 'registration_order' %}" enctype="multipart/form-data" class="max-w-md mx-auto" style="max-height: 400px;">
+              <form method="POST" action="{% url 'registration_order' %}" enctype="multipart/form-data" class="max-h-96 overflow-y-auto">
                     {% csrf_token %}
                     
                     <h2>Datos de la Orden</h2>
-                    
-                    <label for="cedula">Cédula del Empleado (Order):</label>
-                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="cedula" name="cedula" required><br>
-
-                    <label for="special_event">Evento Especial (Si/No):</label>
+                     {% for i in contexto %}
+                        
+                            
+                        
+                    <label for="cedula" hidden>Cédula del Empleado (Order):</label>
+                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="cedula" name="cedula" value="{{ i.cedula }}" hidden><br>
+                    <input type="hidden" name="extras" value="1"> 
+                    {% endfor %}
+                    <label for="special_event" class="dark:text-white">Evento Especial (Si/No):</label>
                     <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="special_event" name="special_event" required><br>
 
-                    <label for="authorized">Autorizado (Si/No):</label>
+                    <label for="authorized" class="dark:text-white" >Autorizado (Si/No):</label>
                     <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="authorized" name="authorized" required><br>
                     
-                    <label for="authorized_person">Persona Autorizada:</label>
+                    <label for="authorized_person" class="dark:text-white">Persona Autorizada:</label>
                     <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="authorized_person" name="authorized_person"><br>
 
-                    <label for="id_payment_method">Método de Pago ID:</label>
-                    <input type="number" class="w-full p-2 border border-gray-300 rounded-md text-center" id="id_payment_method" name="id_payment_method" required><br>
+                    <label for="id_payment_method" hidden>Método de Pago ID:</label>
+                    <input type="number" class="w-full p-2 border border-gray-300 rounded-md text-center" id="id_payment_method" name="id_payment_method" value="3" required hidden> <br>
 
-                    <label for="reference">Referencia/Número de Transacción:</label>
+                    <label for="reference" class="dark:text-white">Referencia/Número de Transacción:</label>
                     <input type="number" step="any" class="w-full p-2 border border-gray-300 rounded-md text-center" id="reference" name="reference" required><br>
 
                     <label for="total_amount">Monto Total:</label>
                     <input type="number" class="w-full p-2 border border-gray-300 rounded-md text-center" step="0.01" id="total_amount" name="total_amount" required><br>
 
-                    <label for="payment_support">Soporte de Pago (PNG/JPG):</label>
+                    <label for="payment_support" class="dark:text-white">Soporte de Pago (PNG/JPG):</label>
                     <input type="file" class="w-full p-2 border border-gray-300 rounded-md text-center" id="payment_support" name="payment_support" accept="image/png,image/jpeg" required><br>
 
-                    
-                    <input type="hidden" name="id_order_status" value="1"> 
-                    <input type="hidden" name="id_orders_consumption" value="1">
-                    <input type="hidden" name="extras" value="1"> 
+                    <input type="hidden" name="id_order_status" value="2"> 
+                    <input type="hidden" name="id_orders_consumption" value="2">
+  
 
                     
-                    <h2>Datos del Empleado que Paga/Solicita (employeePayment)</h2>
+                    <h2 class="dark:text-white text-lg">Datos del Empleado que Paga/Solicita (employeePayment)</h2>
 
-                    <label for="cedula_employee">Cédula Empleado:</label>
+                    <label for="cedula_employee" class="dark:text-white">Cédula Empleado:</label>
                     <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="cedula_employee" name="cedula_employee" required><br>
 
-                    <label for="name_employee">Nombre Empleado:</label>
+                    <label for="name_employee" class="dark:text-white">Nombre Empleado:</label>
                     <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="name_employee" name="name_employee" required><br>
 
-                    <label for="phone_employee">Teléfono Empleado:</label>
+                    <label for="phone_employee" class="dark:text-white">Teléfono Empleado:</label>
                     <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="phone_employee" name="phone_employee"><br>
 
-                    <label for="management">Gerencia/Departamento:</label>
+                    <label for="management" class="dark:text-white">Gerencia/Departamento:</label>
                     <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="management" name="management" required><br>
 
                     <br>
-                    <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">Registrar Orden</button>
-
+                    <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 gap-4">Registrar Orden</button>
+                    <br>
+                    <br>
+                     <button  class="w-full bg-green-500 text-white p-2 rounded-md hover:bg-blue-600" data-bs-dismiss="modal">Cancelar</button>
                 </form>
                
         </div>

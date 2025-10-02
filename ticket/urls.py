@@ -16,6 +16,7 @@ urlpatterns = [
     path('ticket', ticket , name='ticket'),
     path('empleados' , empleados , name= 'empleados'),
     path('pedidos', pedidos , name="pedidos"),
+    path('extras', extras , name="extras"),
     path('escaner', escaner, name="escaner"),
     path('logout_view' , logout_view , name='logout_view' )
 ]
