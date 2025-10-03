@@ -831,6 +831,38 @@ def view_extras(request):
         messages.error(request, 'Error al traer la información.')
         return redirect('extras')
 
+def ver_extras(request):
+    
+    if 'api_token' not in request.session:
+        messages.warning(request, "Debe iniciar sesión para ver esta información.")
+        return redirect('inicio') 
+       
+    token = request.session.get('api_token')
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }    
+        
+    extras_list = []
+
+    try:
+        response = requests.get(f"{api_url}/extras", headers=headers, timeout=10)
+        response.raise_for_status()         
+        extras_list = response.json() 
+        
+        print(extras_list) 
+        
+    except requests.exceptions.RequestException as e:
+       
+        messages.error(request, f"Error al consultar los extras: {e}") 
+        
+    context = {
+       
+        'extras': extras_list 
+    }
+    
+    return render(request, "paginas/extras.html", context)
+                 
 def regis_extras(request):
     if 'api_token' not in request.session:
         messages.warning(request, "Debe iniciar sesión para ver esta información.")
@@ -845,8 +877,9 @@ def regis_extras(request):
     if request.method == 'POST': 
        
         precio = request.POST.get('precio')
+        print(precio)
         extras = request.POST.get('extras')
-
+        print(extras)
        
         if not all([precio,extras]):
             messages.error(request, 'Todos los campos son obligatorios.')
@@ -861,15 +894,13 @@ def regis_extras(request):
             
             response = requests.post(f"{api_url}/extras", json=data, headers=headers, timeout=10)
             response.raise_for_status() 
-            show_limit = response.json()
-            print(show_limit)
+                   
             messages.success(request, 'cantidad de pedidos registrado.')
             return redirect('extras')
         except Exception as e:
             messages.error(request, 'Limite de registro al dia es uno')
             return redirect('extras')
             
-
 def escaner(request):
     return render(request,"paginas/scan.html",{'current_page' : 'escaner'})
 
@@ -877,3 +908,6 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'Has cerrado sesión exitosamente.')
     return redirect('inicio')
+
+
+

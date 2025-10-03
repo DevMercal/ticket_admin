@@ -17,8 +17,10 @@ urlpatterns = [
     path('empleados' , empleados , name= 'empleados'),
     path('pedidos', pedidos , name="pedidos"),
     path('extras', extras , name="extras"),
+    path('ver_extras', ver_extras, name="ver_extras"),
     path('view_extras', view_extras , name="view_extras"),
     path('regis_extras', regis_extras , name="regis_extras"),
     path('escaner', escaner, name="escaner"),
     path('logout_view' , logout_view , name='logout_view' )
+    
 ]

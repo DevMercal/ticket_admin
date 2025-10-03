@@ -44,34 +44,52 @@
         </div>
     </div>
 </div>
-  {% if mensaje_error %}
-        <p style="color: red;">Error: {{ mensaje_error }}</p>
-    {% elif datos_ordenes %}
-        <h2>Órdenes Encontradas:</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Cantidad de Órdenes</th>
-                    <th>Fecha</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for orden in datos_ordenes %}
-                <tr>
-                    <td>{{ orden.id_number_orders_days }}</td>
-                    <td>{{ orden.numbers_orders_day }}</td>
-                    <td>{{ orden.date_number_orders }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No se encontraron datos de órdenes o el formato de la respuesta no es el esperado.</p>
-    {% endif %}
-
-    
+  
 {% include 'modal/extras.html' %}
 {% include 'modal/limite.html' %}
+
+<div class="container mt-5">
+        <h2>Extras Disponibles</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if lista_de_extras %}
+            
+            <table class="table table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Creado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for extra in lista_de_extras %}
+                    <tr>
+                        <td>{{ extra.id_extra }}</td>
+                        <td>{{ extra.name_extra }}</td>
+                        <td>${{ extra.price|floatformat:2 }}</td> 
+                        <td>{{ extra.created_at|date:"Y-m-d H:i" }}</td> 
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                No se encontraron extras. Verifique su conexión con la API o que existan datos.
+            </div>
+        {% endif %}
+
+    </div>
+
+
 
 {% endblock %}
