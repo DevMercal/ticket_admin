@@ -7,15 +7,15 @@
             </div>
             <div class="modal-body pt-0">
                 
-                <form action="extras" method="post">
+                <form action="regis_extras" method="post">
                     {% csrf_token %}
                         <div class="text-center mb-4">
                             <label for="referencia" class="text-blue-800 dark:text-blue-300 font-semibold mb-2 block">Precio para llevar:</label>
-                            <input type="text" id="referencia" name="cubiertos" class="w-full p-2 border border-gray-300 rounded-md text-center" placeholder="Precio de cubiertos">
+                            <input type="text" id="referencia" name="extra" class="w-full p-2 border border-gray-300 rounded-md text-center" placeholder="Extra">
                         </div>
                         <div class="text-center mb-4">
                             <label for="referencia" class="text-blue-800 dark:text-blue-300 font-semibold mb-2 block">Precio para llevar:</label>
-                            <input type="text" id="referencia" name="para_llevar" class="w-full p-2 border border-gray-300 rounded-md text-center" placeholder="Precio para llevar">
+                            <input type="text" id="referencia" name="precio" class="w-full p-2 border border-gray-300 rounded-md text-center" placeholder="Precio">
                         </div>
                         
                     </div>

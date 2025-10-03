@@ -783,6 +783,7 @@ def view_extras(request):
     }
     try:
         response = requests.get(f"{api_url}/ordersDay", headers=headers, timeout=10)
+        print(response)
         response.raise_for_status() 
         show_limit = response.json()
         
@@ -798,6 +799,47 @@ def view_extras(request):
         messages.error(request, 'Error al traer la información.')
         return redirect('extras')
 
+def regis_extras(request):
+    if 'api_token' not in request.session:
+        messages.warning(request, "Debe iniciar sesión para ver esta información.")
+        return redirect('inicio') 
+       
+    token = request.session.get('api_token')
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
+
+    if request.method == 'POST': 
+       
+        precio = request.POST.get('precio')
+        extras = request.POST.get('extras')
+
+       
+        if not all([precio,extras]):
+            messages.error(request, 'Todos los campos son obligatorios.')
+            return redirect('extras') 
+
+        data = {
+            'nameExtra': extras,
+            'price':precio
+        }
+
+        try:
+            
+            response = requests.post(f"{api_url}/extras", json=data, headers=headers, timeout=10)
+            response.raise_for_status() 
+            show_limit = response.json()
+            print(show_limit)
+            messages.success(request, 'cantidad de pedidos registrado.')
+            return redirect('extras')
+        except Exception as e:
+            messages.error(request, 'Limite de registro al dia es uno')
+            return redirect('extras')
+        
+        
+        
+     
 
 def escaner(request):
     return render(request,"paginas/scan.html",{'current_page' : 'escaner'})
