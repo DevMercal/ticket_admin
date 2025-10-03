@@ -13,6 +13,7 @@ from django.conf import settings
 import matplotlib.patches as mpatches
 import os
 import mimetypes
+import json
 LOGO_PATH = os.path.join(settings.STATIC_ROOT, 'img', 'logo.png')
 
 api_url = settings.API
@@ -425,12 +426,12 @@ def resumen(request):
         for i in range(total): 
            
             employee_name = request.POST.get(f'employees_{i}') 
-            
+            print(employee_name)
             employee_index = request.POST.get(f'employee_index_{i}')
             
             
             cedula = request.POST.get(f'cedula_{i}')
-            
+            print(cedula)
             if not employee_name:
                 continue 
             
@@ -476,7 +477,7 @@ def registration_order(request):
     headers = {
         'Authorization': f'Bearer {token}'
     }
-
+    resumen_empleados = request.session.get('resumen_empleados', [])
     if request.method == 'POST':
         # 1. Recuperar y CONVERTIR/PREPARAR los datos
         
@@ -492,14 +493,14 @@ def registration_order(request):
             reference = str(float(request.POST.get('reference') or 0.0))
         except ValueError:
             messages.error(request, " Error: El campo 'Referencia' debe ser numérico.")
-            return redirect('ticket')
+            return redirect('pedidos')
             
         try:
             # cedula: 'required|numeric'
             cedula = str(int(request.POST.get('cedula') or 0))
         except ValueError:
             messages.error(request, " Error: El campo 'Cédula de la Orden' debe ser un número entero.")
-            return redirect('ticket')
+            return redirect('pedidos')
 
         try:
             # IDs: Convertidos a STRING
@@ -508,20 +509,19 @@ def registration_order(request):
             id_orders_consumption = str(int(request.POST.get('id_orders_consumption', '1')))
         except ValueError:
             messages.error(request, " Error: Los IDs de pago o estado deben ser números enteros.")
-            return redirect('ticket')
+            return redirect('pedidos')
             
         # --- Campos de EmployeePayment (STRING) ---
         cedula_employee = request.POST.get('cedula_employee')
         name_employee = request.POST.get('name_employee')
         phone_employee = request.POST.get('phone_employee', '')
         management = request.POST.get('management') 
-        extras = request.POST.get('extras', '1') # Lo incluimos aunque no esté en la validación
+        extras = request.POST.get('extras', '1') 
         
         payment_support = request.FILES.get('payment_support')
         
         
-        # 2. CONSTRUIR el payload PLANO (Claves de Laravel)
-        # ESTO REEMPLAZA a payload_data, json.dumps() y data_to_send anterior.
+        
         data_to_send = {
            
             'order[special_event]': special_event,
@@ -564,14 +564,30 @@ def registration_order(request):
                 files=files_to_send, 
                 timeout=10
             )
+            
+            
+            # 1. Imprime el código de estado para verificar
+            print(f"Código de estado de la respuesta: {response.status_code}")
+            
+            # 2. Obtiene y muestra el JSON de la respuesta
+            try:
+                
+                response_json = response.json()
+                print(response_json)  
+            except requests.exceptions.JSONDecodeError:
+                print("La respuesta no contiene JSON válido. Contenido de la respuesta:")
+                print(response.text)
+            # --------------------------------
+            
             response.raise_for_status()
-
+            request.session['order_data_for_ticket'] = response.json()
             messages.success(request, "La orden se ha registrado correctamente. ")
             return redirect('ticket')
 
         except requests.exceptions.HTTPError as err:
             # La depuración es esencial
-            print(f"Error {response.status_code} - Respuesta de la API: {response.text}") 
+            print(f"Error {response.status_code} - Respuesta de la API: {response.text}")
+            # En el error, ya estás imprimiendo response.text, que es correcto para ver el detalle.
             
             error_msg = f"Error: {response.status_code}. Detalles no disponibles."
             try:
@@ -591,81 +607,97 @@ def registration_order(request):
             messages.error(request, "Error de conexión con la API de órdenes.")
             print(f"Error de conexión: {e}")
 
-    return render(request, "paginas/ticket.html")
+    return render(request, "paginas/pedidos.html")
 
 def ticket(request):
+    # Solo procesamos la petición GET que viene del redirect exitoso.
+    # Si la vista se llama directamente sin datos, advertimos.
+    if request.method != 'GET':
+        messages.warning(request, "Acceso no válido.")
+        return redirect('seleccion')
+        
+    #PASO CLAVE 1: Recuperar los datos de la sesión
+    resumen_empleados = request.session.get('resumen_empleados', [])
+    order_data = request.session.get('order_data_for_ticket', {})
     
-    if request.method == 'POST':
+    # Si no hay empleados, no hay tiques que generar
+    if not resumen_empleados:
+        messages.warning(request, "No hay empleados registrados para generar tiques.")
+        # Limpiamos la sesión si es necesario antes de redirigir
+        if 'order_data_for_ticket' in request.session:
+             del request.session['order_data_for_ticket']
+        return redirect('seleccion')
+
+    #Opcional: Obtener detalles importantes de la orden para el tique (ej: ID de orden)
+    order_id = order_data.get('order_id', 'N/A')
+    
+    encoded_qrs_with_data = []
+    
+    try:
+        # Intenta abrir el logo una sola vez
+        logo = Image.open(LOGO_PATH)
+    except FileNotFoundError:
+       
+        logo = None
+        print(f"Advertencia: No se encontró el archivo del logo en la ruta: {LOGO_PATH}")
         
-        employee_names = request.POST.getlist('employees')
-        lunch_options = request.POST.getlist('lunch')
-        to_go_options = request.POST.getlist('to_go')
-        covered_options = request.POST.getlist('covered')
-        
-        encoded_qrs = []
-        
-        
+    #PASO CLAVE 2: Iterar sobre los datos de los empleados de la sesión
+    for empleado in resumen_empleados:
         try:
-            logo = Image.open(LOGO_PATH)
-        except FileNotFoundError:
-           
-            logo = None
-            print(f"Advertencia: No se encontró el archivo del logo en la ruta: {LOGO_PATH}")
+            # Prepara la información para el QR (incluye el ID de la orden si es relevante)
+            info = (
+                f"Orden ID: {order_id}\n" # Incluimos la referencia a la orden recién creada
+                f"Empleado: {empleado.get('employees', 'N/A')}\n"
+                f"Cédula: {empleado.get('cedula', 'N/A')}\n"
+                f"Almuerzo: {empleado.get('lunch', 'No')}\n"
+                f"Para Llevar: {empleado.get('to_go', 'No')}\n"
+                f"Cubiertos: {empleado.get('covered', 'No')}"
+            )
             
-        for i in range(len(employee_names)):
-            try:
-                info = (
-                    f"Empleado: {employee_names[i]}\n"
-                    f"Almuerzo: {lunch_options[i]}\n"
-                    f"Para Llevar: {to_go_options[i]}\n"
-                    f"Cubiertos: {covered_options[i]}"
-                )
-                
-               
-                qr = qrcode.QRCode(
-                    error_correction=qrcode.constants.ERROR_CORRECT_H
-                )
-                qr.add_data(info)
-                qr.make(fit=True)
-                
-                
-                qr_img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
-                
-               
-                if logo:
-                    qr_width, qr_height = qr_img.size
-                    
-                    
-                    logo_size = int(qr_width * 0.40)
-                    logo.thumbnail((logo_size, logo_size), Image.Resampling.LANCZOS)
-                    
-                    # Calcular la posición para centrar el logo
-                    logo_pos = ((qr_width - logo.width) // 2, (qr_height - logo.height) // 2)
-                    
-                    # Pegar el logo sobre el QR, usando el propio logo como máscara
-                    qr_img.paste(logo, logo_pos, logo)
-                
-                # Guardar la imagen combinada en un buffer de memoria
-                buffer = BytesIO()
-                qr_img.save(buffer, format='PNG')
-                
-                # Codificar la imagen y añadirla a la lista
-                encoded_img_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
-                encoded_qrs.append(encoded_img_data)
-                zipped_data = zip(employee_names, encoded_qrs) 
-                
-            except IndexError:
-                print(f"Skipping incomplete data for employee at index {i}")
-                continue
+            # --- Generación del QR (Tu código actual) ---
+            qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H)
+            qr.add_data(info)
+            qr.make(fit=True)
+            qr_img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
+            
+            if logo:
+                qr_width, qr_height = qr_img.size
+                logo_size = int(qr_width * 0.40)
+                logo_resized = logo.copy()
+                logo_resized.thumbnail((logo_size, logo_size), Image.Resampling.LANCZOS)
+                logo_pos = ((qr_width - logo_resized.width) // 2, (qr_height - logo_resized.height) // 2)
+                # Usamos el logo_resized como máscara
+                qr_img.paste(logo_resized, logo_pos, logo_resized)
+            
+            buffer = BytesIO()
+            qr_img.save(buffer, format='PNG')
+            encoded_img_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            
+            # Almacenamos el nombre y el QR codificado
+            encoded_qrs_with_data.append({
+                'employee_name': empleado.get('employees', 'Empleado'),
+                'qr_code': encoded_img_data,
+                'cedula': empleado.get('cedula', 'N/A')
+            })
+            
+        except Exception as e:
+            print(f"Error generando QR para empleado: {e}")
+            continue
+
+    #PASO CLAVE 3: Limpiar los datos de la sesión después de usarlos
+    if 'resumen_empleados' in request.session:
+        del request.session['resumen_empleados']
+    if 'order_data_for_ticket' in request.session:
+        del request.session['order_data_for_ticket']
+
+    # PASO CLAVE 4: Renderizar la plantilla FINAL de los tiques
+    contexto = {
+        'tickets': encoded_qrs_with_data,
+        'order_id': order_id,
+        'current_page': 'ticket' 
+    }
         
-        return render(request, 'paginas/ticket.html',{
-                'zipped_data': zipped_data,
-                'current_page': 'ticket' , 
-                
-                } )
-    
-    messages.warning(request, "Advertencia: Para crear un ticket, primero debe seleccionar un empleado")
-    return redirect('seleccion')
+    return render(request, 'paginas/ticket.html', contexto)
     
 def empleados(request):
     if 'api_token' not in request.session:
@@ -836,10 +868,7 @@ def regis_extras(request):
         except Exception as e:
             messages.error(request, 'Limite de registro al dia es uno')
             return redirect('extras')
-        
-        
-        
-     
+            
 
 def escaner(request):
     return render(request,"paginas/scan.html",{'current_page' : 'escaner'})

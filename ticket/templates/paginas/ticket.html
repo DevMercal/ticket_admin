@@ -9,16 +9,16 @@
 
     <div class="qr-container-list grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  auto-rows-fr">
     
-        {% for name, qr_data in zipped_data %} 
+        {%  for ticket in tickets%} 
         <div class="qr-item bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 ease-in-out transform hover:-translate-y-1 p-5 flex flex-col items-center justify-between border border-gray-100 dark:border-gray-700">
             
             <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 text-center truncate w-full" title="{{ name }}">
-                {{ name }}
+                {{ ticket.employee_name }}
             </h3>
-            
+            {{ ticket.cedula }}
             <div class="flex-grow flex items-center justify-center mb-4 w-full">
                 <img 
-                    src="data:image/png;base64,{{ qr_data }}" 
+                    src="data:image/png;base64,{{ ticket.qr_code }}" 
                     alt="Código QR para {{ name }}" 
                     class="w-full max-w-xs h-auto rounded-lg border border-gray-200 dark:border-gray-600 p-1 bg-white" 
                 />
@@ -28,4 +28,6 @@
         {% endfor %}
     </div>
 </div>
+
+
 {% endblock %}

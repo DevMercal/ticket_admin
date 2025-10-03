@@ -12,11 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const allRows = Array.from(tbody.querySelectorAll('tr'));
     let filteredRows = [...allRows];
     let currentPage = 1;
-    let rowsPerPage = parseInt(rowsPerPageSelect.value);
+    let rowsPerPage = parseInt(rowsPerPageSelect.value, 10); // ✅ Especificar base decimal
 
-    // Objeto para almacenar las selecciones de todos los empleados
     const employeeSelections = {};
-    console.log(employeeSelections)
+
     // --- 2. Funciones de Lógica de Negocio ---
     function renderTable() {
         tbody.innerHTML = '';
@@ -33,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const employeeIndex = row.dataset.employeeIndex;
                 const selections = employeeSelections[employeeIndex] || {};
 
-                // Restaurar estado de checkboxes si existen
                 const lunchCheckbox = row.querySelector(`[name="lunch_${employeeIndex}"]`);
                 const toGoCheckbox = row.querySelector(`[name="to_go_${employeeIndex}"]`);
                 const coveredCheckbox = row.querySelector(`[name="covered_${employeeIndex}"]`);
@@ -51,27 +49,25 @@ document.addEventListener('DOMContentLoaded', () => {
     function updatePaginationControls() {
         const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
         pageNumbersSpan.textContent = `Página ${currentPage} de ${totalPages}`;
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+        prevBtn.disabled = currentPage <= 1;
+        nextBtn.disabled = currentPage >= totalPages;
     }
 
     function handleSearch() {
         const searchTerm = searchInput.value.toLowerCase().trim();
-        if (searchTerm === '') {
-            filteredRows = [...allRows];
-        } else {
-            filteredRows = allRows.filter(row => {
-                return Array.from(row.children).some(cell =>
+        filteredRows = searchTerm === ''
+            ? [...allRows]
+            : allRows.filter(row =>
+                Array.from(row.children).some(cell =>
                     cell.textContent.toLowerCase().includes(searchTerm)
-                );
-            });
-        }
+                )
+            );
         currentPage = 1;
         renderTable();
     }
 
     function handleRowsPerPageChange() {
-        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        rowsPerPage = parseInt(rowsPerPageSelect.value, 10); // ✅ base decimal
         currentPage = 1;
         renderTable();
     }
@@ -90,111 +86,72 @@ document.addEventListener('DOMContentLoaded', () => {
             renderTable();
         }
     }
-    
+
     // --- 3. Event Listeners ---
     searchInput.addEventListener('input', handleSearch);
     rowsPerPageSelect.addEventListener('change', handleRowsPerPageChange);
     prevBtn.addEventListener('click', handlePrevClick);
     nextBtn.addEventListener('click', handleNextClick);
 
-    // Listener para capturar cambios en los checkboxes
-   tbody.addEventListener('change', (event) => {
+    tbody.addEventListener('change', (event) => {
         if (event.target.type === 'checkbox') {
             const row = event.target.closest('tr');
-            if (!row) return; // Protección por si no encuentra fila
-            const employeeIndex = row.dataset.employeeIndex;
-            const selectionType = event.target.dataset.selectionType;
-            if (!employeeIndex || !selectionType) return; // Protección
+            if (!row) return;
 
+            const employeeIndex = row.dataset.employeeIndex;
+            const employeeCedula = row.dataset.employeeCedula;
+            const selectionType = event.target.dataset.selectionType;
             const isChecked = event.target.checked;
 
-            if (!employeeSelections[employeeIndex]) {
-                employeeSelections[employeeIndex] = {
-                    index: employeeIndex,
+            if (!employeeIndex || !selectionType || !employeeCedula) return;
+
+            if (!employeeSelections[employeeCedula]) {
+                employeeSelections[employeeCedula] = {
                     name: row.dataset.employeeName,
-                    
-                    // --- CAPTURAR LA CÉDULA DE LA FILA ---
-                    cedula: row.dataset.employeeCedula,
-                    
-                    
+                    cedula: employeeCedula,
                     lunch: 'No',
                     to_go: 'No',
                     covered: 'No'
                 };
             }
-            employeeSelections[employeeIndex][selectionType] = isChecked ? 'Si' : 'No';
-            console.log(employeeSelections);
+
+            //Corrección: asegurar que se actualiza el objeto correcto
+            employeeSelections[employeeCedula][selectionType] = isChecked ? 'Si' : 'No';
         }
     });
 
-   // Listener para el envío del formulario
     resumenForm.addEventListener('submit', (event) => {
-        // ... (código previo)
-
-        // Eliminar inputs ocultos previos
         const oldInputs = resumenForm.querySelectorAll('input[name^="employees_"], input[name^="lunch_"], input[name^="to_go_"], input[name^="covered_"], input[name^="cedula_"], input[name^="employee_index_"], input[name="total_employees"]');
-
         oldInputs.forEach(input => input.remove());
 
         let employeeCount = 0;
-        let i = 0; //  NUEVO: Usaremos 'i' como contador secuencial para el nombre del input
+        let i = 0;
 
-        for (const index in employeeSelections) {
-            const selection = employeeSelections[index];
-            
+        for (const cedula in employeeSelections) {
+            const selection = employeeSelections[cedula];
             if (selection.lunch === 'Si' || selection.to_go === 'Si' || selection.covered === 'Si') {
-               
-                // --- CAMBIO CLAVE: Usamos 'i' para el nombre del input ---
-                
-                // Input para la cédula
-                const inputCedula = document.createElement('input');
-                inputCedula.type = 'hidden';
-                inputCedula.name = `cedula_${i}`; //  Usamos 'i'
-                inputCedula.value = selection.cedula; 
-                resumenForm.appendChild(inputCedula);
+                const fields = {
+                    [`cedula_${i}`]: selection.cedula,
+                    [`employees_${i}`]: selection.name,
+                    [`employee_index_${i}`]: cedula,
+                    [`lunch_${i}`]: selection.lunch,
+                    [`to_go_${i}`]: selection.to_go,
+                    [`covered_${i}`]: selection.covered
+                };
 
-                // Input para el nombre
-                const inputName = document.createElement('input');
-                inputName.type = 'hidden';
-                inputName.name = `employees_${i}`; //  Usamos 'i'
-                inputName.value = selection.name;
-                resumenForm.appendChild(inputName);
+                for (const [name, value] of Object.entries(fields)) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = name;
+                    input.value = value;
+                    resumenForm.appendChild(input);
+                }
 
-                // Input para el índice original (Opcional, pero útil si lo necesitas)
-                const inputIndex = document.createElement('input');
-                inputIndex.type = 'hidden';
-                inputIndex.name = `employee_index_${i}`; //  Usamos 'i'
-                inputIndex.value = index; //  El valor es el índice original
-                resumenForm.appendChild(inputIndex);
-
-
-                // Input para Lunch
-                const inputLunch = document.createElement('input');
-                inputLunch.type = 'hidden';
-                inputLunch.name = `lunch_${i}`; //  Usamos 'i'
-                inputLunch.value = selection.lunch;
-                resumenForm.appendChild(inputLunch);
-
-                // Input para To Go
-                const inputToGo = document.createElement('input');
-                inputToGo.type = 'hidden';
-                inputToGo.name = `to_go_${i}`; //  Usamos 'i'
-                inputToGo.value = selection.to_go;
-                resumenForm.appendChild(inputToGo);
-
-                // Input para Covered
-                const inputCovered = document.createElement('input');
-                inputCovered.type = 'hidden';
-                inputCovered.name = `covered_${i}`; //  Usamos 'i'
-                inputCovered.value = selection.covered;
-                resumenForm.appendChild(inputCovered);
-
-                i++; //  Incrementamos el contador secuencial
+                i++;
                 employeeCount++;
             }
         }
-        
-        // El input total_employees queda igual, contando la cantidad de empleados seleccionados.
+
         const totalInput = document.createElement('input');
         totalInput.type = 'hidden';
         totalInput.name = 'total_employees';
@@ -202,6 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resumenForm.appendChild(totalInput);
     });
 
-    // --- 4. Renderizado Inicial ---
+    
     renderTable();
 });
