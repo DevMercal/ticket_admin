@@ -4,7 +4,7 @@
         <div class="modal-content dark:bg-gray-800 p-6">
             <div class="modal-header border-b-0 pb-0">
                 <h5 class="modal-title dark:text-white text-xl font-bold text-center w-full" id="staticBackdropLabel">
-                    Total a pagar: <span class="text-green-500">Bs. 0.00</span></h5>
+                    Total a pagar: <span class="text-green-500">Bs. {{ total_general }}</span></h5>
                 <button type="button" class="btn-close absolute top-3 right-3" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
@@ -56,13 +56,13 @@
               <form method="POST" action="{% url 'registration_order' %}" enctype="multipart/form-data" >
                     {% csrf_token %}
                     
-                    <h2>Datos de la Orden</h2>
+                    <h2 class="dark:text-white text-center">Datos de la Orden</h2>
                      {% for i in contexto %}
                         
                             
                         
                     <label for="cedula" hidden>Cédula del Empleado (Order):</label>
-                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="cedula" name="cedula" value="{{ i.cedula }}" ><br>
+                    <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="cedula" name="cedula" value="{{ i.cedula }}" hidden><br>
                     <input type="hidden" name="extras" value="1"> 
                     {% endfor %}
                     <label for="special_event" class="dark:text-white" hidden>Evento Especial (Si/No):</label>
@@ -80,8 +80,8 @@
                     <label for="reference" class="dark:text-white">Referencia/Número de Transacción:</label>
                     <input type="number" step="any" class="w-full p-2 border border-gray-300 rounded-md text-center" id="reference" name="reference" required><br>
 
-                    <label for="total_amount">Monto Total:</label>
-                    <input type="number" class="w-full p-2 border border-gray-300 rounded-md text-center" step="0.01" id="total_amount" name="total_amount" required><br>
+                    <label for="total_amount" hidden>Monto Total:</label>
+                    <input type="hidden" class="w-full p-2 border border-gray-300 rounded-md text-center" step="0.01" id="total_amount" name="total_amount" value="{{ total_general }}" required><br>
 
                     <label for="payment_support" class="dark:text-white">Soporte de Pago (PNG/JPG):</label>
                     <input type="file" class="w-full p-2 border border-gray-300 rounded-md text-center" id="payment_support" name="payment_support" accept="image/png,image/jpeg" required><br>
@@ -105,6 +105,7 @@
                     <label for="management" class="dark:text-white">Gerencia/Departamento:</label>
                     <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="management" name="management" required><br>
 
+                </div>
                     <br>
                     <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 gap-4">Registrar Orden</button>
                     <br>
@@ -112,6 +113,5 @@
                      <button  class="w-full bg-green-500 text-white p-2 rounded-md hover:bg-blue-600" data-bs-dismiss="modal">Cancelar</button>
                 </form>
                
-        </div>
     </div>
 </div>

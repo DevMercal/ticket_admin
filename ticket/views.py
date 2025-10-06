@@ -112,6 +112,10 @@ def progreso_mensual_view(request):
     return HttpResponse(buffer.getvalue(), content_type='image/png') 
 
 def index(request):
+    if 'api_token' not in request.session:
+        messages.warning(request, "Debe iniciar sesión para ver esta información.")
+        return redirect('inicio')  
+    
     token = request.session.get('api_token')
     headers = {
         'Authorization': f'Bearer {token}'
@@ -337,7 +341,6 @@ def menu(request):
         
         try:
             menus = json_data.get('menus', [])
-            print(menu)
             menu_item = menus[4]
 
             
@@ -420,51 +423,48 @@ def resumen(request):
     if request.method == 'POST':
         total = int(request.POST.get('total_employees', 0))
         
+        total_pago_general = request.POST.get('total_pago_general', '0.00')
+        
         resumen_empleados = []
         
         
         for i in range(total): 
            
             employee_name = request.POST.get(f'employees_{i}') 
-            print(employee_name)
             employee_index = request.POST.get(f'employee_index_{i}')
-            
-            
             cedula = request.POST.get(f'cedula_{i}')
-            print(cedula)
+            
             if not employee_name:
                 continue 
             
-            # Captura las opciones de servicio
+            
             lunch = request.POST.get(f'lunch_{i}', 'No')
             to_go = request.POST.get(f'to_go_{i}', 'No')
             covered = request.POST.get(f'covered_{i}', 'No')
+           
             
             if lunch == 'No' and to_go == 'No' and covered == 'No':
                 continue
 
             resumen_empleados.append({
-                'employees': employee_name, # Usamos el nombre que acabamos de capturar
+                'employees': employee_name,
                 'lunch': lunch,
                 'to_go': to_go,
                 'covered': covered,
                 'cedula': cedula,
-                # 'index': employee_index # Si enviaste el índice original, puedes guardarlo aquí
             })
             
-            # (El resto de tu lógica de Python es correcta)
-            # ...
             
         if resumen_empleados:
             request.session['resumen_empleados'] = resumen_empleados
             contexto = {
                 'contexto': resumen_empleados,
-                'current_page': 'resumen'
+                'current_page': 'resumen',
+                'total_general': total_pago_general 
             }
                 
             return render(request, 'paginas/resumen.html', contexto)
     
-    # Redirigir si el método no es POST
     messages.warning(request, "Acceso denegado: Debe seleccionar un empleado para acceder a esta vista.")
     return redirect('seleccion')
 
@@ -477,7 +477,9 @@ def registration_order(request):
     headers = {
         'Authorization': f'Bearer {token}'
     }
-    resumen_empleados = request.session.get('resumen_empleados', [])
+    # La variable 'resumen_empleados' no se usa en el bloque POST, pero la mantengo si tiene un propósito en el GET
+    resumen_empleados = request.session.get('resumen_empleados', []) 
+
     if request.method == 'POST':
         # 1. Recuperar y CONVERTIR/PREPARAR los datos
         
@@ -521,73 +523,85 @@ def registration_order(request):
         payment_support = request.FILES.get('payment_support')
         
         
-        
-        data_to_send = {
-           
-            'order[special_event]': special_event,
-            'order[authorized]': authorized,
-            'order[authorized_person]': authorized_person,
-            'order[id_payment_method]': str(id_payment_method), 
-            'order[reference]': str(reference), 
-            'order[total_amount]': total_amount, 
-            'order[cedula]': str(cedula), 
-            'order[id_order_status]': str(id_order_status), 
-            'order[id_orders_consumption]': str(id_orders_consumption),
-            
-            # --- Claves de employeePayment con NOTACIÓN DE ARRAY ---
-            'employeePayment[cedula_employee]': cedula_employee,
-            'employeePayment[name_employee]': name_employee,
-            'employeePayment[phone_employee]': phone_employee,
-            'employeePayment[management]': management,
-            
-            # --- Extras ---
-            'extras[]': extras, 
-        }
+        # 2. Construir el JSON y el Payload
+        data_for_json = {
+                "order": {
+                    'special_event': special_event,
+                    'authorized': authorized,
+                    'id_payment_method': id_payment_method,
+                    'id_order_status':id_order_status,
+                    'authorized_person': authorized_person,
+                    'reference':reference,
+                    'cedula': cedula, 
+                    'total_amount':total_amount,
+                    'id_orders_consumption': str(id_orders_consumption),
+                },
+                "employeePayment": {
+                    'cedula_employee': cedula_employee,
+                    'name_employee': name_employee,
+                    'phone_employee':phone_employee,
+                    'management': management,
+                },
+                # Los arrays simples a menudo van como listas JSON
+                "extras": [extras] 
+            }
 
-        # 3. Preparar los archivos (Clave de Laravel para el archivo con notación de array)
+        orders = [data_for_json]
+        orders_json_string = json.dumps(orders)
+        payload_data = {
+            'orders_json':  orders_json_string
+        }
+        print(payload_data) # Eliminado para limpieza
+
+        # 3. Preparar los archivos
         files_to_send = {}
         if payment_support:
             content_type = mimetypes.guess_type(payment_support.name)[0] or 'application/octet-stream'
-            
-            # ¡CLAVE! El archivo también debe usar la notación de array
-            files_to_send = {
-                'order[payment_support]': (payment_support.name, payment_support.file, content_type)
-            }
+
+            files_to_send = [
+                # Tupla: (nombre_campo, (nombre_archivo, datos_archivo, tipo_mime))
+                ('payment_supports[]', (payment_support.name, payment_support.file, content_type))
+            ]
         
-       
+        # 4. Enviar la solicitud a la API
         try:
-            # Enviamos data (datos planos con claves de array) y files (archivo)
+            # Aquí es donde estaba la indentación INCORRECTA
+            # El bloque de código de la petición debe estar DENTRO del 'if request.method == 'POST':'
+            # y NO anidado en una estructura incorrecta.
+            
             response = requests.post(
-                f"{api_url}/pedidos", 
+                f"{api_url}/pedidos/bluk", 
                 headers=headers, 
-                data=data_to_send, 
+                data=payload_data, 
                 files=files_to_send, 
                 timeout=10
             )
+                    
+            # print(response) # Eliminado para limpieza
+            # print(f"Código de estado de la respuesta: {response.status_code}") # Eliminado para limpieza
+
+            # 5. Manejo de la Respuesta de la API
             
-            
-            # 1. Imprime el código de estado para verificar
-            print(f"Código de estado de la respuesta: {response.status_code}")
-            
-            # 2. Obtiene y muestra el JSON de la respuesta
+            # Intenta obtener el JSON de la respuesta para la depuración y el éxito
             try:
-                
                 response_json = response.json()
-                print(response_json)  
+                # print(response_json) # Eliminado para limpieza
             except requests.exceptions.JSONDecodeError:
-                print("La respuesta no contiene JSON válido. Contenido de la respuesta:")
-                print(response.text)
-            # --------------------------------
+                # print("La respuesta no contiene JSON válido. Contenido de la respuesta:") # Eliminado para limpieza
+                # print(response.text) # Eliminado para limpieza
+                # Si la respuesta no es 2xx y no tiene JSON, raise_for_status lo manejará.
+                pass 
+           
             
-            response.raise_for_status()
+            response.raise_for_status() # Esto lanzará una excepción HTTPError para respuestas 4xx/5xx
+            
+            # Si llegamos aquí, la respuesta fue 2xx
             request.session['order_data_for_ticket'] = response.json()
             messages.success(request, "La orden se ha registrado correctamente. ")
             return redirect('ticket')
 
         except requests.exceptions.HTTPError as err:
-            # La depuración es esencial
-            print(f"Error {response.status_code} - Respuesta de la API: {response.text}")
-            # En el error, ya estás imprimiendo response.text, que es correcto para ver el detalle.
+            # print(f"Error {response.status_code} - Respuesta de la API: {response.text}") # Eliminado para limpieza
             
             error_msg = f"Error: {response.status_code}. Detalles no disponibles."
             try:
@@ -600,18 +614,20 @@ def registration_order(request):
                     error_msg += " | Detalles: " + " | ".join(validation_errors)
 
             except:
-                pass
+                # Si falla la decodificación del JSON del error, usamos el mensaje genérico
+                pass 
             messages.error(request, f" Error al registrar: {error_msg}")
 
         except requests.exceptions.RequestException as e:
             messages.error(request, "Error de conexión con la API de órdenes.")
-            print(f"Error de conexión: {e}")
+            # print(f"Error de conexión: {e}") # Eliminado para limpieza
 
+    # Renderiza la plantilla si no es un POST o si hay un error antes de la redirección
+    # o si se ejecuta la primera vez (método GET)
     return render(request, "paginas/pedidos.html")
 
 def ticket(request):
-    # Solo procesamos la petición GET que viene del redirect exitoso.
-    # Si la vista se llama directamente sin datos, advertimos.
+    
     if request.method != 'GET':
         messages.warning(request, "Acceso no válido.")
         return redirect('seleccion')
@@ -622,13 +638,12 @@ def ticket(request):
     
     # Si no hay empleados, no hay tiques que generar
     if not resumen_empleados:
-        messages.warning(request, "No hay empleados registrados para generar tiques.")
+        messages.warning(request, "No hay empleados registrados para generar ticket.")
         # Limpiamos la sesión si es necesario antes de redirigir
         if 'order_data_for_ticket' in request.session:
              del request.session['order_data_for_ticket']
         return redirect('seleccion')
 
-    #Opcional: Obtener detalles importantes de la orden para el tique (ej: ID de orden)
     order_id = order_data.get('order_id', 'N/A')
     
     encoded_qrs_with_data = []

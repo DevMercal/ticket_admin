@@ -8,7 +8,7 @@
     <section class="bg-white rounded-xl shadow-md p-6 mb-12 dark:bg-gray-800">
       <header class="flex justify-between items-center mb-4">
         <h2 class="font-semibold text-lg md:text-xl dark:text-white">Detalles de la Orden</h2>
-        <span class="text-green-600 font-semibold text-sm md:text-base">Total a pagar: <span class="font-bold">Bs. 0.00</span></span>
+        <span class="text-green-600 font-semibold text-sm md:text-base">Total a pagar: <span class="font-bold">Bs. {{ total_general }}</span></span>
       </header>
 
 <div class="hidden md:block overflow-x-auto max-h-96 overflow-y-auto bg-white dark:bg-gray-800 rounded-lg shadow-md">
@@ -21,6 +21,7 @@
                 <th class="py-3 px-4 font-semibold text-center">Cubiertos</th>
             </tr>
         </thead>
+       
         <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-700 dark:divide-gray-600">
             {% for i in contexto %}
             <tr class="hover:bg-gray-50 dark:hover:bg-gray-600 transition duration-150">

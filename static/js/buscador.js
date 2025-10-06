@@ -121,13 +121,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     resumenForm.addEventListener('submit', (event) => {
-        const oldInputs = resumenForm.querySelectorAll('input[name^="employees_"], input[name^="lunch_"], input[name^="to_go_"], input[name^="covered_"], input[name^="cedula_"], input[name^="employee_index_"], input[name="total_employees"]');
+        // ... (Tu código existente para limpiar inputs) ...
+        const oldInputs = resumenForm.querySelectorAll('input[name^="employees_"], input[name^="lunch_"], input[name^="to_go_"], input[name^="covered_"], input[name^="cedula_"], input[name^="employee_index_"], input[name="total_employees"], input[name="total_pago_general"]'); // <-- AÑADIR NUEVO NOMBRE
         oldInputs.forEach(input => input.remove());
 
         let employeeCount = 0;
         let i = 0;
 
         for (const cedula in employeeSelections) {
+            // ... (Tu código existente para añadir empleados) ...
             const selection = employeeSelections[cedula];
             if (selection.lunch === 'Si' || selection.to_go === 'Si' || selection.covered === 'Si') {
                 const fields = {
@@ -152,13 +154,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        const totalInput = document.createElement('input');
-        totalInput.type = 'hidden';
-        totalInput.name = 'total_employees';
-        totalInput.value = employeeCount;
-        resumenForm.appendChild(totalInput);
+        // 1. Agregar el conteo total de empleados (tu código existente)
+        const totalEmployeesInput = document.createElement('input');
+        totalEmployeesInput.type = 'hidden';
+        totalEmployeesInput.name = 'total_employees';
+        totalEmployeesInput.value = employeeCount;
+        resumenForm.appendChild(totalEmployeesInput);
+        
+        // 2. AÑADIR EL TOTAL DE PAGO CALCULADO AQUÍ
+        const totalPagoInput = document.createElement('input');
+        totalPagoInput.type = 'hidden';
+        totalPagoInput.name = 'total_pago_general'; // Nombre del campo en el POST
+        totalPagoInput.value = totalInput.value; // ¡Obtener el valor del campo que calcula el total!
+        resumenForm.appendChild(totalPagoInput);
     });
-
-    
     renderTable();
 });

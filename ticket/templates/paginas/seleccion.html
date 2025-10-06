@@ -55,14 +55,15 @@
                         
                         <td class="py-3 px-4 text-center dark:text-white" data-label="Nombre" >{{ em.full_name }}</td>
                         <td class="py-3 px-4 text-center dark:text-white" data-label="Comida">
-                            <input type="checkbox" data-selection-type="lunch" value="Si">
+                            <input id="lunch" type="checkbox" class="selection-checkbox" data-selection-type="lunch" value="185">
                         </td>
                         <td class="py-3 px-4 text-center dark:text-white" data-label="Para llevar">
-                            <input type="checkbox" data-selection-type="to_go" value="Si">
+                            <input id="to_go" type="checkbox" class="selection-checkbox" data-selection-type="to_go" value="20">
                         </td>
                         <td class="py-3 px-4 text-center dark:text-white" data-label="Cubiertos">
-                            <input type="checkbox" data-selection-type="covered" value="Si">
+                            <input id="covered" type="checkbox" class="selection-checkbox" data-selection-type="covered" value="10">
                         </td>
+                        <input id="total" type="text" name="total_pago"  value="0" hidden>
                         
                        
                     </tr>
