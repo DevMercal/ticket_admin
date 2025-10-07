@@ -35,15 +35,16 @@ def inicio(request):
             if response.status_code == 200:
                 json_data = response.json()
                 empleados = json_data.get('data', [])
-                
+                print(empleados)
                 token = json_data.get('token')
-                name = empleados.get('name')
+                name = empleados.get('first_name')
+                
                 email = empleados.get('email')
                 
                 if token:
                     
                     request.session['api_token'] = token
-                    request.session['name'] = name
+                    request.session['first_name'] = name
                     request.session['email'] = email
                     
                     messages.success(request, '¡Inicio de sesión exitoso!')

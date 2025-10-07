@@ -40,20 +40,22 @@
                    
                     <td class="py-3 px-4 dark:text-white" data-label="Accion"> <button data-modal-target="miModal{{ usuario.id }}"
                             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Ver mas
+                            <i class="fa-solid fa-eye"></i>
                         </button>
                     </td>
                     <td class="py-3 px-4 dark:text-white" data-label="Accion">
                         {% url 'eliminar_user' usuario.id as ruta %}
                          <a href="#" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                                onclick="confirmarEliminar(event, '{{ruta}}')" >Eliminar</a> 
+                                onclick="confirmarEliminar(event, '{{ruta}}')" ><i class="fa-solid fa-trash"></i></a> 
                     </td>
+                    
                 </tr>
  
                 {% endfor %}
             </tbody>
         </table>
     </div>
+   
 <script>
                                 function confirmarEliminar(event, url) {
                                     event.preventDefault(); // Evita que el enlace navegue inmediatamente
