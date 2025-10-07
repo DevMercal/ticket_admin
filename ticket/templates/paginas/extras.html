@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="flex flex-col items-center p-4">
-    <h1 class="text-xl font-bold mb-4">GESTIÓN DEL COMEDOR</h1>
+    <h1 class="text-xl font-bold mb-4 dark:text-white">GESTIÓN DEL COMEDOR</h1>
 
     <div class="w-full max-w-2xl flex flex-col md:flex-row items-start justify-center m-2 gap-4">
         
@@ -12,16 +12,14 @@
                 <h2 class="text-lg dark:text-white font-semibold">EXTRAS</h2>
                 <button class="text-lg font-bold w-6 h-6 border border-black rounded-full flex items-center justify-center dark:text-white" data-bs-toggle="modal" data-bs-target="#extras">+</button>
             </div>
+            {% for item in resultados %}
             <div class="text-base space-y-2">
                 <div class="flex justify-between">
-                    <span class="font-medium dark:text-white">ENVASE</span>
-                    <span class="dark:text-white">20</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="font-medium dark:text-white">CUBIERTO</span>
-                    <span class="dark:text-white">20</span>
-                </div>
+                    <span class="font-medium dark:text-white">{{ item.name_extra }}</span>
+                    <span class="dark:text-white">{{ item.price }}</span>
+                </div>  
             </div>
+            {% endfor %}
         </div>
 
          <div class="border border-gray-400 p-4 w-full md:w-1/2 shadow-lg rounded-lg">
@@ -33,13 +31,16 @@
                 
                 <div class="flex justify-between">
                     <span class="font-medium dark:text-white">limite</span>
-                    <!-- <span class="dark:text-white">{{ numbers_orders_day }}</span> -->
+                     <span class="dark:text-white">{{ total_all }}</span> 
                 </div>
                 <div class="flex justify-between">
-                    <span class="font-medium dark:text-white">Dia</span>
-                    <span class="dark:text-white">20</span>
+                    <span class="font-medium dark:text-white">Restantes del día</span>
+                    <span class="dark:text-white">{{ resultado }}</span>
                 </div>
-                
+                <div class="flex justify-between">
+                    <span class="font-medium dark:text-white">total Vendido</span>
+                    <span class="dark:text-white">{{ date }}</span>
+                </div>
             </div>
         </div>
     </div>
@@ -47,49 +48,6 @@
   
 {% include 'modal/extras.html' %}
 {% include 'modal/limite.html' %}
-
-<div class="container mt-5">
-        <h2>Extras Disponibles</h2>
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        {% if lista_de_extras %}
-            
-            <table class="table table-striped table-hover">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Precio</th>
-                        <th>Creado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for extra in lista_de_extras %}
-                    <tr>
-                        <td>{{ extra.id_extra }}</td>
-                        <td>{{ extra.name_extra }}</td>
-                        <td>${{ extra.price|floatformat:2 }}</td> 
-                        <td>{{ extra.created_at|date:"Y-m-d H:i" }}</td> 
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-        {% else %}
-            <div class="alert alert-info" role="alert">
-                No se encontraron extras. Verifique su conexión con la API o que existan datos.
-            </div>
-        {% endif %}
-
-    </div>
-
 
 
 {% endblock %}

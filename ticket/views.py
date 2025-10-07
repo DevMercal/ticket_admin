@@ -81,12 +81,8 @@ def progreso_mensual_view(request):
            wedgeprops={'edgecolor': '#282c34', 'width': 0.3})
 
     # Añadir el texto en el centro
-    ax.text(0, 0, f'{completado}%',
-            ha='center', va='center',
-            fontsize=40, color='white', weight='bold')
-    ax.text(0, -0.2, 'Objetivo',
-            ha='center', va='center',
-            fontsize=20, color='white')
+    ax.text(0, 0, f'{completado}%', ha='center', va='center', fontsize=40, color='green', weight='bold')
+    ax.text(0, -0.2, 'Objetivo', ha='center', va='center', fontsize=20, color='gray')
 
     # Crear la leyenda
     legend_elements = [
@@ -94,12 +90,12 @@ def progreso_mensual_view(request):
         mpatches.Patch(facecolor=colores[1], label=f'{etiquetas[1]}   {restante}%')
     ]
     ax.legend(handles=legend_elements, loc='lower center', bbox_to_anchor=(0.5, -0.1),
-              ncol=1, frameon=False, fontsize=12, labelcolor='white')
+              ncol=1, frameon=False, fontsize=12, labelcolor='gray')
 
     # Configurar el fondo y el título
     fig.patch.set_facecolor('#282c34')
     ax.set_facecolor('#282c34')
-    ax.set_title('Progreso Mensual', fontsize=20, color='white', weight='bold')
+    ax.set_title('Progreso Mensual', fontsize=20, color='gray', weight='bold')
     ax.axis('equal')
 
     # Guardar el gráfico en un buffer en memoria en lugar de un archivo
@@ -471,41 +467,38 @@ def resumen(request):
 def registration_order(request):
     if 'api_token' not in request.session:
         messages.warning(request, "Debe iniciar sesión para ver esta información.")
-        return redirect('inicio') # Asumiendo el nombre de la URL 'inicio'
+        return redirect('inicio') 
 
     token = request.session.get('api_token')
     headers = {
         'Authorization': f'Bearer {token}'
     }
-    # La variable 'resumen_empleados' no se usa en el bloque POST, pero la mantengo si tiene un propósito en el GET
+    
     resumen_empleados = request.session.get('resumen_empleados', []) 
-
-    if request.method == 'POST':
-        # 1. Recuperar y CONVERTIR/PREPARAR los datos
+    
+    if not resumen_empleados and request.method == 'POST':
+        messages.error(request, "No hay empleados en el resumen para registrar la orden.")
+        return redirect('pedidos') 
         
-        # --- CAMPOS STRING ---
+    if request.method == 'POST':
+       
+       
         special_event = request.POST.get('special_event', 'No')
         authorized = request.POST.get('authorized', 'No')      
         authorized_person = request.POST.get('authorized_person', '')
-        total_amount = request.POST.get('total_amount', '0.0') # 'required|string'
+        total_amount = request.POST.get('total_amount', '0.0') 
 
-        # --- CAMPOS NUMÉRICOS (Convertidos a STRING para el envío 'multipart') ---
+       
         try:
-            # reference: 'required|numeric'
-            reference = str(float(request.POST.get('reference') or 0.0))
+        # Usamos int() para asegurar que la referencia base sea un entero sin .0
+         reference_base = str(int(request.POST.get('reference') or 0)) 
         except ValueError:
-            messages.error(request, " Error: El campo 'Referencia' debe ser numérico.")
+            messages.error(request, " Error: El campo 'Referencia' debe ser un número entero.")
             return redirect('pedidos')
-            
+                
+        
+        
         try:
-            # cedula: 'required|numeric'
-            cedula = str(int(request.POST.get('cedula') or 0))
-        except ValueError:
-            messages.error(request, " Error: El campo 'Cédula de la Orden' debe ser un número entero.")
-            return redirect('pedidos')
-
-        try:
-            # IDs: Convertidos a STRING
             id_payment_method = str(int(request.POST.get('id_payment_method') or 0))
             id_order_status = str(int(request.POST.get('id_order_status', '1')))
             id_orders_consumption = str(int(request.POST.get('id_orders_consumption', '1')))
@@ -513,7 +506,7 @@ def registration_order(request):
             messages.error(request, " Error: Los IDs de pago o estado deben ser números enteros.")
             return redirect('pedidos')
             
-        # --- Campos de EmployeePayment (STRING) ---
+       
         cedula_employee = request.POST.get('cedula_employee')
         name_employee = request.POST.get('name_employee')
         phone_employee = request.POST.get('phone_employee', '')
@@ -523,17 +516,36 @@ def registration_order(request):
         payment_support = request.FILES.get('payment_support')
         
         
-        # 2. Construir el JSON y el Payload
-        data_for_json = {
+        
+        orders = []
+        
+      
+        try:
+            total_float = float(total_amount)
+            monto_unitario = total_float / len(resumen_empleados) if resumen_empleados else 0.0
+            total_amount_unitario_str = "{:.2f}".format(monto_unitario)
+        except (ValueError, ZeroDivisionError):
+            messages.error(request, "Error en el cálculo del monto total o lista de empleados vacía.")
+            return redirect('pedidos')
+
+
+        
+        for empleado_consumo in resumen_empleados:
+            
+            
+            cedula_orden = str(empleado_consumo['cedula']) 
+            employee_cedula = cedula_orden + reference_base
+            print(employee_cedula)
+            data_for_json = {
                 "order": {
                     'special_event': special_event,
                     'authorized': authorized,
                     'id_payment_method': id_payment_method,
                     'id_order_status':id_order_status,
                     'authorized_person': authorized_person,
-                    'reference':reference,
-                    'cedula': cedula, 
-                    'total_amount':total_amount,
+                    'reference':employee_cedula,
+                    'cedula': cedula_orden, 
+                    'total_amount': total_amount_unitario_str,
                     'id_orders_consumption': str(id_orders_consumption),
                 },
                 "employeePayment": {
@@ -542,71 +554,62 @@ def registration_order(request):
                     'phone_employee':phone_employee,
                     'management': management,
                 },
-                # Los arrays simples a menudo van como listas JSON
+                
                 "extras": [extras] 
             }
+            orders.append(data_for_json) 
 
-        orders = [data_for_json]
+      
         orders_json_string = json.dumps(orders)
+
+       
         payload_data = {
-            'orders_json':  orders_json_string
+            'orders_json': orders_json_string
         }
-        print(payload_data) # Eliminado para limpieza
-
-        # 3. Preparar los archivos
-        files_to_send = {}
-        if payment_support:
-            content_type = mimetypes.guess_type(payment_support.name)[0] or 'application/octet-stream'
-
-            files_to_send = [
-                # Tupla: (nombre_campo, (nombre_archivo, datos_archivo, tipo_mime))
-                ('payment_supports[]', (payment_support.name, payment_support.file, content_type))
-            ]
         
-        # 4. Enviar la solicitud a la API
-        try:
-            # Aquí es donde estaba la indentación INCORRECTA
-            # El bloque de código de la petición debe estar DENTRO del 'if request.method == 'POST':'
-            # y NO anidado en una estructura incorrecta.
+        
+        files_to_send = []
+
+        if payment_support:
+           
+            payment_support.file.seek(0)
+            file_content = payment_support.file.read() # <--- Leemos el archivo a memoria
             
+            
+            num_orders = len(orders) 
+            content_type = mimetypes.guess_type(payment_support.name)[0] or 'application/octet-stream'
+            file_name = payment_support.name
+            
+           
+            for i in range(num_orders):
+                
+                files_to_send.append(
+                    ('payment_supports[]', (f"soporte_{i}_{file_name}", file_content, content_type))
+                )
+                
+
+        
+        try:
             response = requests.post(
                 f"{api_url}/pedidos/bluk", 
                 headers=headers, 
-                data=payload_data, 
+                data=payload_data,   
                 files=files_to_send, 
                 timeout=10
             )
-                    
-            # print(response) # Eliminado para limpieza
-            # print(f"Código de estado de la respuesta: {response.status_code}") # Eliminado para limpieza
-
-            # 5. Manejo de la Respuesta de la API
+            print(response)
+            response.raise_for_status() 
             
-            # Intenta obtener el JSON de la respuesta para la depuración y el éxito
-            try:
-                response_json = response.json()
-                # print(response_json) # Eliminado para limpieza
-            except requests.exceptions.JSONDecodeError:
-                # print("La respuesta no contiene JSON válido. Contenido de la respuesta:") # Eliminado para limpieza
-                # print(response.text) # Eliminado para limpieza
-                # Si la respuesta no es 2xx y no tiene JSON, raise_for_status lo manejará.
-                pass 
-           
-            
-            response.raise_for_status() # Esto lanzará una excepción HTTPError para respuestas 4xx/5xx
-            
-            # Si llegamos aquí, la respuesta fue 2xx
             request.session['order_data_for_ticket'] = response.json()
-            messages.success(request, "La orden se ha registrado correctamente. ")
+            messages.success(request, "La orden se ha registrado correctamente. Se crearon múltiples pedidos.")
             return redirect('ticket')
 
         except requests.exceptions.HTTPError as err:
-            # print(f"Error {response.status_code} - Respuesta de la API: {response.text}") # Eliminado para limpieza
-            
+             
             error_msg = f"Error: {response.status_code}. Detalles no disponibles."
             try:
                 error_data = response.json()
-                # Mostrar el detalle del error de validación
+               
                 error_msg = error_data.get('message', error_msg)
                 
                 if 'errors' in error_data:
@@ -614,16 +617,15 @@ def registration_order(request):
                     error_msg += " | Detalles: " + " | ".join(validation_errors)
 
             except:
-                # Si falla la decodificación del JSON del error, usamos el mensaje genérico
+           
                 pass 
             messages.error(request, f" Error al registrar: {error_msg}")
 
         except requests.exceptions.RequestException as e:
             messages.error(request, "Error de conexión con la API de órdenes.")
-            # print(f"Error de conexión: {e}") # Eliminado para limpieza
+            
 
-    # Renderiza la plantilla si no es un POST o si hay un error antes de la redirección
-    # o si se ejecuta la primera vez (método GET)
+    
     return render(request, "paginas/pedidos.html")
 
 def ticket(request):
@@ -778,144 +780,116 @@ def pedidos(request):
         messages.error(request, f"error inesperado no se encontraron registros" )
     return render(request, "paginas/pedidos.html" ,{'current_page' : 'pedidos', 'pedidos':pedidos})
 
-def extras(request):
+def extras_unified_view(request):
+    # 1. Verificación de Autenticación y Encabezados Comunes
     if 'api_token' not in request.session:
         messages.warning(request, "Debe iniciar sesión para ver esta información.")
-        return redirect('inicio') 
+        return redirect('inicio')
        
     token = request.session.get('api_token')
     headers = {
         'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json'
-    }
-
-    if request.method == 'POST': 
-       
-        numberOrdersDay = request.POST.get ('numberOrdersDay')
-
-       
-        if not all([numberOrdersDay]):
-            messages.error(request, 'Todos los campos son obligatorios.')
-            return redirect('usu') 
-
-        data = {
-            'numberOrdersDay': numberOrdersDay
-        }
-
-        try:
-            
-            response = requests.post(f"{api_url}/ordersDay", json=data, headers=headers, timeout=10)
-            response.raise_for_status() 
-            show_limit = response.json()
-            print(show_limit)
-            messages.success(request, 'cantidad de pedidos registrado.')
-            return redirect('extras')
-        except Exception as e:
-            messages.error(request, 'Limite de registro al dia es uno')
-            return redirect('extras')
-        
-        
-        
-    return render(request, "paginas/extras.html",{'current_page' : 'extras'}) 
-
-def view_extras(request):
-    if 'api_token' not in request.session:
-        messages.warning(request, "Debe iniciar sesión para ver esta información.")
-        return redirect('inicio') 
-       
-    token = request.session.get('api_token')
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json'
-    }
-    try:
-        response = requests.get(f"{api_url}/ordersDay", headers=headers, timeout=10)
-        print(response)
-        response.raise_for_status() 
-        show_limit = response.json()
-        
-        limites = show_limit.get('cantidadOrdenes', [])
-        print(limites)
-        contexto = {
-            'current_page': 'extras',
-            'limites': limites
-        }
-       
-        return render(request, "paginas/extras.html", contexto) 
-    except Exception as e:
-        messages.error(request, 'Error al traer la información.')
-        return redirect('extras')
-
-def ver_extras(request):
-    
-    if 'api_token' not in request.session:
-        messages.warning(request, "Debe iniciar sesión para ver esta información.")
-        return redirect('inicio') 
-       
-    token = request.session.get('api_token')
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json'
-    }    
-        
-    extras_list = []
-
-    try:
-        response = requests.get(f"{api_url}/extras", headers=headers, timeout=10)
-        response.raise_for_status()         
-        extras_list = response.json() 
-        
-        print(extras_list) 
-        
-    except requests.exceptions.RequestException as e:
-       
-        messages.error(request, f"Error al consultar los extras: {e}") 
-        
-    context = {
-       
-        'extras': extras_list 
     }
     
-    return render(request, "paginas/extras.html", context)
-                 
-def regis_extras(request):
-    if 'api_token' not in request.session:
-        messages.warning(request, "Debe iniciar sesión para ver esta información.")
-        return redirect('inicio') 
-       
-    token = request.session.get('api_token')
-    headers = {
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json'
+    # Inicialización del Contexto
+    contexto = {
+        'current_page': 'extras',
+        'limites': None,      # Para el límite de pedidos diarios
+        'extras': []          # Para la lista de extras registrados
     }
 
+    # 2. Manejo de la Solicitud POST (Registro de Datos)
     if request.method == 'POST': 
-       
-        precio = request.POST.get('precio')
-        print(precio)
-        extras = request.POST.get('extras')
-        print(extras)
-       
-        if not all([precio,extras]):
-            messages.error(request, 'Todos los campos son obligatorios.')
-            return redirect('extras') 
+        # Identificar qué formulario se ha enviado
+        # Usaremos la presencia de campos específicos para distinguir
+        
+        # --- Lógica de registro de Límite de Pedidos (de la función 'extras_management') ---
+        if 'numberOrdersDay' in request.POST:
+            numberOrdersDay = request.POST.get('numberOrdersDay')
+           
+            if not numberOrdersDay:
+                messages.error(request, 'El campo de límite de pedidos es obligatorio.')
+                return redirect('extras_unified_view') 
 
-        data = {
-            'nameExtra': extras,
-            'price':precio
+            data = {'numberOrdersDay': numberOrdersDay}
+
+            try:
+                response = requests.post(f"{api_url}/ordersDay", json=data, headers=headers, timeout=10)
+                response.raise_for_status() 
+                messages.success(request, 'Cantidad de pedidos registrada.')
+                return redirect('extras_unified_view')
+            except requests.exceptions.HTTPError as e:
+                messages.error(request, f'Error al registrar el límite de pedidos: {e}')
+                return redirect('extras_unified_view')
+            except Exception as e:
+                messages.error(request, 'Ocurrió un error inesperado al registrar el límite.')
+                return redirect('extras_unified_view')
+
+        # --- Lógica de registro de Extras Adicionales (de la función 'regis_extras') ---
+        elif 'extras' in request.POST and 'precio' in request.POST:
+            precio = request.POST.get('precio')
+            extras_name = request.POST.get('extras')
+           
+            if not all([precio, extras_name]):
+                messages.error(request, 'Los campos de extra y precio son obligatorios.')
+                return redirect('extras_unified_view') 
+
+            data = {
+                'nameExtra': extras_name,
+                'price': precio
+            }
+
+            try:
+                response = requests.post(f"{api_url}/extras", json=data, headers=headers, timeout=10)
+                response.raise_for_status() 
+                messages.success(request, 'Extra registrado correctamente.')
+                return redirect('extras_unified_view')
+            except Exception as e:
+                messages.error(request, f'Error al registrar el extra: {e}')
+                return redirect('extras_unified_view')
+        
+        else:
+            # POST sin campos reconocidos
+            messages.error(request, 'Solicitud POST no válida.')
+            return redirect('extras_unified_view')
+
+    result = []
+    try:
+        response_limit = requests.get(f"{api_url}/ordersDay", headers=headers, timeout=10)
+        response_limit.raise_for_status() 
+        
+        limite = response_limit.json() 
+        resultado = limite.get('remainingTotal')
+        
+        total_all = limite.get('totalAllowed')
+        date = limite.get('totalSold')
+        
+        result ={
+            'resultado':resultado,
+            'total_all':total_all,
+            'date':date
         }
+        
+    except requests.exceptions.RequestException:
+        messages.warning(request, 'No se pudo obtener la información del límite diario.')
+        
+    
+    try:
+        response_extras = requests.get(f"{api_url}/extras", headers=headers, timeout=10)
+        response_extras.raise_for_status()         
+        extras = response_extras.json() 
+        resultados = extras.get('extras',[])
+        contexto={
+            'resultados': resultados
+        }
+        contexto.update(result)
+    except requests.exceptions.RequestException:
+        messages.warning(request, 'No se pudo obtener la lista de extras.')
 
-        try:
-            
-            response = requests.post(f"{api_url}/extras", json=data, headers=headers, timeout=10)
-            response.raise_for_status() 
-                   
-            messages.success(request, 'cantidad de pedidos registrado.')
-            return redirect('extras')
-        except Exception as e:
-            messages.error(request, 'Limite de registro al dia es uno')
-            return redirect('extras')
-            
+    
+    return render(request, "paginas/extras.html",contexto)
+
 def escaner(request):
     return render(request,"paginas/scan.html",{'current_page' : 'escaner'})
 
