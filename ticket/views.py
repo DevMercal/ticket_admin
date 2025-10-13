@@ -647,17 +647,17 @@ def ticket(request):
         messages.warning(request, "Acceso no válido.")
         return redirect('seleccion')
         
-    # PASO 1: Recuperar los datos de la sesión
+    
     resumen_empleados = request.session.get('resumen_empleados', [])
     order_data = request.session.get('order_data_for_ticket', {})
     
-    # 🎯 Extraer la lista de IDs de orden. Si no existe, es una lista vacía.
+    
     order_ids = order_data.get('orders', []) 
     
-    # Si no hay empleados, no hay tiques que generar
+    
     if not resumen_empleados:
         messages.warning(request, "No hay empleados registrados para generar ticket.")
-        # Limpiamos la sesión si es necesario antes de redirigir
+        
         if 'order_data_for_ticket' in request.session:
              del request.session['order_data_for_ticket']
         return redirect('seleccion')
@@ -681,12 +681,12 @@ def ticket(request):
     # zip() empareja (empleado[0], order_id[0]), (empleado[1], order_id[1]), etc.
     for empleado, order_id in zip(resumen_empleados, order_ids):
         try:
-            # order_id contendrá 39, luego 40, luego 41 en cada iteración
+           
             current_order_id = str(order_id) if order_id is not None else 'N/A'
             
-            # Prepara la información para el QR
+            
             info = (
-                f"Orden ID: {current_order_id}\n" # ⬅️ Usa el ID de orden individual
+                f"Orden ID: {current_order_id}\n" 
                 f"Empleado: {empleado.get('employees', 'N/A')}\n"
                 f"Cédula: {empleado.get('cedula', 'N/A')}\n"
                 f"Almuerzo: {empleado.get('lunch', 'No')}\n"
