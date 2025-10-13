@@ -35,7 +35,7 @@ def inicio(request):
             if response.status_code == 200:
                 json_data = response.json()
                 empleados = json_data.get('data', [])
-                print(empleados)
+                
                 token = json_data.get('token')
                 name = empleados.get('first_name')
                 
@@ -536,7 +536,7 @@ def registration_order(request):
             
             cedula_orden = str(empleado_consumo['cedula']) 
             employee_cedula = cedula_orden + reference_base
-            print(employee_cedula)
+            
             data_for_json = {
                 "order": {
                     'special_event': special_event,
@@ -574,7 +574,7 @@ def registration_order(request):
         if payment_support:
            
             payment_support.file.seek(0)
-            file_content = payment_support.file.read() # <--- Leemos el archivo a memoria
+            file_content = payment_support.file.read() 
             
             
             num_orders = len(orders) 
@@ -598,11 +598,23 @@ def registration_order(request):
                 files=files_to_send, 
                 timeout=10
             )
-            print(response)
+            
+    
+            
+            try:
+                response_data = response.json() # Convierte el JSON a un diccionario de Python
+                print(response_data)
+            except requests.exceptions.JSONDecodeError:
+               
+                print(response.text)
+                
+            
+            
             response.raise_for_status() 
             
-            request.session['order_data_for_ticket'] = response.json()
-            messages.success(request, "La orden se ha registrado correctamente. Se crearon múltiples pedidos.")
+            # Si la respuesta es JSON, ya la tienes en 'response_data'
+            request.session['order_data_for_ticket'] = response_data
+            messages.success(request, "La orden se ha registrado correctamente")
             return redirect('ticket')
 
         except requests.exceptions.HTTPError as err:
@@ -635,9 +647,12 @@ def ticket(request):
         messages.warning(request, "Acceso no válido.")
         return redirect('seleccion')
         
-    #PASO CLAVE 1: Recuperar los datos de la sesión
+    # PASO 1: Recuperar los datos de la sesión
     resumen_empleados = request.session.get('resumen_empleados', [])
     order_data = request.session.get('order_data_for_ticket', {})
+    
+    # 🎯 Extraer la lista de IDs de orden. Si no existe, es una lista vacía.
+    order_ids = order_data.get('orders', []) 
     
     # Si no hay empleados, no hay tiques que generar
     if not resumen_empleados:
@@ -647,24 +662,31 @@ def ticket(request):
              del request.session['order_data_for_ticket']
         return redirect('seleccion')
 
-    order_id = order_data.get('order_id', 'N/A')
-    
+    # Validación de seguridad: Asegurar que el número de empleados coincida con el de órdenes.
+    if len(resumen_empleados) != len(order_ids):
+        # Manejo de error si la API no devolvió la cantidad esperada
+        messages.error(request, f"Error: La API devolvió {len(order_ids)} IDs de orden, pero se registraron {len(resumen_empleados)} empleados. Se usarán IDs genéricos.")
+        # Creamos una lista de None o 'N/A' para evitar errores de índice
+        order_ids = [None] * len(resumen_empleados) 
+        
     encoded_qrs_with_data = []
     
     try:
-        # Intenta abrir el logo una sola vez
         logo = Image.open(LOGO_PATH)
     except FileNotFoundError:
-       
         logo = None
         print(f"Advertencia: No se encontró el archivo del logo en la ruta: {LOGO_PATH}")
         
-    #PASO CLAVE 2: Iterar sobre los datos de los empleados de la sesión
-    for empleado in resumen_empleados:
+    # PASO CLAVE 2: Iterar sobre empleados y IDs de orden *simultáneamente*
+    # zip() empareja (empleado[0], order_id[0]), (empleado[1], order_id[1]), etc.
+    for empleado, order_id in zip(resumen_empleados, order_ids):
         try:
-            # Prepara la información para el QR (incluye el ID de la orden si es relevante)
+            # order_id contendrá 39, luego 40, luego 41 en cada iteración
+            current_order_id = str(order_id) if order_id is not None else 'N/A'
+            
+            # Prepara la información para el QR
             info = (
-                f"Orden ID: {order_id}\n" # Incluimos la referencia a la orden recién creada
+                f"Orden ID: {current_order_id}\n" # ⬅️ Usa el ID de orden individual
                 f"Empleado: {empleado.get('employees', 'N/A')}\n"
                 f"Cédula: {empleado.get('cedula', 'N/A')}\n"
                 f"Almuerzo: {empleado.get('lunch', 'No')}\n"
@@ -672,7 +694,7 @@ def ticket(request):
                 f"Cubiertos: {empleado.get('covered', 'No')}"
             )
             
-            # --- Generación del QR (Tu código actual) ---
+            # --- Código de Generación de QR (sin cambios) ---
             qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H)
             qr.add_data(info)
             qr.make(fit=True)
@@ -691,27 +713,31 @@ def ticket(request):
             qr_img.save(buffer, format='PNG')
             encoded_img_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
             
-            # Almacenamos el nombre y el QR codificado
+            # Almacenamos el nombre, el QR codificado y el ID de orden individual
             encoded_qrs_with_data.append({
                 'employee_name': empleado.get('employees', 'Empleado'),
                 'qr_code': encoded_img_data,
-                'cedula': empleado.get('cedula', 'N/A')
+                'cedula': empleado.get('cedula', 'N/A'),
+                'order_id': current_order_id  # ⬅️ Guardamos el ID individual para el template
             })
             
         except Exception as e:
             print(f"Error generando QR para empleado: {e}")
             continue
 
-    #PASO CLAVE 3: Limpiar los datos de la sesión después de usarlos
+    
+     # PASO 3: Limpiar los datos de la sesión
     if 'resumen_empleados' in request.session:
         del request.session['resumen_empleados']
     if 'order_data_for_ticket' in request.session:
         del request.session['order_data_for_ticket']
 
-    # PASO CLAVE 4: Renderizar la plantilla FINAL de los tiques
+    # PASO 4: Renderizar la plantilla FINAL
+    # NOTA: Ahora no se pasa un 'order_id' único, sino que cada ticket tiene su propio ID
     contexto = {
         'tickets': encoded_qrs_with_data,
-        'order_id': order_id,
+        # Si quieres mostrar un rango (ej: "Órdenes 39 a 41"):
+        'order_range': f"Órdenes {order_ids[0]} - {order_ids[-1]}" if order_ids else 'N/A',
         'current_page': 'ticket' 
     }
         
@@ -740,17 +766,17 @@ def empleados(request):
                 full_first_name = names_lasname.get("first_name")
                 full_last_name = names_lasname.get("last_name")
                 
-                # Safely split and concatenate the names
+                
                 first_name = full_first_name.split()[0] if full_first_name else ""
                 first_last_name = full_last_name.split()[0] if full_last_name else ""
                 
-                # Combine into a full name
+                
                 full_name = f"{first_name} {first_last_name}".strip()
                 
-                # Add the full name to the current employee's dictionary
+                
                 names_lasname['full_name'] = full_name
-                print(names_lasname)
-                # Append the processed employee data to the new list
+                
+               
                 processed_employees.append(names_lasname)
        
     except requests.exceptions.RequestException as req_err:
@@ -898,6 +924,5 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'Has cerrado sesión exitosamente.')
     return redirect('inicio')
-
 
 

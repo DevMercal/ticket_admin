@@ -34,7 +34,8 @@
         </tbody>
     </table>
 </div>
-
+  
+ {% include 'modal/pago_movil.html' %}
 <div class="md:hidden space-y-4 p-4">
     {% for i in contexto %}
     <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700">
@@ -63,10 +64,12 @@
         </div>
     </div>
     {% endfor %}
+    
+   
 </div>
     </section>
-
     <section>
+        
       <h3 class="text-xl md:text-2xl font-semibold mb-6 text-center select-none dark:text-white">Opciones de Pago</h3>
 
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
@@ -75,27 +78,30 @@
          <span>Pago Movil</span>
           <img src="{% static 'img/pago.png' %}" alt="Pago Movil" class="w-16 h-16 mt-2">
         </div>
-         <div class="bg-blue-200  dark:bg-blue-600  rounded-lg p-4 flex flex-col items-center cursor-pointer select-none transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500" data-bs-toggle="modal" data-bs-target="#transf">
-         <span>Transferencias</span>
-          <img src="{% static 'img/banesco.jpg' %}" alt="Pago Movil" class="w-16 h-16 mt-2">
-        </div>
-         <div class="bg-blue-200 dark:bg-blue-600  rounded-lg p-4 flex flex-col items-center cursor-pointer select-none transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500" data-bs-toggle="modal" data-bs-target="#debito">
+        <div class="bg-blue-200 dark:bg-blue-600 rounded-lg p-4 flex flex-col items-center cursor-pointer select-none transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500" data-bs-toggle="modal" data-bs-target="#debitos">
          <span>Debito</span>
           <img src="{% static 'img/tarjeta.png' %}" alt="Pago Movil" class="w-16 h-16 mt-2">
         </div>
+         
+         <div class="bg-blue-200  dark:bg-blue-600  rounded-lg p-4 flex flex-col items-center cursor-pointer select-none transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500" data-bs-toggle="modal" data-bs-target="#Tranferencias">
+         <span>Transferencias</span>
+          <img src="{% static 'img/banesco.jpg' %}" alt="Pago Movil" class="w-16 h-16 mt-2">
+        </div>
+
          <div class="bg-blue-200 dark:bg-blue-600 rounded-lg p-4 flex flex-col items-center cursor-pointer select-none transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500" data-bs-toggle="modal" data-bs-target="#efectivo">
          <span>efectivo</span>
           <img src="{% static 'img/efectivo.png' %}" alt="Pago Movil" class="w-16 h-16 mt-2">
         </div>
       
     </section>
-    
+     {% include 'modal/transf.html' %}
   </main>
 
- {% include 'modal/pago_movil.html' %}
- {% include 'modal/transf.html' %}
- {% include 'modal/debito.html' %}
+
+ 
+
+
  {% include 'modal/efectivo.html' %}
 
-
+{% include 'modal/dibitos.html' %}
 {% endblock %}

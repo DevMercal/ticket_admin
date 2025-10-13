@@ -1,4 +1,4 @@
-<div class="modal fade" id="Tranferencias" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+<div class="modal fade" id="debitos" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-="true">
     <div class="modal-dialog">
         <div class="modal-content dark:bg-gray-800 p-6">
@@ -10,7 +10,49 @@
             </div>
             <div class="modal-body pt-0 max-h-96 overflow-y-auto">
 
-                 
+                <div class="grid grid-cols-2 gap-y-4 text-blue-800 dark:text-blue-300 font-semibold mb-6">
+                    <span class="text-left">Número de Teléfono:</span>
+                    <div class="flex items-center justify-end">
+                        <span>0414-2418171</span>
+                        <button class="ml-2" onclick="navigator.clipboard.writeText('0414-2418171')">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                                <path
+                                    d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <span class="text-left">Banco:</span>
+                    <div class="flex items-center justify-end">
+                        <span>0108 - Provincial</span>
+                        <button class="ml-2" onclick="navigator.clipboard.writeText('0108')">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                                <path
+                                    d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <span class="text-left">Cédula:</span>
+                    <div class="flex items-center justify-end">
+                        <span>V-19.254.775</span>
+                        <button class="ml-2" onclick="navigator.clipboard.writeText('V-19254775')">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                                <path
+                                    d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
               <form method="POST" action="{% url 'registration_order' %}" enctype="multipart/form-data" >
                     {% csrf_token %}
                     
@@ -33,7 +75,7 @@
                     <input type="text" class="w-full p-2 border border-gray-300 rounded-md text-center" id="authorized_person" name="authorized_person"><br>
 
                     <label for="id_payment_method" hidden>Método de Pago ID:</label>
-                    <input type="number" class="w-full p-2 border border-gray-300 rounded-md text-center" id="id_payment_method" name="id_payment_method" value="4" required hidden> <br>
+                    <input type="number" class="w-full p-2 border border-gray-300 rounded-md text-center" id="id_payment_method" name="id_payment_method" value="2" required hidden> <br>
 
                     <label for="reference" class="dark:text-white">Referencia/Número de Transacción:</label>
                     <input type="number" step="any" class="w-full p-2 border border-gray-300 rounded-md text-center" id="reference" name="reference" required><br>
