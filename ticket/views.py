@@ -1,3 +1,4 @@
+from datetime import date
 from PIL import Image
 from requests.exceptions import ConnectionError, HTTPError, Timeout
 from django.http import HttpRequest, HttpResponse
@@ -62,10 +63,6 @@ def inicio(request):
     return render(request, 'paginas/login.html')
 
 def progreso_mensual_view(request):
-    """
-    Genera el gráfico de progreso mensual con Matplotlib
-    y lo devuelve como una imagen PNG.
-    """
     # Los datos pueden ser dinámicos, por ejemplo, de un modelo de Django
     completado = 70
     restante = 100 - completado
@@ -103,9 +100,9 @@ def progreso_mensual_view(request):
     buffer = BytesIO()
     plt.savefig(buffer, format='png', dpi=300, bbox_inches='tight', transparent=True)
     buffer.seek(0)
-    plt.close(fig) # Cierra la figura para liberar memoria
+    plt.close(fig) 
 
-    # Devolver la imagen como una respuesta HTTP
+    
     return HttpResponse(buffer.getvalue(), content_type='image/png') 
 
 def index(request):
@@ -129,12 +126,61 @@ def index(request):
         print(f"Error al conectar con la API: {e}")
         number = 0
         json_data = []
+    
+    # Obtener la fecha de hoy en formato AAAA-MM-DD para enviarla a la API
+    hoy = date.today().isoformat()
+    total_sales = 0.0 # Se inicializa a float para consistencia
+    
+    try:
+        # 2. Llamada a la API con Filtrado (asumiendo que la API lo soporta)
+        # La URL debería incluir un parámetro para filtrar por la fecha de hoy.
+        # Ejemplo: /pedidos?fecha=2025-10-14
+        endpoint = f"{api_url}/pedidos"
+        params = {'fecha': hoy} # Parámetro de filtrado
+        
+        response = requests.get(
+            endpoint, 
+            headers=headers, 
+            params=params, # Se envían los parámetros de filtrado
+            timeout=10
+        )
+        
+        # 3. Manejo de Errores HTTP
+        response.raise_for_status() 
+        
+        # 4. Procesamiento de Datos
+        json_data = response.json()
+        # Asumiendo que la API devuelve los pedidos filtrados en una clave 'orders'
+        orders = json_data.get('orders', []) 
+        
+        for order in orders:
+            # Es buena práctica validar que el campo exista y sea numérico
+            try:
+                # Asegura que el valor se convierte a float para la suma
+                amount = float(order.get('total_amount', 0.0)) 
+                total_sales += int(amount)
+                
+            except (ValueError, TypeError):
+                 # Manejar el caso donde 'total_amount' no es un número válido
+                print(f"Advertencia: Pedido con monto inválido: {order}") 
+                continue # Pasa al siguiente pedido
+        
+
+    except requests.exceptions.HTTPError as http_err:
+        # Errores 4xx o 5xx de la API
+        error_msg = f"Error de la API al obtener pedidos ({response.status_code}): {http_err}"
+        messages.error(request, error_msg)
+        print(error_msg)
+    
+    
+    
     contexto = {
         'number': number,
         'datos_usuarios': json_data,  
+        'total_sales':total_sales,
         'current_page': 'dashboard'
     }
-    
+    print(total_sales)
     return render(request, 'paginas/index.html', contexto)
 
 def usu(request: HttpRequest):
@@ -483,13 +529,11 @@ def registration_order(request):
         
     if request.method == 'POST':
        
-       
         special_event = request.POST.get('special_event', 'No')
         authorized = request.POST.get('authorized', 'No')      
         authorized_person = request.POST.get('authorized_person', '')
         total_amount = request.POST.get('total_amount', '0.0') 
 
-       
         try:
         # Usamos int() para asegurar que la referencia base sea un entero sin .0
          reference_base = str(int(request.POST.get('reference') or 0)) 
