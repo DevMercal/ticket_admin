@@ -127,53 +127,53 @@ def index(request):
         number = 0
         json_data = []
     
-    # Obtener la fecha de hoy en formato AAAA-MM-DD para enviarla a la API
+    
     hoy = date.today().isoformat()
-    total_sales = 0.0 # Se inicializa a float para consistencia
+    total_sales = 0.0 
     
     try:
-        # 2. Llamada a la API con Filtrado (asumiendo que la API lo soporta)
-        # La URL debería incluir un parámetro para filtrar por la fecha de hoy.
-        # Ejemplo: /pedidos?fecha=2025-10-14
-        endpoint = f"{api_url}/pedidos"
-        params = {'fecha': hoy} # Parámetro de filtrado
         
+        endpoint = f"{api_url}/pedidos"
+        params = {'fecha': hoy} 
+        print(params)
         response = requests.get(
             endpoint, 
             headers=headers, 
-            params=params, # Se envían los parámetros de filtrado
+            params=params,
             timeout=10
         )
         
-        # 3. Manejo de Errores HTTP
         response.raise_for_status() 
         
-        # 4. Procesamiento de Datos
         json_data = response.json()
-        # Asumiendo que la API devuelve los pedidos filtrados en una clave 'orders'
-        orders = json_data.get('orders', []) 
         
+        orders = json_data.get('orders', []) 
+        if orders:
+            first_order = orders[0] 
+            date_order = first_order.get('date_order')
+            print(date_order)
+            
+                
         for order in orders:
-            # Es buena práctica validar que el campo exista y sea numérico
+           
             try:
-                # Asegura que el valor se convierte a float para la suma
+                
                 amount = float(order.get('total_amount', 0.0)) 
                 total_sales += int(amount)
                 
             except (ValueError, TypeError):
-                 # Manejar el caso donde 'total_amount' no es un número válido
+                
                 print(f"Advertencia: Pedido con monto inválido: {order}") 
-                continue # Pasa al siguiente pedido
+                continue
         
-
+        if date_order == params:
+                total_sales
+        else: 
+            print("error ho noy pedidos")        
     except requests.exceptions.HTTPError as http_err:
-        # Errores 4xx o 5xx de la API
-        error_msg = f"Error de la API al obtener pedidos ({response.status_code}): {http_err}"
-        messages.error(request, error_msg)
-        print(error_msg)
-    
-    
-    
+       
+        error_msg = f"Error de la API al obtener pedidos "
+        
     contexto = {
         'number': number,
         'datos_usuarios': json_data,  
@@ -194,7 +194,7 @@ def usu(request: HttpRequest):
         'Authorization': f'Bearer {token}'
     }
       
-      
+    usuarios =[] 
     try:
      
         response = requests.get(f"{api_url}/users", headers=headers, timeout=10)
@@ -941,7 +941,7 @@ def extras_unified_view(request):
             'total_all':total_all,
             'date':date
         }
-        
+        print(result)
     except requests.exceptions.RequestException:
         messages.warning(request, 'No se pudo obtener la información del límite diario.')
         

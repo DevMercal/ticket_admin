@@ -1,0 +1,82 @@
+/*M!999999\- enable the sandbox mode */ 
+-- MariaDB dump 10.19  Distrib 10.6.22-MariaDB, for debian-linux-gnu (x86_64)
+--
+-- Host: localhost    Database: devices_db
+-- ------------------------------------------------------
+-- Server version	10.6.22-MariaDB-0ubuntu0.22.04.1
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `devices`
+--
+
+DROP TABLE IF EXISTS `devices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `devices` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ip` varchar(45) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `password` text NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `brand` varchar(50) DEFAULT 'Cisco',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `ip` (`ip`)
+) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `devices`
+--
+
+LOCK TABLES `devices` WRITE;
+/*!40000 ALTER TABLE `devices` DISABLE KEYS */;
+INSERT INTO `devices` VALUES (1,'10.20.100.41','Cvarela','gAAAAABo98ZG8e5rEvUx8NAcgyDB16bl-ldQ-I4tXiaVC0Qz7UpT3-xUQshs8v_wsxI_rjoLi-0HDgzuvtfXE0ldSne9pir7Eg==','SW-PB-FINANZA','Cisco'),(3,'10.20.100.32','Cvarela','gAAAAABo98YTT4-VyZ0ZWEQAjSUwGpMD15hn-YzXVXCVI2EXlNmUNpZLhlgFkyF3-borv4afRKNdaXwDwVd_Olkw2skLRu16Yg==','SW-PB-SVMEDICO','Cisco'),(4,'10.20.100.30','Cvarela','gAAAAABo98YGJqqCmYS0IJ6fhDinImZIRW3BPvzqUd00u_0VDZu1D-gN3H_3wWmiL4NcMMzu7qtVvWDCKMWxeoPIcpfFA5cZ4g==','SW-PB-CTINGRESO1','Cisco'),(5,'10.20.100.31','Cvarela','gAAAAABo98YMKvQuYAEHnWb5VVsH4tdey0vLDuFNi_RUZuxaPYhoGXWax14D_6YSqYXR7b5LQVcoEvtvEKNMbCCrFcrDWOX3XQ==','SW-PB-CTINGRESO2','Cisco'),(6,'10.20.100.29','Cvarela','gAAAAABo98YAIqzOtLG88YbdzsLY_nsUxdHVsidjchVrGi87rcpS5LOGxbKOVZ2TZTnaB2rHpy5_mvUpLjGg7-T7QQZOdKpsxg==','SW-PB-INSUMOS','Cisco'),(7,'10.20.100.28','Cvarela','gAAAAABo98X6Psw0XnjFatvvgr3wrAvynds7cRdTQRssxXn2PiwKOMhR7hrG_FF0YgKqGJMANz1E7KX_xPEguUll_YRgLSYWdg==','SW-PB-JURIDICA1','Cisco'),(8,'10.20.100.27','Cvarela','gAAAAABo98Xz5AJ2B9n9m3d6woTT4y_h5ctCdw2xMEHOXbsdlG2EAtVsdmhjMMUTV3xoEtCBxG5s4MYdjEjJBxeaxpSepBv9dg==','SW-PB-JURIDICA2','Cisco'),(9,'10.20.100.26','Cvarela','gAAAAABo98XqcJ1gqc9Tbvto0evfk-Uz6NjD-zhgEV5aQqvVq6sKnoVoM674WkGy9dw9NrSNiMw1j-Uncp9WmtCB-BngsI3Iyg==','SW-PB-ATCIUDADANO','Cisco'),(10,'10.20.100.25','Cvarela','gAAAAABo98Xi8kRKT1zuWP9NuBegtKilzz_Qp2pXTup3zkGZYECiEPCFGxs0tssKDJehDZQ9MhqmO5bGzBvkaaZnJ6aFETcuqw==','SW-P1/2-TECNOGLOGIA','Cisco'),(11,'10.20.100.52','Cvarela','gAAAAABo98aAUuzDcZZYdxl0Kvkhb8Hps5mCc8XityHGSGHZuIBMkfj_-rOUF14K7CBKEtspKB7pCSC3QQEwtP5tU50ybEl1vw==','SW-P2.1/2-INSPECTORIA','Cisco'),(12,'10.20.100.20','Cvarela','gAAAAABo98XLgju7t2vaHimWWhM9V3yH34wvKO4SdH46g2xcNpnnuWF51OWua7rtmUtCnFctFlpiPjeYWNuTo3o1Ui6iM2u9GA==','SW-PB-BIENES','Cisco'),(13,'10.20.100.40','Cvarela','gAAAAABo98ZAqWX_oPMMnPu0bwYF7Ppf4CqTAUBUmAD_jNjtjgmXcROP0NmFakm7Icqs-Zv5cjs2NO_IkTyrUF8f9Z1zbsbbbQ==','SW-P2-SOPORTE','Cisco'),(14,'10.20.100.36','Cvarela','gAAAAABo98Y3MDXbSkbh9gnqvdJbFo_MfExrbxr2SPcdkyPyHlEJ_D-tGrv2r1VlZpqrV6Omb7LsNDsbxOaIa_qNiBfJBtVFGQ==','SW-P2-PRESUPUESTO','Cisco'),(15,'10.20.100.35','Cvarela','gAAAAABo98YuHkVnwVxAlf3YBOwKvPN3rpVmYFq--oNiUf8kTdiWZb6JLcANK6bbq4hKLbPV6g32clh4S4MYMomTFxCedvxXJg==','SW-P2-CONTABILIDAD','Cisco'),(16,'10.20.100.34','Cvarela','gAAAAABo98YlgOusxdqXiujzvDpJYyIqqvLowpj7TwkK14CkBagt0el6Hq4wSaWoeJIAakJpbgNaom_F5Fq1IXgTvwardQKr3A==','SW-P2-CONTABILIDAD2','Cisco'),(17,'10.20.100.50','Cvarela','gAAAAABo98ZvO96rcf5s8BXoiK4E7E61JeR4KZb9RD0hrXYu0aE1Yqf3a9BQXHgVNz9eRnE-enc1SxDIfw69q5DTNFFTYUQ9Cg==','SW-P3-COMPRAS','Cisco'),(18,'10.20.100.51','Cvarela','gAAAAABo98Z33eM-wTg1OqhT1IpC7IGqCybNMQdnVDpKzBbzvL6N4sOskMgZQF_rBR4H73n6s3dU_th-7MGx5f7fvEE3rNbnbQ==','SW-P3-MERCADEO','Cisco'),(19,'10.20.100.49','Cvarela','gAAAAABo98ZnlLdpZRGhOtflWIkTh4ZS0ENZUUYmpWROmsnmVuBopSX8AqCHQbwFyUS5iKTQFt_NXjUK6Wpd5l22sbB-rwcpvA==','SW-P3-COMERCIALIZACION','Cisco'),(20,'10.20.100.47','Cvarela','gAAAAABo98ZXX9EStKiC1PnkgcXIeuXCdLI25hkSNZrRfjrWnAld1fH-zj3GRJ4ne7-85T2UWSlZ4qrpWq_PXUxacLCOz8tNcg==','SW-P3.1/2-PRESIDENCIA','Cisco'),(21,'10.20.100.57','Cvarela','gAAAAABo98agIixy4oeRsumUjzht6DPKSLPfTWpwSAoWiJ6TThAYb1vBwCQX9VBBZFqtc21Gpg5R-aG5-lcsGg8L4l5I_DZQvw==','SW-P4-CTDCALIDAD','Cisco'),(22,'10.20.100.56','Cvarela','gAAAAABo98aXY1FvLW0Tn8eClt0bYdvzmWzPgWcjpVSL-6eNKVnNBjbzCNrho7Ug_EMyhqzEv6M48m3XzUUubsk_Z5_Cg23o4g==','SW-P4-INFRAESTRUCTURA','Cisco'),(23,'10.20.100.54','Cvarela','gAAAAABo98aInW7QlxTFtdSgiqif179V0hnjBCvinWmOJE4xHTFsUOnPPtrNERJO7D6AvhLe27gcBtDin7tmigHeqfzzHZVTQg==','SW-P4-INFRAESTRUCTURA2','Cisco'),(24,'10.20.100.33','Cvarela','gAAAAABo98Ycw1jcWva7nVZHIPclD6UyuUaU1E8yipazYUEtd_f7tD_PwN9XTO05QBqraDHhkNJalS10SHqfGmSLxkZv3cAYEA==','SW-C5-SALA','Cisco'),(25,'10.20.100.55','Cvarela','gAAAAABo98aPsX5-LsVCPvMAul2_RTFvBer4cGOvFKBk0wA3n_sK9_biaNgrxxsB0boBQ8w_ESBkX3oJz4-l2oGLe4OFYz8UYA==','SW-P4-CARNESVNZL','Cisco'),(26,'10.20.100.48','Cvarela','gAAAAABo98ZfvD-uHx9LPutj_4juTMCUAKkd6uuBXuHtmBAigWL8E0UOMTrKdfinWdB35rZKoVncP0GGwYurnCCT49lJjCrq0g==','SW-P3.1/2-UNINVESTIGACIONES','Cisco'),(27,'10.20.100.58','Cvarela','gAAAAABo98ankR15AjTdXYo8LIYEQXMxGF5B1UYzpM5b6amPhh-G7HvKroXxLvjDSuwCRTpcov4fv5-l4lwAVUSsEXpVdgHfmw==','SW-P5-GSINTITUCIONAL','Cisco'),(28,'10.20.100.62','Cvarela','gAAAAABo98a1ORyp7IIDDbj3fSn68IqfuiQ_1qiw62VRCZRbfjm5YkGK4t7oz5rA4P2QaXQ1WWl9rIZixEdvCDuP8dEOv05MCw==','SW-P6-LOGISTICA','Cisco'),(29,'10.20.100.61','Cvarela','gAAAAABo98atbr4qDAGxbekmdMNmgjL3QmPMCeqdYKEFnGTZVuYculEeMyhZ9Q6impRUSF2FAMyptycd_maOyELi4IuWGEaH8g==','SW-P6-LGDISTRIBUCION','Cisco'),(30,'10.20.100.63','Cvarela','gAAAAABo98a8fAwUGnBt7b1DyrnWbHcstJOm_MYKYyhvvAE-mNMYOwckSztCzHkxADJysmo_UFMoPFPR5oBvNvJqisDwAcM6ZA==','SW-P6-LGDISTRIBUCION2','Cisco'),(31,'10.20.100.66','Cvarela','gAAAAABo98bKDjTdcfGBXngTPBPbEwPwq2qe2HYzE3jKkmp0D0XDQdjZb_zag9fFmxsggOLldtBStm337s1J7lqFvdj8Dp5PgA==','SW-P8-AUDITORIA1','Cisco'),(32,'10.20.100.65','Cvarela','gAAAAABo98bDMYVs0FBG4Z_XG9ULe-A47xyo7-bendvUzTNxX1sOAodkSfVgk1_09VC90kHfSk0VGH2OVmYE0LTJ4JtP-huUog==','SW-P8-AUDITORIA2','Cisco'),(33,'10.20.100.67','Cvarela','gAAAAABo98bRfyrkaKhjX8OHUFyUvVMRUkRcwQwNobjT0S1EoN-zNAXPLiRqlPrtczDuNSPT3dAbtcrQaj4mwIGl15xwsiCLmA==','SW-P8-AUDITORIA3','Cisco'),(34,'10.20.100.69','Cvarela','gAAAAABo98bYs7FLd29vndsBGltg23LDO-8DJlNU4u3EB73wN1VlI7YGUDVx1uJlqlRFQktlLeO2JTxkBn83xGsegJryiBIvKQ==','SW-P9-GSCOMUNICACIONAL','Cisco'),(35,'10.20.100.70','Cvarela','gAAAAABo98beHhuE-YviKNBaoY6T3E3sCHxMLWR5NdI-N8glxEaQ5EQ4WRyutIHhtQmew5tnhAq01vGITfQQu7655r8DUCOQOQ==','SW-P9-COMUNICACIONAL2','Cisco'),(36,'10.20.100.71','Cvarela','gAAAAABo98bmTRqnQTlQ6_GZGfFxLqGUUfivttBmSNOFIud9rPCoK-Y2YY5F4jVswRKCiqxxnExuaemL9pHryvrGqLcfhXwg3A==','SW-P9-CONTRATACIONES','Cisco'),(37,'10.20.100.77','Cvarela','gAAAAABo98cQNRS3ADuW-B_KnCmer5qZVqveDUtAWamLrCvRZ32Ljgd5vm0PL3XC9FNHIc1TSSWICg8PzOmCpm7zunp2oHTtbQ==','SW-P10-GSALUD','Cisco'),(38,'10.20.100.72','Cvarela','gAAAAABo98bxXMxM0cTpt5ReAF44n3d6UP-YmTHnFpsy6JEPrOSSOda2sGcgeEZEfgTGF-AETdrmsWrDo9eCvzUWAlPVGolmig==','SW-P10-GESSOCIALISTA','Cisco'),(39,'10.20.100.73','Cvarela','gAAAAABo98b4awlFsyJ6D6v-YVj2S3-QK6uwPD_OFxrwj9DfXiqwNMEZ7fAJ8-K5CZQdx9YTtJi-fdeg8rFK4sk6B1aj4fyFEg==','SW-P11-GSHUMANA2','Cisco'),(40,'10.20.100.76','Cvarela','gAAAAABo98cJinM7iu-PmWkT00eb1nuwP8idguC55OgW9HBYC8YK-tTGW9sfPsN8ATBuWk5hnTFO5BK1pLN6ra6EzZ5v6uOOXw==','SW-P11-GSHUMANA','Cisco'),(41,'10.20.100.74','Cvarela','gAAAAABo98cAky2NlB12TYI4cihQYq7-ddan6FLiqeKgBlINxjuRofmEkJ_65a5JmJTIxkVnA03wunJ-D2OcYMHYTdx9dm-dfw==','SW-P12-PRESIDENCIA','Cisco'),(42,'10.20.100.10','Cvarela','gAAAAABo98W1UvubfHjOpxknQdU1DPcNso02SJ4hn1rjpc6Mi6klfXDNbz4F1lKpU7hR4tieUGIqMBPvcJc-KMN2ITKQ3dkUvg==','SW-PB-OPERACIONES','Cisco'),(43,'10.20.100.12','Cvarela','gAAAAABo98XbHmiLh0ceYyWaUa2znuCNw6vD2GKHRxfJwx-YtIhyE6R8W0r6qnkh8QM0SgHgH3TyUQGDWTr_2Gm9cx9_WgdSNg==','SW-P5-PROYECTO','Cisco'),(44,'10.30.2.7','Cvarela','gAAAAABo98cWVm9B24MKD2NN7NFUZWZmrr2nz4jmipzaITMAvxy1hAnp4uQaDCqMwkeJW5lwT6VuJLT_oP45Se9oeK0XVvMsTg==','SW1_CISCO','Cisco'),(45,'10.30.2.8','Cvarela','gAAAAABo98cdSkyTZ6Z0TRmdKaXRkJTN6sytQ34XSQm_XqrgAW3ormP4i2h3xJBpaymdzqT9Nt4jT4i9X1dz5kW1-PqLY40OsA==','SW2_HUAWEI','Cisco'),(46,'10.30.2.9','Cvarela','gAAAAABo98cky1aKSadpnmo9wkuwJMvj2m9xBq-O4HkXVoXIZDZv3TFvW9u42W9eDQLX93xOyzpivvwPU95ObEX6I30e7edheQ==','SW3_HUAWEI','Cisco');
+/*!40000 ALTER TABLE `devices` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `user`
+--
+
+DROP TABLE IF EXISTS `user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL,
+  `user` varchar(50) NOT NULL,
+  `passwor` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user`
+--
+
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,'lnavarro','123456'),(2,'Cvarela','Cv16889002*');
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-10-22  9:34:44
