@@ -15,7 +15,10 @@
             <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 text-center truncate w-full" title="{{ name }}">
                 {{ ticket.employee_name }}
             </h3>
-            {{ ticket.cedula }}
+             <h4 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 text-center truncate w-full" title="{{ name }}">
+                {{ ticket.cedula }}
+            </h4>
+           
             <div class="flex-grow flex items-center justify-center mb-4 w-full">
                 <img 
                     src="data:image/png;base64,{{ ticket.qr_code }}" 
@@ -28,6 +31,10 @@
         {% endfor %}
     </div>
 </div>
-
+<script>
+    // IMPORTANTE: Escapa el valor si contiene caracteres especiales
+    // Aunque un token Bearer no debería tener problemas, es buena práctica.
+    const API_TOKEN = "{{ request.session.api_token|safe }}"; 
+</script>
 
 {% endblock %}
