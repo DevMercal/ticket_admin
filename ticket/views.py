@@ -710,10 +710,10 @@ def registration_order(request):
            
                 pass 
             messages.error(request, f" Error al registrar: {error_msg}")
-
+            return redirect('seleccion')
         except requests.exceptions.RequestException as e:
             messages.error(request, "Error de conexión con la API de órdenes.")
-            
+            return redirect('seleccion')
 
     
     return render(request, "paginas/pedidos.html")

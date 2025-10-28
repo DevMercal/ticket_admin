@@ -30,14 +30,17 @@ function onScanError(error) {
 
 /**
  * Realiza una solicitud GET para obtener información usando el ID del QR (Order ID).
- * @param {string} resourceId El texto decodificado del QR (Order ID).
+ * @typedef {Object} orderData
  * @returns {Promise<object|null>} Los datos del recurso o null si hay un error.
  */
-async function getResourceInfo(resourceId) {
+async function getResourceInfo(orderData) {
     if (!API_TOKEN) {
         console.error("Función getResourceInfo: No se puede ejecutar sin API_TOKEN.");
         return null;
     }
+
+    
+    const { resourceId } = orderData;
 
     const headers = {
         'Content-Type': 'application/json',
@@ -45,9 +48,8 @@ async function getResourceInfo(resourceId) {
         'Authorization': `Bearer ${API_TOKEN}` 
     };
     
-    // **CORRECCIÓN CLAVE:** La URL debe ser base + ID.
     const url = `${API_BASE_URL}/${resourceId}`;
-
+   
     console.log(url);
     try {
         const response = await fetch(url, {
@@ -55,16 +57,16 @@ async function getResourceInfo(resourceId) {
             headers: headers // Usar los headers definidos, incluyendo el token
         });
 
-        console.log(`Respuesta GET para ${resourceId}:`, response);
-
+        
         if (response.status === 404) {
-             throw new Error(`Recurso no encontrado (404) para ID: ${resourceId}`);
+            throw new Error(`Recurso no encontrado (404) para ID: ${resourceId}`);
         }
         if (!response.ok) {
             throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
         }
-
+        
         const data = await response.json();
+        console.log(`Respuesta GET para`, data);
         return data;
     } catch (error) {
         console.error('Error en la solicitud GET:', error);
@@ -73,16 +75,16 @@ async function getResourceInfo(resourceId) {
 }
 
 /**
- * Realiza una solicitud PATCH para actualizar el estado del recurso (consumo).
- * @param {string} resourceId El texto decodificado del QR (Order ID).
+
+ * @param {orderData} orderData 
  * @returns {Promise<boolean>} True si la actualización fue exitosa, false en caso contrario.
  */
-async function patchResourceStatus(resourceId) {
+async function patchResourceStatus(orderData) {
     if (!API_TOKEN) {
         console.error("Función patchResourceStatus: No se puede ejecutar sin API_TOKEN.");
         return false;
     }
-
+    const { resourceId } = orderData;
     // Asume que quieres cambiar un campo 'status' a '3' (consumido/completado)
     const patchData = { 
         consumption: 3
@@ -115,10 +117,23 @@ async function patchResourceStatus(resourceId) {
         return true; // Éxito
     } catch (error) {
         console.error('Error en la solicitud PATCH:', error);
-        // Mejor SweetAlert2 aquí para informar al usuario
-        Swal.fire('Error de Actualización', `No se pudo actualizar el recurso **${resourceId}**. Error: ${error.message}`, 'error');
+        Swal.fire(`No se pudo actualizar el recurso  ${error.message}`);
         return false; // Fallo
     }
+}
+
+
+/**
+ * Analiza el texto plano del QR y extrae el ID de la orden.
+ * @param {string} qrText El texto completo escaneado.
+ * @returns {string|null} El ID numérico de la orden o null si no se encuentra.
+ */
+function extractOrderId(qrText) {
+    // Busca "Orden: " seguido de uno o más dígitos
+    const match = qrText.match(/Orden: (\d+)/);
+    
+    // match[1] contiene el grupo capturado (el número ID)
+    return match ? match[1] : null; 
 }
 
 // ------------------------------------------------------------------
@@ -147,24 +162,32 @@ function startScanner() {
             }).catch(stopErr => {
               //  console.error("Error al detener el escáner (puede que haya estado ya detenido):", stopErr);
             });
+            
+           
 
-            // 2. **Paso GET**: Obtener la información del recurso
-            const resourceInfo = await getResourceInfo(decodedText);
-            let titleText = `Escaneado: ${decodedText}`;
+            const orderId = extractOrderId(decodedText);
+
+
+            const orderData = {
+                resourceId: orderId
+                
+            };
+            const resourceInfo = await getResourceInfo(orderData);
+            let titleText = `Orden: ${decodedText}`;
+            
             let htmlContent = '';
             let iconType = 'question'; // Cambiado a 'question' para la confirmación
             let confirmButtonText = 'Confirmar Consumo';
             
             if (resourceInfo) {
-                // Asume que la información tiene campos relevantes
-                titleText = `Pedido ID: ${decodedText}`;
-                htmlContent = `
-                    <p><strong>Estado:</strong> ${resourceInfo.status_name || 'Desconocido'}</p>
-                    <p><strong>Detalle:</strong> ${resourceInfo.detail || 'N/A'}</p>
-                    <p class="mt-3">¿Deseas confirmar el consumo de esta orden?</p>
-                `;
-                console.log(htmlContent)
-                iconType = 'info';
+               
+                // 1. EXTRAER order_id
+                const orderId = resourceInfo.order_id; 
+
+
+                 titleText = `Numero de order:${orderId || decodedText}`;
+                 console.log(titleText)
+                 iconType = 'info';
 
             } else {
                 // Si el GET falla o devuelve null
@@ -175,14 +198,15 @@ function startScanner() {
             
             // 3. Mostrar SweetAlert2 para la confirmación
             const swalResult = await Swal.fire({
-                title: titleText,
-                html: htmlContent,
+                //title: titleText,
+                title: "hola mundo",
+                // html: htmlContent,
                 icon: iconType,
                 showCancelButton: true,
                 confirmButtonText: confirmButtonText, 
                 cancelButtonText: 'Cancelar',
                 draggable: true,
-                allowOutsideClick: false, // Forzar la elección
+                allowOutsideClick: false, 
                 allowEscapeKey: false
             });
 
@@ -191,7 +215,7 @@ function startScanner() {
                 console.log("Confirmación recibida. Iniciando solicitud PATCH...");
                 
                
-                const patchSuccess = await patchResourceStatus(decodedText);
+                const patchSuccess = await patchResourceStatus(orderData);
 
                 if (patchSuccess) {
                    
