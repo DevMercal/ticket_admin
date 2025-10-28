@@ -1,8 +1,7 @@
 const API_BASE_URL = 'http://comedor.mercal.gob.ve/api/p1/pedidos/takeOrder'; 
 const API_CONSUMO_URL = 'http://comedor.mercal.gob.ve/api/p1/pedidos/consumo'; 
 
-// ------------------------------------------------------------------
-// ## Inicialización y Token
+
 const bodyElement = document.getElementById('page-body');
 
 const API_TOKEN = bodyElement ? bodyElement.dataset.apiToken : null;
@@ -18,18 +17,17 @@ if (!API_TOKEN) {
 }
 
 function onScanError(error) {
-    //console.error('Error al escanear el QR: ', error);
-    // Usar la variable resultElement
+   
     if (resultElement) {
         resultElement.innerHTML = ``;
     }
 }
 
-// ------------------------------------------------------------------
+
 // ## Funciones de API
 
 /**
- * Realiza una solicitud GET para obtener información usando el ID del QR (Order ID).
+ * Formatea los datos de la orden en contenido HTML con estilos.
  * @typedef {Object} orderData
  * @returns {Promise<object|null>} Los datos del recurso o null si hay un error.
  */
@@ -39,15 +37,13 @@ function formatOrderData(orderData) {
     
     const orderNumber = orderData.number_order;
     const totalAmount = orderData.total_amount;
-    // ERROR CORREGIDO: "ordorderDataer.date_order" => "orderData.date_order"
     const date = orderData.date_order; 
     const status = orderData.order_status.status_order;
     const paymentMethod = orderData.payment_method.payment_method;
     const employeeName = orderData.employee_payment.name_employee;
     const employeePhone = orderData.employee_payment.phone_employee;
-    const reference = orderData.payment_support.reference; 
-
-    // Contenido HTML con estilos internos
+    const reference = orderData.reference; 
+    
     let htmlContent = `
         <style>
             .order-summary { 
@@ -148,7 +144,7 @@ async function patchResourceStatus(orderData) {
         return false;
     }
     const { resourceId } = orderData;
-    // Asume que quieres cambiar un campo 'status' a '3' (consumido/completado)
+    
     const patchData = { 
         consumption: 3
     };

@@ -32,7 +32,13 @@ Authorization: Bearer 43|uycl8AbfGi6DwIT2ijHPd76w5snnGyk519sOjfl2436f5164
 GET https://comedor.mercal.gob.ve/api/p1/empleados HTTP/1.1
 content-type: application/json
 Authorization: Bearer 24|BxFKtVx0KzahYfgGZNSAWtyZCgOCdnWCqhzXlz8X60d697c5
+
+###  bcv DOLAR
+GET https://comedor.mercal.gob.ve/api/p1/dolar-bcv HTTP/1.1
+content-type: application/json
+Authorization: Bearer 8|4yezqPvUE4KM2I1Pfa5mwKIMJ1oISYKxDN2THu7c4f36e3b3
 *******************************POSTS******************************
+
 #### LOGIN
 POST https://comedor.mercal.gob.ve/api/p1/users/login HTTP/1.1
 content-type: application/json

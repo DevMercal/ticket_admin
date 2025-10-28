@@ -6,7 +6,7 @@ const API_CONSUMO_URL = 'http://comedor.mercal.gob.ve/api/p1/pedidos/consumo';
 const bodyElement = document.getElementById('page-body');
 
 const API_TOKEN = bodyElement ? bodyElement.dataset.apiToken : null;
-const resultElement = document.getElementById('result'); // Asegúrate de que este elemento exista
+const resultElement = document.getElementById('result'); 
 console.log(bodyElement,API_TOKEN,resultElement)
 if (!API_TOKEN) {
     console.error("Error: Token de API no encontrado en la sesión (dataset-api-token).");
@@ -21,7 +21,7 @@ function onScanError(error) {
     //console.error('Error al escanear el QR: ', error);
     // Usar la variable resultElement
     if (resultElement) {
-        resultElement.innerHTML = `<p class="text-red-500">Error al escanear: ${error}</p>`;
+        resultElement.innerHTML = ``;
     }
 }
 
@@ -33,6 +33,69 @@ function onScanError(error) {
  * @typedef {Object} orderData
  * @returns {Promise<object|null>} Los datos del recurso o null si hay un error.
  */
+
+// CORRECCIÓN 1: Corregido error de sintaxis en 'date'
+function formatOrderData(orderData) {
+    
+    const orderNumber = orderData.number_order;
+    const totalAmount = orderData.total_amount;
+    // ERROR CORREGIDO: "ordorderDataer.date_order" => "orderData.date_order"
+    const date = orderData.date_order; 
+    const status = orderData.order_status.status_order;
+    const paymentMethod = orderData.payment_method.payment_method;
+    const employeeName = orderData.employee_payment.name_employee;
+    const employeePhone = orderData.employee_payment.phone_employee;
+    const reference = orderData.payment_support.reference; 
+
+    // Contenido HTML con estilos internos
+    let htmlContent = `
+        <style>
+            .order-summary { 
+                text-align: left; 
+                margin-top: 15px;
+                font-size: 1.05em;
+            }
+            .order-summary p {
+                margin: 5px 0;
+            }
+            .order-summary strong {
+                display: inline-block;
+                min-width: 130px; 
+            }
+            .highlight-green {
+                color: #28a745; 
+                font-weight: bold;
+            }
+            .highlight-red {
+                color: #dc3545; 
+                font-weight: bold;
+            }
+        </style>
+        
+        <div class="order-summary">
+            <h3 style="text-align: center; margin-bottom: 20px;">Orden **N° ${orderNumber}**</h3>
+            
+            <p><strong>Fecha de Orden:</strong> ${date}</p>
+            <p><strong>Estado:</strong> <span class="${status === 'PENDIENTE' ? 'highlight-red' : 'highlight-green'}">${status}</span></p>
+            <p><strong>Monto Total:</strong> <span class="highlight-green">$ ${totalAmount}</span></p>
+            
+            <hr style="margin: 10px 0;">
+
+            <h4>Detalles de Pago</h4>
+            <p><strong>Método:</strong> ${paymentMethod}</p>
+            <p><strong>Referencia:</strong> ${reference}</p>
+
+            <hr style="margin: 10px 0;">
+            
+            <h4>Empleado (Registro)</h4>
+            <p><strong>Nombre:</strong> ${employeeName}</p>
+            <p><strong>Teléfono:</strong> ${employeePhone}</p>
+        </div>
+    `;
+
+    return htmlContent;
+}
+
 async function getResourceInfo(orderData) {
     if (!API_TOKEN) {
         console.error("Función getResourceInfo: No se puede ejecutar sin API_TOKEN.");
@@ -117,7 +180,27 @@ async function patchResourceStatus(orderData) {
         return true; // Éxito
     } catch (error) {
         console.error('Error en la solicitud PATCH:', error);
-        Swal.fire(`No se pudo actualizar el recurso  ${error.message}`);
+        
+        let title = 'Error al actualizar el recurso';
+        let text = error.message;
+        let icon = 'error';
+
+        //  Lógica de Estilo para Error Específico (422 - Ticket ya utilizado) 
+        if (text.includes('422') && text.includes('Ticket ya utilizado')) {
+            title = 'Ticket ya Consumido';
+            text = 'El código QR escaneado corresponde a una orden que ya fue registrada como consumida o utilizada.';
+            icon = 'warning'; // Cambiamos el ícono a advertencia para diferenciarlo de un error de red.
+        }
+        
+        //Usar Swal.fire con estilos 
+        Swal.fire({
+            title: title,
+            html: `<p style="font-size: 1.1em;">${text}</p>`, // Estilo en el texto
+            icon: icon,
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: icon === 'warning' ? '#ffc107' : '#d33' // Color amarillo/rojo
+        });
+        
         return false; // Fallo
     }
 }
@@ -178,31 +261,34 @@ function startScanner() {
             let htmlContent = '';
             let iconType = 'question'; // Cambiado a 'question' para la confirmación
             let confirmButtonText = 'Confirmar Consumo';
+            // CORRECCIÓN 2: Declarar 'order' aquí para evitar ReferenceError
+            let order = null; 
             
-            if (resourceInfo) {
+            if (resourceInfo && resourceInfo.order) {
                
-                // 1. EXTRAER order_id
-                const orderId = resourceInfo.order_id; 
+                // CORRECCIÓN 2: Asignar 'order' del recurso info
+                order = resourceInfo.order; 
 
-
-                 titleText = `Numero de order:${orderId || decodedText}`;
-                 console.log(titleText)
-                 iconType = 'info';
-
+                // Ya no necesitas 'const orderId' aquí, ya tienes la variable 'order'
+                // 1. **Generar Contenido HTML**
+                htmlContent = formatOrderData(order); 
+                
+                // 2. **Actualizar Título y Tipo de Icono**
+                titleText = `Verificar Consumo de Orden N° ${order.number_order}`;
+                iconType = 'info';
             } else {
-                // Si el GET falla o devuelve null
-                htmlContent = `<p class="text-red-500">No se pudo obtener la información para el ID: ${decodedText}. Puede que no exista o haya un error de red/API.</p>`;
+               // Si el GET falla o devuelve null
+                htmlContent = `<p class="text-red-500">No se pudo obtener la información para el ID: ${orderId}. Puede que no exista o haya un error de red/API.</p>`;
                 iconType = 'error'; // Error más específico
-                confirmButtonText = 'Reintentar Actualización (No recomendado)';
+                confirmButtonText = 'No se puede confirmar'; // Mensaje en caso de error
             }
             
-            // 3. Mostrar SweetAlert2 para la confirmación
+            
             const swalResult = await Swal.fire({
-                //title: titleText,
-                title: "hola mundo",
-                // html: htmlContent,
+                title: titleText, // <-- Usamos el título dinámico
+                html: htmlContent, // <-- ¡Usamos el HTML generado!
                 icon: iconType,
-                showCancelButton: true,
+                showCancelButton: iconType !== 'error', // Ocultar Cancelar si es error
                 confirmButtonText: confirmButtonText, 
                 cancelButtonText: 'Cancelar',
                 draggable: true,
@@ -226,7 +312,7 @@ function startScanner() {
                         confirmButtonText: confirmButtonText, 
                         cancelButtonText: 'Cancelar',
                         draggable: true,
-                        allowOutsideClick: false, // Forzar la elección
+                        allowOutsideClick: false,
                     }).then(() => {
                         window.location.reload(); 
                     });

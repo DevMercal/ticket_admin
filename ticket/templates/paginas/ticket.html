@@ -4,36 +4,39 @@
 {% block content %}
 <div class="p-4 sm:p-6 lg:p-8">
     <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-6 border-b pb-2 border-gray-200 dark:border-gray-700 text-center">
-        Códigos QR Generados
+        🎟️ Códigos QR Generados
     </h2>
 
-    <div class="qr-container-list grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  auto-rows-fr">
+    <div class="qr-container-list grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-fr">
     
         {%  for ticket in tickets%} 
         <div class="qr-item bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 ease-in-out transform hover:-translate-y-1 p-5 flex flex-col items-center justify-between border border-gray-100 dark:border-gray-700">
             
-            <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 text-center truncate w-full" title="{{ name }}">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2 text-center truncate w-full" title="{{ ticket.employee_name }}">
                 {{ ticket.employee_name }}
             </h3>
-             <h4 class="text-xl font-semibold text-gray-800 dark:text-white mb-4 text-center truncate w-full" title="{{ name }}">
-                {{ ticket.cedula }}
+            <h4 class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-4 text-center w-full">
+                C.I.: {{ ticket.cedula }}
             </h4>
            
-            <div class="flex-grow flex items-center justify-center mb-4 w-full">
-                <img 
-                    src="data:image/png;base64,{{ ticket.qr_code }}" 
-                    alt="Código QR para {{ name }}" 
-                    class="w-full max-w-xs h-auto rounded-lg border border-gray-200 dark:border-gray-600 p-1 bg-white" 
-                />
+            <div class="flex-grow flex items-center justify-center mb-4 w-full h-40">
+                <div class="w-36 h-36 p-1 border border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center bg-white">
+                    <img 
+                        src="data:image/png;base64,{{ ticket.qr_code }}" 
+                        alt="Código QR para {{ ticket.employee_name }}" 
+                        class="w-full h-auto max-w-full max-h-full block" 
+                    />
+                </div>
             </div>
+            <p class="text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-2">
+                Orden #: {{ ticket.order_id }}
+            </p>
 
-            </div>
+        </div>
         {% endfor %}
     </div>
 </div>
 <script>
-    // IMPORTANTE: Escapa el valor si contiene caracteres especiales
-    // Aunque un token Bearer no debería tener problemas, es buena práctica.
     const API_TOKEN = "{{ request.session.api_token|safe }}"; 
 </script>
 
