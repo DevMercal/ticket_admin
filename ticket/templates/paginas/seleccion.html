@@ -23,13 +23,6 @@
                 </select>
             </div>
         </div>
-        <div class="basis-1/4 min-w-[150px]">
-            <button class="bg-green-600 dark:bg-green-800 dark:text-white px-3 py-1 rounded-md w-full"
-                data-bs-toggle="modal" data-bs-target="#invitado">
-                Registrar Invitado
-            </button>
-            {% include 'modal/invitado.html' %}
-        </div>
     </div>
     <form action="resumen" method="POST" id="resumen-form">
         {% csrf_token %}
@@ -50,6 +43,7 @@
                     {% for em in employees %}
                     <tr data-employee-id="{{ em.id }}" data-employee-name="{{ em.full_name }}"
                         data-employee-index="{{ forloop.counter0 }}" data-employee-cedula="{{ em.cedula }}">
+                      
                         <td class="py-3 px-4 text-center dark:text-white" hidden data-label="Gerencias">{{ em.gerencias.management_name }}</td>
                         <td class="py-3 px-4 text-center dark:text-white" data-label="Cedula" >{{ em.cedula }}</td>
                         
@@ -58,7 +52,7 @@
                             <input id="lunch" type="checkbox" class="selection-checkbox" data-selection-type="lunch" value="185">
                         </td>
                         <td class="py-3 px-4 text-center dark:text-white" data-label="Para llevar">
-                            <input id="to_go" type="checkbox" class="selection-checkbox" data-selection-type="to_go" value="20">
+                            <input id="to_go" type="checkbox" class="selection-checkbox" data-selection-type="to_go" value="20" >
                         </td>
                         <td class="py-3 px-4 text-center dark:text-white" data-label="Cubiertos">
                             <input id="covered" type="checkbox" class="selection-checkbox" data-selection-type="covered" value="10">

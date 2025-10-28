@@ -28,41 +28,46 @@
     
         {% csrf_token %}
         <div class="overflow-x-auto bg-white dark:bg-dark-100 rounded-lg shadow-md">
-            <table class="responsive-table w-full" id="myTable">
-                <thead class="bg-gray-100 dark:bg-dark-200">
-                    <tr>
-                        <th class="py-3 px-4 text-center dark:text-white">Nº de Pedido</th>
-                        <th class="py-3 px-4 text-center dark:text-white">Personas Autorizada</th>
-                        <th class="py-3 px-4 text-center dark:text-white">Nombre y Apellido</th>
-                        <th class="py-3 px-4 text-center dark:text-white">Cedula</th>
-                        <th class="py-3 px-4 text-center dark:text-white">Gerencia</th>
-                        <th class="py-3 px-4 text-center dark:text-white">Metodo de pago</th>
-                        <th class="py-3 px-4 text-center dark:text-white">Referencia</th>
-                        <th class="py-3 px-4 text-center dark:text-white" >total a pagar</th>
-                        <th class="py-3 px-4 text-center dark:text-white">Accion</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for pedido in pedidos %}
-                    <tr data-employee-id="{{ em.id }}" data-employee-name="{{ em.first_name }}"
-                        data-employee-index="{{ forloop.counter0 }}">
-                        <td class="py-3 px-4 text-center dark:text-white" >{{ pedido.number_order }}</td>
-                        <td class="py-3 px-4 text-center dark:text-white">{{ pedido.authorized_person }}</td>
-                        <td class="py-3 px-4 text-center dark:text-white">{{ pedido.employee_payment.name_employee }}</td>
-                        <td class="py-3 px-4 text-center dark:text-white">{{ pedido.employee_payment.cedula_employee }}</td>
-                        <td class="py-3 px-4 text-center dark:text-white">{{ pedido.employee_payment.management }}</td>
-                        <td class="py-3 px-4 text-center dark:text-white">{{ pedido.payment_method.payment_method }}</td>
-                        <td class="py-3 px-4 text-center dark:text-white" >{{ pedido.reference }}</td>
-                        <td class="py-3 px-4 text-center dark:text-white">{{ pedido.total_amount }}</td>
-                        <td><button class="py-1 px-2 bg-blue-600 text-white rounded-lg" data-bs-toggle="modal" data-bs-target="#VerPedido{{ pedido.number_order }}"
-                            >ver mas</button></td>
-                    </tr>
-                    {% include 'modal/pedido.html' %}
-                    {% endfor %}
+           <table class="responsive-table w-full bg-white dark:bg-dark-100" id="myTable">
+    
+            <thead class="bg-gray-100 dark:bg-dark-200">
+                <tr>
+                    <th class="py-3 px-4 text-center text-gray-700 dark:text-white">Nº de Pedido</th>
+                    <th class="py-3 px-4 text-center text-gray-700 dark:text-white">Personas Autorizada</th>
+                    <th class="py-3 px-4 text-center text-gray-700 dark:text-white">Nombre y Apellido</th>
+                    <th class="py-3 px-4 text-center text-gray-700 dark:text-white">Cedula</th>
+                    <th class="py-3 px-4 text-center text-gray-700 dark:text-white">Gerencia</th>
+                    <th class="py-3 px-4 text-center text-gray-700 dark:text-white">Metodo de pago</th>
+                    <th class="py-3 px-4 text-center text-gray-700 dark:text-white">Referencia</th>
+                    <th class="py-3 px-4 text-center text-gray-700 dark:text-white" >total a pagar</th>
+                    <th class="py-3 px-4 text-center text-gray-700 dark:text-white">Accion</th>
+                </tr>
+            </thead>
+            
+            <tbody class="text-gray-900 dark:text-gray-200">
+                {% for pedido in pedidos %}
+                
+                <tr class="bg-white border-b border-gray-200 hover:bg-gray-50 dark:bg-dark-100 dark:border-dark-200 dark:hover:bg-dark-200" 
+                    data-employee-id="{{ em.id }}" data-employee-name="{{ em.first_name }}"
+                    data-employee-index="{{ forloop.counter0 }}">
+                    
+                    <td class="py-3 px-4 text-center">{{ pedido.number_order }}</td>
+                    <td class="py-3 px-4 text-center">{{ pedido.authorized_person }}</td>
+                    <td class="py-3 px-4 text-center">{{ pedido.employee_payment.name_employee }}</td>
+                    <td class="py-3 px-4 text-center">{{ pedido.employee_payment.cedula_employee }}</td>
+                    <td class="py-3 px-4 text-center">{{ pedido.employee_payment.management }}</td>
+                    <td class="py-3 px-4 text-center">{{ pedido.payment_method.payment_method }}</td>
+                    <td class="py-3 px-4 text-center">{{ pedido.reference }}</td>
+                    <td class="py-3 px-4 text-center">{{ pedido.total_amount }}</td>
+                    <td><button class="py-1 px-2 bg-blue-600 text-white rounded-lg" data-bs-toggle="modal" data-bs-target="#VerPedido{{ pedido.number_order }}"
+                        >ver mas</button></td>
+                </tr>
+                {% include 'modal/pedido.html' %}
+                {% endfor %}
 
-                </tbody>
+            </tbody>
 
-            </table>
+        </table>
  
         </div>
         <div class="pagination-controls flex justify-center items-center gap-4 my-4">
