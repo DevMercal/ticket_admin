@@ -1,7 +1,16 @@
 ###  USUARIOS
-GET http://comedor.mercal.gob.ve/api/p1/users HTTP/1.1
+POST http://comedor.mercal.gob.ve/api/p1/users HTTP/1.1
 content-type: application/json
-Authorization: Bearer 2|nuW5L8KqsnFcxK8R28XXTIISYTgXlTL7dNYJ6Y5Pc2b07bdd
+Authorization: Bearer 19|DFTkw5NfIZLijIfnPxKibyDYOuOmye2acRuZHcLifa4a32ac
+
+{
+    "email": "username@mercal.gob.ve", 
+    "password": "12345678",
+    "password_confirmation": "12345678",
+    "cedula":"18933323"     
+}
+
+
 ### MENU
 GET  http://comedor.mercal.gob.ve/api/p1/menus HTTP/1.1
 content-type: application/json

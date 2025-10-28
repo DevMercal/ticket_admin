@@ -235,30 +235,29 @@ def user_registro(request: HttpRequest) -> HttpResponse:
 
     if request.method == 'POST': 
        
-        name = request.POST.get('name', '')
+        cedula = request.POST.get('cedula', '')
         email = request.POST.get('email', '')
         password = request.POST.get('password', '')
         password_confirmation = request.POST.get('password_confirmation', '')
-        id_management = request.POST.get('id_management', '')
-
+        
        
-        if not all([name, email, password, password_confirmation, id_management]):
+        if not all([cedula, email, password, password_confirmation,]):
             messages.error(request, 'Todos los campos son obligatorios.')
             return redirect('usu') 
 
         data = {
-            'name': name,
             'email': email,
             'password': password,
             'password_confirmation': password_confirmation,
-            'id_management': id_management
+            'cedula': cedula,
         }
-
+        print(data)
         try:
             
             response = requests.post(f"{api_url}/users", json=data, headers=headers, timeout=10)
+            print(response)
             response.raise_for_status()  # This will raise an HTTPError for 4xx/5xx status codes
-
+            
             messages.success(request, 'Usuario registrado exitosamente.')
             return redirect('usu')
 
@@ -268,14 +267,15 @@ def user_registro(request: HttpRequest) -> HttpResponse:
                 json_data = response.json()
                 error_message = json_data.get('message', 'Error al registrar el usuario.')
                 messages.error(request, error_message)
+                return redirect('usu')
             except requests.exceptions.JSONDecodeError:
                 # Handle cases where the response isn't valid JSON
                 messages.error(request, f'Error del servidor: {response.text}')
-
+                return redirect('usu')
         except requests.exceptions.RequestException as e:
             # Catch all other request-related errors (e.g., connection, DNS)
             messages.error(request, f'Error de conexión con la API: {e}')
-
+            return redirect('usu')
     return render(request, 'paginas/usuarios.html') # Replace with your form template path
 
 def eliminar_user(request, id):
@@ -732,7 +732,6 @@ def registration_order(request):
     
     return render(request, "paginas/pedidos.html")
    
-
 def ticket(request):
     """
     Genera un ticket para cada empleado con un código QR asociado a su número de orden.

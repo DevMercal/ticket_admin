@@ -1,4 +1,3 @@
-<!-- Modal -->
 <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content dark:bg-gray-800">
@@ -9,26 +8,24 @@
       <div class="modal-body">
         <form action="user_registro" method="post">
           {% csrf_token %}
-        <div class="grid grid-cols-1 gap-4">
-            <input type="text" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white" name="name" placeholder="Nombre Completo"> 
-            <input type="email" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white" name="email" placeholder="Correo Electrónico">
-            <input type="text" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white" name="password" placeholder="Contraseña">
-            <input type="text" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white" name="password_confirmation" placeholder="Confitmar Contraseña">
+          <div class="grid grid-cols-1 gap-4">
             
-            <select name="id_management" id="" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white">
-              <option  >---Seleccione Gerencia</option>
-              {% for management in managements %}
-                 <option value="{{ management.id_management }}">{{ management.management_name }}</option>
-              {% endfor %}
-            </select> 
+            <input type="text" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white" name="cedula" placeholder="Cédula" required> 
+            
+            <input type="email" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white" name="email" placeholder="Correo Electrónico" required>
+            
+            <input type="password" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white" name="password" placeholder="Contraseña" required>
+            
+            <input type="password" class="border dark:bg-gray-600 py-1 px-2 rounded-md dark:text-white" name="password_confirmation" placeholder="Confirmar Contraseña" required>
+            
           </div>
-      
+          
+          <div class="modal-footer flex gap-4 mt-4">
+            <button type="button" class="btn btn-secondary w-20 flex-auto" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-primary w-20 flex-auto">Registrar</button>
+          </div>
+        </form>
       </div>
-      <div class="modal-footer flex gap-4">
-        <button type="button" class="btn btn-secondary w-20 flex-auto" data-bs-dismiss="modal">Cerrar</button>
-        <button type="submit" class="btn btn-primary w-20 flex-auto">Registrar</button>
-      </div>
-      </form>
     </div>
   </div>
 </div>
