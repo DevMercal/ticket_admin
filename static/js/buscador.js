@@ -167,6 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         totalPagoInput.name = 'total_pago_general'; // Nombre del campo en el POST
         totalPagoInput.value = totalInput.value; // ¡Obtener el valor del campo que calcula el total!
         resumenForm.appendChild(totalPagoInput);
+        console.log('Total Pago General añadido al formulario:', totalPagoInput.value);
     });
     renderTable();
 });

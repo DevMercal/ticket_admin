@@ -3,13 +3,13 @@
 const checkboxes = document.querySelectorAll('.selection-checkbox');
 const totalInput = document.getElementById('total');
 
+
 /**
  * Calcula el total sumando los valores de los checkboxes seleccionados.
  */
 function calculateTotal() {
-    let total = 0;
-
-    // Iterar sobre todos los checkboxes
+    let total = 0; 
+// Iterar sobre todos los checkboxes
     checkboxes.forEach(checkbox => {
         // Verificar si el checkbox está marcado (checked)
         if (checkbox.checked) {
@@ -17,12 +17,13 @@ function calculateTotal() {
             // Es importante usar parseFloat() o parseInt() para sumar números.
             // Si no está marcado, su valor no se suma.
             total += parseFloat(checkbox.value) || 0; // || 0 previene errores si el valor no es un número
+            
         }
     });
-
+    console.log("Total calculado (antes de mostrar):", total);
     // Mostrar el resultado en el campo 'total'
     totalInput.value = total.toFixed(2); // toFixed(2) para mostrar dos decimales
-    
+    console.log("Total calculado:", totalInput.value);
     // Opcional: También puedes mostrarlo en la consola si lo necesitas
     console.log("Nuevo Total:", total.toFixed(2));
 }

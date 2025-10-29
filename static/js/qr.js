@@ -45,7 +45,7 @@ function formatOrderData(orderData) {
     const paymentMethod = orderData.payment_method.payment_method;
     const employeeName = orderData.employee_payment.name_employee;
     const employeePhone = orderData.employee_payment.phone_employee;
-    const reference = orderData.payment_support.reference; 
+    const reference = orderData.reference; 
 
     // Contenido HTML con estilos internos
     let htmlContent = `
