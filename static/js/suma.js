@@ -1,6 +1,7 @@
 // 1. Obtener todos los checkboxes relevantes
 // Usamos la clase 'selection-checkbox' que añadimos en el HTML
 const checkboxes = document.querySelectorAll('.selection-checkbox');
+
 const totalInput = document.getElementById('total');
 
 
