@@ -485,24 +485,10 @@ def seleccion(request):
         json_management = response_management.json()
         
         management = json_management.get('management', [])   
-    
         
     except requests.exceptions.RequestException as req_err:
         messages.warning(request, f"No se pudo cargar la lista de gerencias: {req_err}")
-    
-    bcv_data = {}
-    try:
-        response = requests.get(f"{api_url}/dolar-bcv", headers=headers, timeout=10)
-        response.raise_for_status() 
-        bcv_data = response.json()
-        bcv = bcv_data.get('data', {})
-        precio = bcv.get('rate', 'N/A')
-        
-    except requests.exceptions.RequestException as req_err:
-        messages.error(request, f"Ocurrió un error inesperado: {req_err}")
-    
     return render(request, 'paginas/seleccion.html', {
-        'precio': precio,
         'management': management,
         'selected_management': selected_management,
         'employees': processed_employees, 
@@ -731,92 +717,151 @@ def registration_order(request):
 
     
     return render(request, "paginas/pedidos.html")
+
+
+def pedidos(request):
+    # 1. Verificación de sesión
+    if 'api_token' not in request.session:
+        messages.warning(request, "Debe iniciar sesión para ver esta información.")
+        return redirect('inicio') 
+
+    token = request.session.get('api_token')
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+    
+    pedidos = []
+    
+    try:
+       
+        response = requests.get(f"{api_url}/pedidos", headers=headers, timeout=10)
+        response.raise_for_status() # Lanza un error para códigos 4xx/5xx
+        json_data = response.json()
+
+        pedidos = json_data.get('orders', [])
+        
+
+    except requests.exceptions.RequestException as req_err:
+        
+        messages.error(request, f"Error al comunicarse con la API: {req_err}")
+        
    
+    return render(request, "paginas/pedidos.html" ,{
+        'current_page' : 'pedidos', 
+        'pedidos': pedidos 
+    })
+    
+
 def ticket(request):
     """
-    Genera un ticket para cada empleado con un código QR asociado a su número de orden.
+    Genera los tickets (códigos QR) para cada empleado y orden registrada 
+    en la sesión, y limpia los datos de la sesión.
     """
     
-    # ... (Validación del método y obtención de datos de la sesión, puntos 1 a 4) ...
+    # 1. Validación del método HTTP
     if request.method != 'GET':
         messages.warning(request, "Acceso no válido. Solo se permite GET.")
+        # Es mejor redirigir a una página de error o a la principal si no es GET
         return redirect('seleccion') 
         
+    # 2. Obtención de datos de la sesión
     resumen_empleados = request.session.get('resumen_empleados', [])
     order_data = request.session.get('order_data_for_ticket', {})
-    order_data_items = order_data.get('orders', [])
+    # pedidosbd no parece usarse, pero se mantiene si es por motivos de depuración
+    pedidosbd = request.session.get('id_orders_consumption', []) 
+    order_ids = order_data.get('orders', []) 
     
+    # 3. Validación de datos de empleados
     if not resumen_empleados:
         messages.warning(request, "No hay empleados registrados para generar ticket.")
+        # La limpieza debe ser *después* de esta validación para evitar errores de clave
         if 'order_data_for_ticket' in request.session:
              del request.session['order_data_for_ticket']
         return redirect('seleccion')
 
-    if len(resumen_empleados) != len(order_data_items):
-        error_msg = f"Inconsistencia de datos: La API devolvió {len(order_data_items)} órdenes, pero hay {len(resumen_empleados)} empleados. Usando datos genéricos."
+    # 4. Validación de seguridad: Asegurar que el número de empleados coincida con el de órdenes.
+    if len(resumen_empleados) != len(order_ids):
+        # Manejo de error: se loggea y se usa la lista más segura (IDs genéricos)
+        error_msg = f"Inconsistencia de datos: La API devolvió {len(order_ids)} IDs, pero hay {len(resumen_empleados)} empleados. Usando IDs genéricos."
         messages.error(request, error_msg)
         print(f"ERROR: {error_msg}")
-        order_items_to_use = [{'number_order': 'N/A'}] * len(resumen_empleados) 
+        # Creamos una lista de None para emparejar con cada empleado
+        order_ids_to_use = [None] * len(resumen_empleados) 
     else:
-        order_items_to_use = order_data_items
+        order_ids_to_use = order_ids
         
     encoded_qrs_with_data = []
     
     # 5. Carga del logo (mejorado el manejo de excepciones)
     logo = None
     try:
-        # Nota: Asume que LOGO_PATH y Image están correctamente importados
-        logo_original = Image.open(LOGO_PATH).convert("RGBA")
-        # Recomendación: Redimensionar el logo a un tamaño pequeño para el QR (e.g., 60x60 píxeles)
-        logo = logo_original.resize((60, 60)) 
+        # Asegurarse de que LOGO_PATH esté definido y sea correcto
+        # Si LOGO_PATH requiere una importación, debe estar arriba.
+        # Por ejemplo: LOGO_PATH = 'ruta/a/tu/logo.png'
+        # 
+        logo = Image.open(LOGO_PATH) 
+    except NameError:
+        # Manejo si LOGO_PATH no está definido
+        print("Advertencia: LOGO_PATH no está definido.")
+    except FileNotFoundError:
+        print(f"Advertencia: No se encontró el archivo del logo en la ruta: {LOGO_PATH}")
     except Exception as e:
-        print(f"Advertencia/Error al cargar o redimensionar el logo: {e}")
+        print(f"Error desconocido al cargar el logo: {e}")
         
-    # 6. Generación de QRs: Iterar sobre empleados y datos de orden *simultáneamente*
-    for empleado, order_data_item in zip(resumen_empleados, order_items_to_use):
+    # 6. Generación de QRs: Iterar sobre empleados y IDs de orden *simultáneamente*
+    # zip() usa la longitud de la lista más corta si no son iguales, 
+    # por eso es crucial usar `order_ids_to_use` que se ajustó en el punto 4.
+    for empleado, order_id in zip(resumen_empleados, order_ids_to_use):
         try:
-            current_order_number = str(order_data_item.get('number_order', 'N/A'))
-            info = f"Orden: {current_order_number}"  
+           
+            current_order_id = str(order_id) if order_id is not None else 'N/A'
+            
+            
+            info = f"Orden: {current_order_id}" 
+            
             
             qr = qrcode.QRCode(
                 version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_H,
-                # *** OPTIMIZACIÓN: Reducimos el tamaño de la caja (box_size) ***
-                box_size=10,  # Cambiado de 5 a 3
+                box_size=10,
                 border=4,
             )
             qr.add_data(info)
             qr.make(fit=True)
+            qr_img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
             
-            # Crear la imagen del QR y opcionalmente centrar el logo
-            qr_img = qr.make_image(fill_color="black", back_color="white").convert("RGBA")
-            
+            # Insertar logo si existe
             if logo:
-                # Calcular posición para centrar el logo
-                pos = ((qr_img.size[0] - logo.size[0]) // 2, (qr_img.size[1] - logo.size[1]) // 2)
-                # La máscara del logo (el propio objeto 'logo') maneja la transparencia
-                qr_img.paste(logo, pos, logo) 
+                qr_width, qr_height = qr_img.size
+                logo_size = int(qr_width * 0.40)
+                logo_resized = logo.copy()
+                # Image.Resampling.LANCZOS es más moderno que Image.ANTIALIAS si se usa PIL >= 9.0.0
+                logo_resized.thumbnail((logo_size, logo_size), Image.Resampling.LANCZOS)
+                logo_pos = ((qr_width - logo_resized.width) // 2, (qr_height - logo_resized.height) // 2)
+                # La máscara debe ser la imagen del logo o su canal alfa; aquí usamos la imagen RGB misma, que funciona.
+                qr_img.paste(logo_resized, logo_pos, logo_resized if logo_resized.mode == 'RGBA' else None)
             
             # Codificación a Base64
             buffer = BytesIO()
-            qr_img.save(buffer, format="PNG")
-            encoded_img_data = base64.b64encode(buffer.getvalue()).decode()
+            qr_img.save(buffer, format='PNG')
+            encoded_img_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
             
-            
+            # Almacenamos el nombre, el QR codificado y el ID de orden individual
             encoded_qrs_with_data.append({
-                'employee_name': empleado.get('employees', 'Empleado Desconocido'), 
-                'qr_code': encoded_img_data, 
+                'employee_name': empleado.get('employees', 'Empleado Desconocido'), # Mejorar 'N/A'
+                'qr_code': encoded_img_data,
                 'cedula': empleado.get('cedula', 'N/A'),
-                'order_id': current_order_number  
+                'order_id': current_order_id  
             })
             
         except Exception as e:
+            # Loguear el error y continuar con el siguiente empleado
             print(f"Error crítico generando QR para empleado {empleado.get('employees', 'Desconocido')}: {e}")
-            messages.error(request, f"Error generando ticket para empleado {empleado.get('employees', 'Desconocido')}. Detalle: {e}")
+            messages.error(request, f"Error generando ticket para empleado {empleado.get('employees', 'Desconocido')}.")
             continue
 
     
-     # 7. Limpiar los datos de la sesión
+     # 7. Limpiar los datos de la sesión (Importante: Limpiar SIEMPRE después de usarlos)
     if 'resumen_empleados' in request.session:
         del request.session['resumen_empleados']
     if 'order_data_for_ticket' in request.session:
@@ -827,10 +872,10 @@ def ticket(request):
     
     contexto = {
         'tickets': encoded_qrs_with_data,
-        'order_range': order_data_items, 
+        'order_range': order_ids,
         'current_page': 'ticket' 
     }
-    print(contexto) 
+        
     return render(request, 'paginas/ticket.html', contexto)
     
 def empleados(request):
@@ -983,38 +1028,6 @@ def extras_unified_view(request):
 
     
     return render(request, "paginas/extras.html",contexto)
-
-def pedidos(request):
-    # 1. Verificación de sesión
-    if 'api_token' not in request.session:
-        messages.warning(request, "Debe iniciar sesión para ver esta información.")
-        return redirect('inicio') 
-
-    token = request.session.get('api_token')
-    headers = {
-        'Authorization': f'Bearer {token}'
-    }
-    
-    pedidos = []
-    
-    try:
-       
-        response = requests.get(f"{api_url}/pedidos", headers=headers, timeout=10)
-        response.raise_for_status() # Lanza un error para códigos 4xx/5xx
-        json_data = response.json()
-
-        pedidos = json_data.get('orders', [])
-        
-
-    except requests.exceptions.RequestException as req_err:
-        
-        messages.error(request, f"Error al comunicarse con la API: {req_err}")
-        
-   
-    return render(request, "paginas/pedidos.html" ,{
-        'current_page' : 'pedidos', 
-        'pedidos': pedidos 
-    })
 
 def escaner(request):
     return render(request,"paginas/scan.html",{'current_page' : 'escaner'})
