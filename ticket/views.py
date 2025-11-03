@@ -350,6 +350,7 @@ def registro_menu(request):
         proteinas = request.POST.getlist('proteinas')
         postres = request.POST.getlist('postres') 
         bebidas = request.POST.getlist('bebidas')
+        ensaladas = request.POST.getlist('ensaladas')
         
        
         data = []
@@ -370,6 +371,7 @@ def registro_menu(request):
         agregar_al_payload("Proteinas", proteinas)
         agregar_al_payload("Postres", postres)
         agregar_al_payload("Bebidas", bebidas)
+        agregar_al_payload("Ensaladas", ensaladas)
         
         try:
             token = request.session.get('api_token')

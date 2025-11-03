@@ -87,3 +87,4 @@ generarGrupoMenu('proteinas', 'btnAgregar_entradas', 'proteinas', 'proteinas');
 generarGrupoMenu('contornos', 'btnAgregar_principales', 'contornos', 'contornos');
 generarGrupoMenu('postres', 'btnAgregar_postres', 'postres', 'postres');
 generarGrupoMenu('bebidas', 'btnAgregar_bebidas', 'bebidas', 'bebidas');
+generarGrupoMenu('ensaladas', 'btnAgregar_ensaladas', 'ensaladas', 'ensaladas');
