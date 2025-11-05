@@ -1,5 +1,5 @@
-const API_BASE_URL = 'http://comedor.mercal.gob.ve/api/p1/pedidos/takeOrder'; 
-const API_CONSUMO_URL = 'http://comedor.mercal.gob.ve/api/p1/pedidos/consumo'; 
+const API_BASE_URL = 'https://comedor.mercal.gob.ve/api/p1/pedidos/takeOrder'; 
+const API_CONSUMO_URL = 'https://comedor.mercal.gob.ve/api/p1/pedidos/consumo'; 
 
 // ------------------------------------------------------------------
 // ## Inicialización y Token

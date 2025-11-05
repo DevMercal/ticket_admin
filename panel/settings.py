@@ -28,10 +28,10 @@ SECRET_KEY = 'django-insecure-$6#$)z!u(nz*7%(h(^fofh5r$l5@*s(ldv1jp+wg3^xkpf+*a*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.20.22.93','localhost','127.0.0.1', '192.168.1.103']
+ALLOWED_HOSTS = ['localhost', '192.168.1.101','10.20.22.93']
 
 API = os.environ.get("API")
-# Application definition
+
 
 INSTALLED_APPS = [
     'sslserver',
