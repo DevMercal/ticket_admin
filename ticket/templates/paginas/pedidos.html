@@ -53,9 +53,9 @@
                     
                     <td class="py-3 px-4 text-center">{{ pedido.number_order }}</td>
                     <td class="py-3 px-4 text-center">{{ pedido.authorized_person }}</td>
-                    <td class="py-3 px-4 text-center">{{ pedido.employee_payment.name_employee }}</td>
+                    <td class="py-3 px-4 text-center">{{ pedido.employee_payment.employee.first_name }}</td>
                     <td class="py-3 px-4 text-center">{{ pedido.employee_payment.cedula_employee }}</td>
-                    <td class="py-3 px-4 text-center">{{ pedido.employee_payment.management }}</td>
+                    <td class="py-3 px-4 text-center">{{ pedido.employee_payment.employee.management }}</td>
                     <td class="py-3 px-4 text-center">{{ pedido.payment_method.payment_method }}</td>
                     <td class="py-3 px-4 text-center">{{ pedido.reference }}</td>
                     <td class="py-3 px-4 text-center">{{ pedido.total_amount }}</td>

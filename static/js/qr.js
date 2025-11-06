@@ -46,9 +46,13 @@ function formatOrderData(orderData) {
     const employeeName = orderData.employee_payment.name_employee;
     const employeePhone = orderData.employee_payment.phone_employee;
     const reference = orderData.reference; 
-
-    // Contenido HTML con estilos internos
-    let htmlContent = `
+    const consumo = orderData.order_consumption.id_orders_consumption;
+    
+    
+      if (consumo === 3) {
+                 
+       }else{
+        let htmlContent = `
         <style>
             .order-summary { 
                 text-align: left; 
@@ -92,8 +96,9 @@ function formatOrderData(orderData) {
             <p><strong>Teléfono:</strong> ${employeePhone}</p>
         </div>
     `;
-
-    return htmlContent;
+    return htmlContent
+       }
+   
 }
 
 async function getResourceInfo(orderData) {
@@ -219,6 +224,11 @@ function extractOrderId(qrText) {
     return match ? match[1] : null; 
 }
 
+/// ... (Código anterior de funciones y variables)
+
+// ------------------------------------------------------------------
+// ## Lógica del Escáner y Flujo
+
 // ------------------------------------------------------------------
 // ## Lógica del Escáner y Flujo
 
@@ -246,92 +256,112 @@ function startScanner() {
               //  console.error("Error al detener el escáner (puede que haya estado ya detenido):", stopErr);
             });
             
-           
-
             const orderId = extractOrderId(decodedText);
-
-
             const orderData = {
                 resourceId: orderId
-                
             };
+
+            // *** 1. OBTENER INFORMACIÓN DEL RECURSO (GET) ***
             const resourceInfo = await getResourceInfo(orderData);
-            let titleText = `Orden: ${decodedText}`;
-            
-            let htmlContent = '';
-            let iconType = 'question'; // Cambiado a 'question' para la confirmación
-            let confirmButtonText = 'Confirmar Consumo';
-            // CORRECCIÓN 2: Declarar 'order' aquí para evitar ReferenceError
             let order = null; 
+            let htmlContent = ''; // Se declara una vez aquí
             
+      
             if (resourceInfo && resourceInfo.order) {
                
-                // CORRECCIÓN 2: Asignar 'order' del recurso info
                 order = resourceInfo.order; 
 
-                // Ya no necesitas 'const orderId' aquí, ya tienes la variable 'order'
-                // 1. **Generar Contenido HTML**
-                htmlContent = formatOrderData(order); 
+                // 1.1. **Verificar Consumo**
+                const consumptionId = Number(order.order_consumption.id_orders_consumption); 
+                htmlContent = formatOrderData(order); // Generar contenido para ambos casos (3 o 2)
                 
-                // 2. **Actualizar Título y Tipo de Icono**
-                titleText = `Verificar Consumo de Orden N° ${order.number_order}`;
-                iconType = 'info';
-            } else {
-               // Si el GET falla o devuelve null
-                htmlContent = `<p class="text-red-500">No se pudo obtener la información para el ID: ${orderId}. Puede que no exista o haya un error de red/API.</p>`;
-                iconType = 'error'; // Error más específico
-                confirmButtonText = 'No se puede confirmar'; // Mensaje en caso de error
-            }
-            
-            
-            const swalResult = await Swal.fire({
-                title: titleText, // <-- Usamos el título dinámico
-                html: htmlContent, // <-- ¡Usamos el HTML generado!
-                icon: iconType,
-                showCancelButton: iconType !== 'error', // Ocultar Cancelar si es error
-                confirmButtonText: confirmButtonText, 
-                cancelButtonText: 'Cancelar',
-                draggable: true,
-                allowOutsideClick: false, 
-                allowEscapeKey: false
-            });
-
-            // 4. **Paso PATCH**: Ejecutar la actualización al confirmar
-            if (swalResult.isConfirmed) {
-                console.log("Confirmación recibida. Iniciando solicitud PATCH...");
-                
-               
-                const patchSuccess = await patchResourceStatus(orderData);
-
-                if (patchSuccess) {
-                   
-                    Swal.fire({
-                        title: '¡Consumo Confirmado!',
-                        text: 'El estado del recurso ha sido actualizado con éxito. Recargando...',
-                        icon: 'success',
-                        confirmButtonText: confirmButtonText, 
-                        cancelButtonText: 'Cancelar',
-                        draggable: true,
-                        allowOutsideClick: false,
-                    }).then(() => {
-                        window.location.reload(); 
+                if (consumptionId === 3) {
+                    
+                    console.log(`Orden N° ${order.number_order} ya está marcada como consumida (ID: 3). Muestra directo.`);
+                    
+                    // Mostrar el mensaje de "Ya Consumido" inmediatamente (Caso: consumption: 3)
+                    await Swal.fire({
+                        title: '¡Ticket ya Consumido!', 
+                        html: htmlContent, 
+                        icon: 'warning', 
+                        confirmButtonText: 'Aceptar', 
+                        allowOutsideClick: false, 
                     });
-                } else {
-                   
-                    startScanner(); 
-                }
-            } else {
+                    
+                    window.location.reload(); 
+                    return; 
+                } 
+
+                // 1.2. **Continuar con Confirmación** (Caso: consumption: 2)
+                // El flujo continúa aquí solo si consumptionId NO es 3.
                 
-                console.log("Acción cancelada por el usuario. Reiniciando escáner.");
-                Swal.fire('Cancelado', 'La operación de actualización fue cancelada.', 'info').then(() => {
-                    startScanner(); 
+                let titleText = `Verificar Consumo de Orden N° ${order.number_order}`;
+                let iconType = 'info';
+                let confirmButtonText = 'Confirmar Consumo';
+                
+                // 2. Mostrar Swal de Confirmación
+                const swalResult = await Swal.fire({
+                    title: titleText, 
+                    html: htmlContent, 
+                    icon: iconType,
+                    showCancelButton: true, 
+                    confirmButtonText: confirmButtonText, 
+                    cancelButtonText: 'Cancelar',
+                    draggable: true,
+                    allowOutsideClick: false, 
+                    allowEscapeKey: false
                 });
+
+                // 3. Paso PATCH: Ejecutar la actualización al confirmar
+                if (swalResult.isConfirmed) {
+                    console.log("Confirmación recibida. Iniciando solicitud PATCH...");
+                    
+                    const patchSuccess = await patchResourceStatus(orderData);
+
+                    if (patchSuccess) {
+                        await Swal.fire({
+                            title: '¡Consumo Confirmado!',
+                            text: 'El estado del recurso ha sido actualizado con éxito.',
+                            icon: 'success',
+                            confirmButtonText: 'Aceptar', 
+                            allowOutsideClick: false,
+                        });
+                        window.location.reload(); 
+                    } else {
+                        // Si el PATCH falló (ej. por error 422 manejado internamente)
+                        startScanner(); 
+                    }
+                } else {
+                    // Acción cancelada por el usuario
+                    console.log("Acción cancelada por el usuario. Reiniciando escáner.");
+                    Swal.fire('Cancelado', 'La operación de actualización fue cancelada.', 'info').then(() => {
+                        startScanner(); 
+                    });
+                }
+                
+            } else {
+            
+                
+                let errorHtml = `<p class="text-red-500">No se pudo obtener la información para el ID: ${orderId}. Puede que no exista o haya un error de red/API.</p>`;
+                
+                await Swal.fire({
+                    title: `Error en Orden: ${orderId}`,
+                    html: errorHtml, 
+                    icon: 'error',
+                    showCancelButton: false, 
+                    confirmButtonText: 'Aceptar', 
+                    draggable: true,
+                    allowOutsideClick: false, 
+                    allowEscapeKey: false
+                });
+
+                // Reiniciar el escáner tras el error
+                startScanner();
             }
         },
         onScanError
     ).catch((err) => {
         // Manejo de errores de inicio de cámara (ej. permisos)
-        //console.error("Error al iniciar el escáner (cámara):", err);
         if (resultElement) {
              resultElement.innerHTML = `<p class="text-red-700 font-bold">Error al iniciar la cámara: Verifique permisos o dispositivo. Detalle: ${err}</p>`;
         }

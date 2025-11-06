@@ -72,7 +72,6 @@
                         <input type="hidden" name="cedula" value="{{ i.cedula }}">
                         <input type="hidden" name="extras" value="1">
                     {% endfor %}
-                    <input type="hidden" name="special_event" value="no">
                     <input type="hidden" name="id_payment_method" value="3">
                     <input type="hidden" name="total_amount" value="{{ total_general }}">
                     <input type="hidden" name="id_order_status" value="2"> 
@@ -103,19 +102,20 @@
                     </div>
 
                     <div>
-                        <label for="name_employee" class="dark:text-gray-300 font-medium mb-1 block">Nombre Empleado:</label>
-                        <input type="text" class="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-blue-500 focus:border-blue-500 text-center" id="name_employee" name="name_employee" required>
-                    </div>
-
-                    <div>
                         <label for="phone_employee" class="dark:text-gray-300 font-medium mb-1 block">Teléfono Empleado:</label>
                         <input type="text" class="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-blue-500 focus:border-blue-500 text-center" id="phone_employee" name="phone_employee">
                     </div>
-
-                    <div>
-                        <label for="management" class="dark:text-gray-300 font-medium mb-1 block">Gerencia/Departamento:</label>
-                        <input type="text" class="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-blue-500 focus:border-blue-500 text-center" id="management" name="management" required>
+                   <div>
+                        <label for="phone_employee" class="dark:text-gray-300 font-medium mb-1 block">Banco de envio</label>
+                        <select required name="bank" class="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-blue-500 focus:border-blue-500 text-center">
+                            <option>seleccione un banco</option>
+                            {% for b in bank %}
+                                <option value="{{ b.code_bank }}">{{ b.name_bank }} - {{ b.code_bank }}</option>
+                            {% endfor %}
+                        </select>
+                      
                     </div>
+                    
 
                     <div class="pt-6 space-y-3">
                         <button type="submit" class="w-full bg-blue-600 text-white font-semibold p-3 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">

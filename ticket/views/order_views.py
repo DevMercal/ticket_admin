@@ -56,9 +56,8 @@ def registration_order(request):
             
        
         cedula_employee = request.POST.get('cedula_employee')
-        name_employee = request.POST.get('name_employee')
+        bank = request.POST.get('bank')
         phone_employee = request.POST.get('phone_employee', '')
-        management = request.POST.get('management') 
         extras = request.POST.get('extras', '1') 
         
         # payment_support = request.FILES.get('payment_support')
@@ -86,7 +85,7 @@ def registration_order(request):
             
             data_for_json = {
                 "order": {
-                    'special_event': special_event,
+                    
                     'authorized': authorized,
                     'id_payment_method': id_payment_method,
                     'id_order_status':id_order_status,
@@ -98,9 +97,9 @@ def registration_order(request):
                 },
                 "employeePayment": {
                     'cedula_employee': cedula_employee,
-                    'name_employee': name_employee,
+                    'code_bank': bank,
                     'phone_employee':phone_employee,
-                    'management': management,
+                    
                 },
                 
                 "extras": [extras] 
@@ -208,7 +207,7 @@ def pedidos(request):
         json_data = response.json()
 
         pedidos = json_data.get('orders', [])
-        
+        print(pedidos)
 
     except requests.exceptions.RequestException as req_err:
         
@@ -221,6 +220,16 @@ def pedidos(request):
     })
     
 def resumen(request):
+    if 'api_token' not in request.session:
+        messages.warning(request, "Debe iniciar sesión para ver esta información.")
+        return redirect('inicio') 
+
+    token = request.session.get('api_token')
+    headers = {
+            'Authorization': f'Bearer {token}'
+    }
+        
+        
     if request.method == 'POST':
         total = int(request.POST.get('total_employees', 0))
         
@@ -246,22 +255,37 @@ def resumen(request):
             
             if lunch == 'No' and to_go == 'No' and covered == 'No':
                 continue
-
+         
             resumen_empleados.append({
                 'employees': employee_name,
                 'lunch': lunch,
                 'to_go': to_go,
                 'covered': covered,
                 'cedula': cedula,
-            })
+            })       
+        
+        bank = []
+        
+        try:
+        
+            response = requests.get(f"{api_url}/bank", headers=headers, timeout=10)
+            response.raise_for_status() # Lanza un error para códigos 4xx/5xx
+            json_data = response.json()
             
-            
+            bank = json_data.get('bank', [])
+            print(bank)
+
+        except requests.exceptions.RequestException as req_err:
+        
+          messages.error(request, f"Error al comunicarse con la API: {req_err}")
+              
         if resumen_empleados:
             request.session['resumen_empleados'] = resumen_empleados
             contexto = {
                 'contexto': resumen_empleados,
                 'current_page': 'resumen',
-                'total_general': total_pago_general 
+                'total_general': total_pago_general ,
+                'bank': bank
             }
                 
             return render(request, 'paginas/resumen.html', contexto)

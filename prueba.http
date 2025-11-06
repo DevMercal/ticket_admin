@@ -32,18 +32,18 @@ GET http://comedor.mercal.gob.ve/api/p1/gerencias/1 HTTP/1.1
 content-type: application/json
 Authorization: Bearer 4|HzW2YI4FVZwN2c6aX3MqppZlGkYEZEoQxfu108vD5f2c5289
 ###  PEDIDOS
-GET http://comedor.mercal.gob.ve/api/p1/pedidos/takeOrder/47 HTTP/1.1
+GET http://10.20.22.88:8000/api/p1/pedidos HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer 43|uycl8AbfGi6DwIT2ijHPd76w5snnGyk519sOjfl2436f5164
+Authorization: Bearer 5|CtcVUPfwVNVBbKwtc7HzV5R7wXuLZEowFfFUYOcz57957f3a
 
 
 ###  EMPLEADOS
-GET https://comedor.mercal.gob.ve/api/p1/empleados HTTP/1.1
+GET http://10.20.22.88:8000/api/p1/bank HTTP/1.1
 content-type: application/json
-Authorization: Bearer 24|BxFKtVx0KzahYfgGZNSAWtyZCgOCdnWCqhzXlz8X60d697c5
+Authorization: Bearer 5|CtcVUPfwVNVBbKwtc7HzV5R7wXuLZEowFfFUYOcz57957f3a
 *******************************POSTS******************************
 #### LOGIN
-POST https://comedor.mercal.gob.ve/api/p1/users/login HTTP/1.1
+POST http://10.20.22.88:8000/api/p1/users/login HTTP/1.1
 content-type: application/json
 
 {
